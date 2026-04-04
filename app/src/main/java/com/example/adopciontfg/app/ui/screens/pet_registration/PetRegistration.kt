@@ -17,6 +17,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -89,8 +90,10 @@ private fun ShelterRegistration() {
                     .fillMaxWidth()
 
             )
+            //cambiar a radiobutton
             Row{
                 Row(verticalAlignment = Alignment.CenterVertically) {
+
                     Checkbox(
                         checked = male.value,
                         onCheckedChange = { male.value = it }
@@ -105,7 +108,6 @@ private fun ShelterRegistration() {
                     )
                     Text("Hembra")
                 }
-
             }
             TextField(
                 value = description,

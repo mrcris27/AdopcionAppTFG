@@ -9,6 +9,9 @@ activityCompose = "1.13.0"
 kotlin = "2.2.10"
 composeBom = "2024.09.00"
 animationCoreLint = "1.10.5"
+navigation3Runtime = "1.0.1"
+material3 = "1.4.0"
+foundationLayout = "1.10.6"
 ksp = "2.2.10-2.0.2"
 roomCommonJvm = "2.8.4"
 firebaseFirestore = "26.2.0"
@@ -31,6 +34,9 @@ androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-te
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-compose-animation-core-lint = { group = "androidx.compose.animation", name = "animation-core-lint", version.ref = "animationCoreLint" }
 material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
+androidx-navigation3-runtime = { group = "androidx.navigation3", name = "navigation3-runtime", version.ref = "navigation3Runtime" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
+androidx-compose-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "foundationLayout" }
 room-runtime = { group = "androidx.room", name = "room-runtime" }
 room-compiler = { group = "androidx.room", name = "room-compiler" }
 androidx-room-common-jvm = { group = "androidx.room", name = "room-common-jvm", version.ref = "roomCommonJvm" }

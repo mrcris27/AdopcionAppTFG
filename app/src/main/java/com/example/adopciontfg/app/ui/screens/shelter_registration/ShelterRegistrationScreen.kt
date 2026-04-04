@@ -30,6 +30,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lint.kotlin.metadata.Visibility
 import com.example.adopciontfg.app.ui.screens.components.SavePhotos
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -44,6 +45,7 @@ private fun ShelterRegistration() {
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
     var passwordHidden by rememberSaveable { mutableStateOf(true) }
+
 
     Scaffold(
         topBar = {
@@ -99,6 +101,7 @@ private fun ShelterRegistration() {
                 value = address,
                 onValueChange = { address = it },
                 singleLine = true,
+                placeholder = {Text("Calle, número, ciudad")},
                 label = { Text("DIRECCIÓN") },
                 modifier = Modifier.fillMaxWidth()
             )
