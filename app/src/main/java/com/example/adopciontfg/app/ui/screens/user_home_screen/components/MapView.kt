@@ -1,6 +1,13 @@
 package com.example.adopciontfg.app.ui.screens.user_home_screen.components
 
-import androidx.compose.runtime.Composable
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.example.adopciontfg.data.Shelter
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
@@ -14,35 +21,63 @@ fun ShelterMapView(
 ) {
     val madrid = GeoPoint(40.4168, -3.7038)
 
-    AndroidView(
-        factory = { context ->
-            MapView(context).apply {
-                setTileSource(TileSourceFactory.MAPNIK)
-                setMultiTouchControls(true)
-            }
-        },
-        update = { mapView ->
+    //añadir una x en la card para salirse
+    // estado del marcador seleccionado
+    var selectedShelter by remember { mutableStateOf<Shelter?>(null) }
 
-            // centrar mapa
-            mapView.controller.setZoom(12.5)
-            mapView.controller.setCenter(madrid)
+    Box(modifier = Modifier.fillMaxSize()) {
 
-            // limpiar markers antiguos (IMPORTANTE)
-            mapView.overlays.clear()
+        AndroidView(
+            modifier = Modifier.fillMaxSize(),
+            factory = { context ->
+                MapView(context).apply {
+                    setTileSource(TileSourceFactory.MAPNIK)
+                    setMultiTouchControls(true)
+                }
+            },
+            update = { mapView ->
 
-            // añadir markers
-            shelters.forEach { shelter ->
+                mapView.controller.setZoom(12.5)
+                mapView.controller.setCenter(madrid)
 
-                val marker = Marker(mapView).apply {
-                    position = GeoPoint(shelter.lat, shelter.lng)
-                    setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                    title = shelter.name
+                mapView.overlays.clear()
+
+                shelters.forEach { shelter ->
+
+                    val marker = Marker(mapView).apply {
+                        position = GeoPoint(shelter.lat, shelter.lng)
+                        setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                        title = shelter.name
+
+                        setOnMarkerClickListener { _, _ ->
+                            mapView.controller.animateTo(GeoPoint(shelter.lat, shelter.lng))
+                            selectedShelter = shelter
+                            true
+                        }
+                    }
+
+                    mapView.overlays.add(marker)
                 }
 
-                mapView.overlays.add(marker)
+                mapView.invalidate()
             }
+        )
 
-            mapView.invalidate()
+
+        AnimatedVisibility(
+            visible = selectedShelter != null,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(16.dp)
+        ) {
+            selectedShelter?.let { shelter ->
+                MapCard(
+                    shelter = shelter,
+                    onClick = {
+                        // aquí navegarás a detalle
+                    }
+                )
+            }
         }
-    )
+    }
 }

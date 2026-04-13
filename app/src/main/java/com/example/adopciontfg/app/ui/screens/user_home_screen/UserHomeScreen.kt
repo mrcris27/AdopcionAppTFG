@@ -1,7 +1,10 @@
 package com.example.adopciontfg.app.ui.screens.user_home_screen
 
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -18,9 +21,13 @@ import androidx.compose.ui.unit.dp
 import com.example.adopciontfg.app.ui.screens.user_home_screen.components.ListCardView
 import com.example.adopciontfg.app.ui.screens.user_home_screen.components.ShelterMapView
 import com.example.adopciontfg.data.Shelter
+import com.example.adopciontfg.ui.theme.AdoptionTheme
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.ui.test.isSelected
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true)
 @Composable
 fun UserHomeScreen() {
 
@@ -36,6 +43,7 @@ fun UserHomeScreen() {
     )
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             HomeTopBar(
                 query = query,
@@ -88,6 +96,9 @@ fun SearchSection(
     onQueryChange: (String) -> Unit
 ) {
     CenterAlignedTopAppBar(
+        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
         title = {
             SearchBar(query, onQueryChange)
         }
@@ -113,21 +124,32 @@ fun SearchBar(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(horizontal = 12.dp)
         ) {
-            Icon(Icons.Default.Search, contentDescription = null)
-
+            Icon(
+                Icons.Default.Search,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary            )
             Spacer(modifier = Modifier.width(8.dp))
 
             TextField(
                 value = query,
                 onValueChange = onQueryChange,
-                placeholder = { Text("Buscar...") },
+                placeholder = {
+                    Text(
+                        "Buscar...",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                },
                 singleLine = true,
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.Transparent,
                     unfocusedContainerColor = Color.Transparent,
                     disabledContainerColor = Color.Transparent,
                     focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
+                    unfocusedIndicatorColor = Color.Transparent,
+                    cursorColor = MaterialTheme.colorScheme.primary
+                ),
+                textStyle = LocalTextStyle.current.copy(
+                    color = MaterialTheme.colorScheme.onSurface
                 ),
                 modifier = Modifier.fillMaxWidth()
             )
@@ -141,7 +163,11 @@ fun TabsSection(
     selectedTab: Int,
     onTabSelected: (Int) -> Unit
 ) {
-    SecondaryTabRow(selectedTabIndex = selectedTab) {
+    SecondaryTabRow(
+        selectedTabIndex = selectedTab,
+        containerColor = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.primary
+    ) {
         tabs.forEachIndexed { index, title ->
             Tab(
                 selected = selectedTab == index,
@@ -163,9 +189,11 @@ fun HomeContent(
     Box(
         modifier = modifier.fillMaxSize()
     ) {
-        when (selectedTab) {
-            0 -> ListCardView()
-            1 -> ShelterMapView(shelters)
+        Crossfade(targetState = selectedTab) { tab ->
+            when (tab) {
+                0 -> ListCardView()
+                1 -> ShelterMapView(shelters)
+            }
         }
     }
 }
@@ -173,18 +201,67 @@ fun HomeContent(
 /* ---------------- BOTTOM BAR ---------------- */
 
 @Composable
-fun HomeBottomBar() {
-    BottomAppBar {
+fun HomeBottomBar(
+    selected: Int = 0,
+    onSelect: (Int) -> Unit = {}
+) {
+
+    val items = listOf(
+        Icons.Filled.Home,
+        Icons.Filled.Pets,
+        Icons.Filled.Settings
+    )
+
+    BottomAppBar(
+        containerColor = MaterialTheme.colorScheme.surface,
+        tonalElevation = 8.dp
+    ) {
         Row(
             modifier = Modifier
-                .padding(20.dp)
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            BottomIcon(Icons.Filled.Home, "Home")
-            BottomIcon(Icons.Filled.Pets, "Pets")
-            BottomIcon(Icons.Filled.Settings, "Settings")
+
+            items.forEachIndexed { index, icon ->
+
+                val isSelected = selected == index
+
+                val tint by animateColorAsState(
+                    targetValue = if (isSelected)
+                        MaterialTheme.colorScheme.primary
+                    else
+                        MaterialTheme.colorScheme.onSurfaceVariant,
+                    label = "iconTint"
+                )
+
+                val backgroundColor by animateColorAsState(
+                    targetValue = if (isSelected)
+                        MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
+                    else
+                        Color.Transparent,
+                    label = "bgTint"
+                )
+
+                Box(
+                    modifier = Modifier
+                        .size(44.dp)
+                        .background(
+                            color = backgroundColor,
+                            shape = CircleShape
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    IconButton(onClick = { onSelect(index) }) {
+                        Icon(
+                            imageVector = icon,
+                            contentDescription = null,
+                            tint = tint
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -196,5 +273,13 @@ fun BottomIcon(
 ) {
     IconButton(onClick = {}) {
         Icon(icon, contentDescription = description)
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun UserHomeScreenPreview() {
+    AdoptionTheme {
+        UserHomeScreen()
     }
 }
