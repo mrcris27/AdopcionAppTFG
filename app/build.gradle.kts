@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
+    id("com.google.gms.google-services")
 
 }
 
@@ -68,4 +69,16 @@ dependencies {
     implementation(libs.room.runtime)
     ksp(libs.room.compiler)
 
+    // Import the Firebase BoM (Bill of Materials) to manage your Firebase library versions
+    // Always use the latest version available.
+    implementation(platform("com.google.firebase:firebase-bom:32.0.0")) //
+
+    // Firebase Authentication for user and shelter logins
+    implementation("com.google.firebase:firebase-auth-ktx")
+
+    // Cloud Firestore for storing animal and shelter data
+    implementation("com.google.firebase:firebase-firestore-ktx")
+
+    // Cloud Storage for animal photos
+    implementation("com.google.firebase:firebase-storage-ktx")
 }
