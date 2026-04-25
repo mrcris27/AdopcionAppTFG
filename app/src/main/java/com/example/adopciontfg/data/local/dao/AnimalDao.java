@@ -31,13 +31,10 @@ public interface AnimalDao {
     @Query("SELECT * FROM animals WHERE characteristics LIKE '%' || :characteristic || '%'")
     LiveData<List<AnimalEntity>> getAnimalsByCharacteristic(String characteristic);
 
-    // Insertar animal (si ya existe lo reemplaza)
+    // Insertar/actualizar animal (si ya existe lo reemplaza)
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAnimal(AnimalEntity animal);
 
-    // Actualizar animal
-    @Update
-    void updateAnimal(AnimalEntity animal);
 
     // Eliminar animal
     @Delete

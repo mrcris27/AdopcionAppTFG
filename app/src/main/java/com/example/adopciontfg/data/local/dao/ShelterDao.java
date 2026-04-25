@@ -23,11 +23,9 @@ public interface ShelterDao {
     @Query("SELECT * FROM shelters WHERE name LIKE '%' || :name || '%'")
     LiveData<List<ShelterEntity>> getSheltersByName(String name);
 
-    // Insertar protectora (si ya existe la reemplaza)
+    // Insertar/actualizar protectora (si ya existe la reemplaza)
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertShelter(ShelterEntity shelter);
 
-    // Actualizar protectora
-    @Update
-    void updateShelter(ShelterEntity shelter);
+
 }

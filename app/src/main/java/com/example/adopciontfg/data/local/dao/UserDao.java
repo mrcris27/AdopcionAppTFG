@@ -17,13 +17,10 @@ public interface UserDao {
     @Query("SELECT * FROM users WHERE id = :userId")
     LiveData<UserEntity> getUserById(String userId);
 
-    // Insertar usuario (si ya existe lo reemplaza)
+    // Insertar/actualizar usuario (si ya existe lo reemplaza)
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertUser(UserEntity user);
+    void saveUser(UserEntity user);
 
-    // Actualizar usuario
-    @Update
-    void updateUser(UserEntity user);
 
     // Eliminar usuario
     @Delete

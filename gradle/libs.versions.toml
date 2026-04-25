@@ -11,6 +11,8 @@ composeBom = "2024.09.00"
 animationCoreLint = "1.10.5"
 ksp = "2.2.10-2.0.2"
 roomCommonJvm = "2.8.4"
+firebaseFirestore = "26.2.0"
+firebaseAuth = "24.0.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -32,6 +34,8 @@ material-icons-extended = { module = "androidx.compose.material:material-icons-e
 room-runtime = { group = "androidx.room", name = "room-runtime" }
 room-compiler = { group = "androidx.room", name = "room-compiler" }
 androidx-room-common-jvm = { group = "androidx.room", name = "room-common-jvm", version.ref = "roomCommonJvm" }
+firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
+firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
 
 
 
