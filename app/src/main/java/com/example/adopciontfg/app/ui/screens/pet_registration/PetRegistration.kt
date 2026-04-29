@@ -13,9 +13,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.adopciontfg.app.ui.screens.components.SavePhotos
+import com.example.adopciontfg.ui.theme.AdoptionTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview
 @Composable
 fun PetRegistration() {
 
@@ -109,5 +109,13 @@ fun PetRegistration() {
                 Text("Registrar animal")
             }
         }
+    }
+}
+
+@Preview
+@Composable
+fun PetRegistrationPreview() {
+    AdoptionTheme {
+        PetRegistration()
     }
 }

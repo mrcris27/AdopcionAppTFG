@@ -14,7 +14,7 @@ import com.example.adopciontfg.R
 import com.example.adopciontfg.ui.theme.AdoptionTheme
 
 @Composable
-fun LoginRegistration() {
+fun LoginRegistrationScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Unit) {
 
     Box(
         modifier = Modifier
@@ -30,7 +30,6 @@ fun LoginRegistration() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            // LOGO + TEXTO
             Column(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.Center,
@@ -49,7 +48,6 @@ fun LoginRegistration() {
                 )
             }
 
-            // BOTONES
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -59,7 +57,7 @@ fun LoginRegistration() {
             ) {
 
                 Button(
-                    onClick = { },
+                    onClick = onLoginClick,
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary,
@@ -70,7 +68,7 @@ fun LoginRegistration() {
                 }
 
                 Button(
-                    onClick = { },
+                    onClick = onRegisterClick,
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.secondary,
@@ -88,6 +86,6 @@ fun LoginRegistration() {
 @Composable
 fun LoginRegistrationPreview() {
     AdoptionTheme {
-        LoginRegistration()
+        LoginRegistrationScreen(onLoginClick = {}, onRegisterClick = {})
     }
 }

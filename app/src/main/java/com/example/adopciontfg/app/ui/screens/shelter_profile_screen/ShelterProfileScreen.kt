@@ -14,11 +14,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.adopciontfg.app.ui.screens.shelter_profile_screen.components.AdoptionList
 import com.example.adopciontfg.app.ui.screens.shelter_profile_screen.components.SponsorList
+import com.example.adopciontfg.ui.theme.AdoptionTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true)
 @Composable
-fun ShelterProfileView() {
+fun ShelterProfileScreen(
+    onBackClick: () -> Unit,
+
+    ) {
 
     val tabs = listOf("Adopción", "Apadrinar")
     var selectedTab by remember { mutableStateOf(0) }
@@ -37,7 +40,7 @@ fun ShelterProfileView() {
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
@@ -116,7 +119,7 @@ fun ShelterProfileView() {
 
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
                     .weight(1f)
             ) {
                 Crossfade(targetState = selectedTab, label = "tabs") { tab ->
@@ -127,5 +130,13 @@ fun ShelterProfileView() {
                 }
             }
         }
+    }
+}
+
+@Preview
+@Composable
+fun ShelterProfileViewPreview() {
+    AdoptionTheme {
+        ShelterProfileScreen(onBackClick = {})
     }
 }

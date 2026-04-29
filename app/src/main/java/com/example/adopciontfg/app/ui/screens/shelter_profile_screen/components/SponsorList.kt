@@ -2,11 +2,12 @@ package com.example.adopciontfg.app.ui.screens.shelter_profile_screen.components
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.adopciontfg.app.ui.screens.components.ComponentList
+import com.example.adopciontfg.app.ui.screens.components.CardViewList
+import com.example.adopciontfg.app.ui.screens.components.ListCardView
 
-@Preview
+@Preview(showBackground = true)
 @Composable
-fun SponsorList () {
+fun SponsorList() {
 
     val list = listOf(
         "Animal1",
@@ -16,10 +17,16 @@ fun SponsorList () {
         "Animal5"
     )
 
-    ComponentList(
+    ListCardView(
         items = list,
         onItemClick = { name ->
-            // aquí luego navegación o acción
+            // acción futura
+        },
+        itemContent = { name, onClick ->
+            CardViewList(
+                name = name,
+                onClick = onClick
+            )
         }
     )
 }

@@ -1,49 +1,54 @@
 package com.example.adopciontfg.app.ui.screens.user_home_screen
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Pets
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SecondaryTabRow
+import androidx.compose.material3.Tab
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import com.example.adopciontfg.app.ui.screens.user_home_screen.components.ListCardView
+import androidx.navigation.NavHostController
+import com.example.adopciontfg.app.ui.screens.components.CardViewList
+import com.example.adopciontfg.app.ui.screens.components.ListCardView
+import com.example.adopciontfg.app.ui.screens.components.SearchSection
 import com.example.adopciontfg.app.ui.screens.user_home_screen.components.ShelterMapView
 import com.example.adopciontfg.data.Shelter
 import com.example.adopciontfg.ui.theme.AdoptionTheme
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.material3.LocalTextStyle
-import androidx.compose.ui.test.isSelected
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserHomeScreen() {
-
+fun UserHomeScreen(
+    navController: NavHostController,
+    onDetailClick: (Shelter) -> Unit = {}
+) {
     var query by remember { mutableStateOf("") }
     val selectedTab = remember { mutableStateOf(0) }
 
     val tabs = listOf("Lista", "Mapa")
 
     val shelters = listOf(
-        Shelter("Protectora 1", 40.4168, -3.7038),
-        Shelter("Protectora 2", 40.45, -3.70),
-        Shelter("Protectora 3", 40.40, -3.65)
+        Shelter("1", "Protectora 1", 40.4168, -3.7038),
+        Shelter("2","Protectora 2", 40.45, -3.70),
+        Shelter("3","Protectora 3", 40.40, -3.65)
     )
 
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             HomeTopBar(
                 query = query,
@@ -52,16 +57,21 @@ fun UserHomeScreen() {
                 selectedTab = selectedTab.value,
                 onTabSelected = { selectedTab.value = it }
             )
-        },
-        bottomBar = {
-            HomeBottomBar()
         }
-    ) { innerPadding ->
-        HomeContent(
-            modifier = Modifier.padding(innerPadding),
-            selectedTab = selectedTab.value,
-            shelters = shelters
-        )
+    ) { padding ->
+
+        Column(modifier = Modifier
+            .padding(padding)
+            .fillMaxSize()
+        ) {
+
+            HomeContent(
+                modifier = Modifier.weight(1f),
+                selectedTab = selectedTab.value,
+                shelters = shelters,
+                onDetailClick = onDetailClick
+            )
+        }
     }
 }
 
@@ -89,73 +99,7 @@ fun HomeTopBar(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun SearchSection(
-    query: String,
-    onQueryChange: (String) -> Unit
-) {
-    CenterAlignedTopAppBar(
-        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        title = {
-            SearchBar(query, onQueryChange)
-        }
-    )
-}
 
-@Composable
-fun SearchBar(
-    query: String,
-    onQueryChange: (String) -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth(0.9f)
-            .height(50.dp)
-            .background(
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                shape = RoundedCornerShape(20.dp)
-            ),
-        contentAlignment = Alignment.CenterStart
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(horizontal = 12.dp)
-        ) {
-            Icon(
-                Icons.Default.Search,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary            )
-            Spacer(modifier = Modifier.width(8.dp))
-
-            TextField(
-                value = query,
-                onValueChange = onQueryChange,
-                placeholder = {
-                    Text(
-                        "Buscar...",
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                },
-                singleLine = true,
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent,
-                    disabledContainerColor = Color.Transparent,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    cursorColor = MaterialTheme.colorScheme.primary
-                ),
-                textStyle = LocalTextStyle.current.copy(
-                    color = MaterialTheme.colorScheme.onSurface
-                ),
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
-    }
-}
 
 @Composable
 fun TabsSection(
@@ -178,97 +122,40 @@ fun TabsSection(
     }
 }
 
-/* ---------------- CONTENT ---------------- */
-
-@Composable
+/* ---------------- CONTENT ---------------- */@Composable
 fun HomeContent(
     modifier: Modifier = Modifier,
     selectedTab: Int,
-    shelters: List<Shelter>
+    shelters: List<Shelter>,
+    onDetailClick: (Shelter) -> Unit
+
 ) {
     Box(
         modifier = modifier.fillMaxSize()
     ) {
         Crossfade(targetState = selectedTab) { tab ->
             when (tab) {
-                0 -> ListCardView()
+                0 -> ListCardView(
+                    items = shelters,
+                    onItemClick = onDetailClick,
+                    itemContent = { shelter, onClick ->
+                        CardViewList(
+                            name = shelter.name,
+                            onClick = onClick
+                        )
+                    }
+                )
+
                 1 -> ShelterMapView(shelters)
             }
         }
     }
 }
 
-/* ---------------- BOTTOM BAR ---------------- */
-
-@Composable
-fun HomeBottomBar(
-    selected: Int = 0,
-    onSelect: (Int) -> Unit = {}
-) {
-
-    val items = listOf(
-        Icons.Filled.Home,
-        Icons.Filled.Pets,
-        Icons.Filled.Settings
-    )
-
-    BottomAppBar(
-        containerColor = MaterialTheme.colorScheme.surface,
-        tonalElevation = 8.dp
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
-            items.forEachIndexed { index, icon ->
-
-                val isSelected = selected == index
-
-                val tint by animateColorAsState(
-                    targetValue = if (isSelected)
-                        MaterialTheme.colorScheme.primary
-                    else
-                        MaterialTheme.colorScheme.onSurfaceVariant,
-                    label = "iconTint"
-                )
-
-                val backgroundColor by animateColorAsState(
-                    targetValue = if (isSelected)
-                        MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
-                    else
-                        Color.Transparent,
-                    label = "bgTint"
-                )
-
-                Box(
-                    modifier = Modifier
-                        .size(44.dp)
-                        .background(
-                            color = backgroundColor,
-                            shape = CircleShape
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    IconButton(onClick = { onSelect(index) }) {
-                        Icon(
-                            imageVector = icon,
-                            contentDescription = null,
-                            tint = tint
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
 
 @Composable
 fun BottomIcon(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     description: String
 ) {
     IconButton(onClick = {}) {
@@ -280,6 +167,8 @@ fun BottomIcon(
 @Composable
 fun UserHomeScreenPreview() {
     AdoptionTheme {
-        UserHomeScreen()
+        UserHomeScreen(
+            navController = NavHostController(LocalContext.current)
+        )
     }
 }

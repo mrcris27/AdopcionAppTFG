@@ -21,11 +21,11 @@ import com.example.adopciontfg.ui.theme.AdoptionTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ShelterRegistration() {
+fun ShelterRegistration(onRegisterClick: () -> Unit, onCancelClick: () -> Unit) {
 
     var name by rememberSaveable { mutableStateOf("") }
     var cif by rememberSaveable { mutableStateOf("") }
-    var telf by rememberSaveable { mutableStateOf("") }
+    var tel by rememberSaveable { mutableStateOf("") }
     var address by rememberSaveable { mutableStateOf("") }
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
@@ -91,8 +91,8 @@ fun ShelterRegistration() {
             )
 
             TextField(
-                value = telf,
-                onValueChange = { telf = it },
+                value = tel,
+                onValueChange = { tel = it },
                 label = { Text("TELÉFONO") },
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.colors(
@@ -150,6 +150,7 @@ fun ShelterRegistration() {
                 )
             )
 
+            //maximo de fotos 1
             Text(
                 "SELECCIONE FOTO DE PERFIL",
                 color = MaterialTheme.colorScheme.onBackground
@@ -158,7 +159,7 @@ fun ShelterRegistration() {
             SavePhotos()
 
             Button(
-                onClick = {},
+                onClick = onRegisterClick,
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.secondary,
@@ -166,6 +167,17 @@ fun ShelterRegistration() {
                 )
             ) {
                 Text("Registrar")
+            }
+
+            Button(
+                onClick = onCancelClick,
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            ) {
+                Text("Cancelar")
             }
         }
     }
@@ -175,6 +187,6 @@ fun ShelterRegistration() {
 @Composable
 fun ShelterRegistrationPreview() {
     AdoptionTheme {
-        ShelterRegistration()
+        ShelterRegistration(onRegisterClick = {}, onCancelClick = {})
     }
 }
