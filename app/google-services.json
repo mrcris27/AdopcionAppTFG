@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "637324720560",
+    "project_id": "adopciontfg",
+    "storage_bucket": "adopciontfg.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:637324720560:android:601f485ee797df2fa2fe75",
+        "android_client_info": {
+          "package_name": "com.example.adopciontfg"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAVBbFfG4VKuKHGgB75_4H6G6Bv99KlNk0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
