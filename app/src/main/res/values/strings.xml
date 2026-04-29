@@ -1,3 +1,25 @@
 <resources>
     <string name="app_name">AdopcionTFG</string>
+
+    <!--  Botones   -->
+    <string name="soy_usuario">Soy usuario</string>
+    <string name="soy_protectora">Soy protectora</string>
+    <string name="continuar">Continuar</string>
+
+    <string name="volver_inicio">Volver al inicio</string>
+    <string name="registro">Registro</string>
+    <string name="login">Login</string>
+    <string name="registro_usuario">Registro de usuario</string>
+    <string name="registro_protectora">Registro de protectora</string>
+
+    <string name="nombre"> Nombre </string>
+    <string name="apellidos"> Apellidos </string>
+    <string name="dni"> Dni </string>
+    <string name="contraseña"> Contraseña </string>
+    <string name="contraseña2"> Repite la contraseña </string>
+    <string name="telefono"> Teléfono </string>
+    <string name="correo"> Correo electrónico </string>
+
+
+
 </resources>
