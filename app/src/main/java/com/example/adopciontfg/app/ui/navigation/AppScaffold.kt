@@ -11,6 +11,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.adopciontfg.app.ui.screens.components.BottomNavBar
 import com.example.adopciontfg.app.ui.screens.components.bottom_tab.BottomTab
 import com.example.adopciontfg.app.ui.screens.pet_list.navigation.PetListRoute
+import com.example.adopciontfg.app.ui.screens.settings.navigation.SettingsHubRoute
 import com.example.adopciontfg.app.ui.screens.user_home_screen.navigation.UserScreenRoute
 
 @Composable
@@ -23,12 +24,14 @@ fun AppScaffold() {
 
     val showBottomBar = currentRoute in listOf(
         UserScreenRoute::class.qualifiedName,
-        PetListRoute::class.qualifiedName
+        PetListRoute::class.qualifiedName,
+        SettingsHubRoute::class.qualifiedName
     )
 
     val currentTab = when (currentRoute) {
         UserScreenRoute::class.qualifiedName -> BottomTab.Home
         PetListRoute::class.qualifiedName -> BottomTab.Pets
+        SettingsHubRoute::class.qualifiedName -> BottomTab.Settings
         else -> BottomTab.Home
     }
 

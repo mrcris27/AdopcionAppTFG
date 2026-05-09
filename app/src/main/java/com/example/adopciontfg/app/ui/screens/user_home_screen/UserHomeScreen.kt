@@ -18,16 +18,12 @@ import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.adopciontfg.app.ui.screens.components.CardViewList
 import com.example.adopciontfg.app.ui.screens.components.ListCardView
 import com.example.adopciontfg.app.ui.screens.components.SearchBar
@@ -38,41 +34,29 @@ import com.example.adopciontfg.ui.theme.AdoptionTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserHomeScreen(
-    navController: NavHostController,
-    onDetailClick: (Shelter) -> Unit = {}
+    onDetailClick: (Shelter) -> Unit = {},
+    viewModel: UserHomeViewModel = hiltViewModel()
 ) {
-    var query by remember { mutableStateOf("") }
-    val selectedTab = remember { mutableStateOf(0) }
-
-    val tabs = listOf("Lista", "Mapa")
-
-    val shelters = listOf(
-        Shelter("1", "Protectora 1", 40.4168, -3.7038),
-        Shelter("2", "Protectora 2", 40.45, -3.70),
-        Shelter("3", "Protectora 3", 40.40, -3.65)
-    )
-
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
     Scaffold { padding ->
-
         Column(
             modifier = Modifier
                 .padding(padding)
                 .padding(horizontal = 8.dp)
                 .fillMaxSize()
         ) {
-
             HomeTopBar(
-                query = query,
-                onQueryChange = { query = it },
-                tabs = tabs,
-                selectedTab = selectedTab.value,
-                onTabSelected = { selectedTab.value = it }
+                query = uiState.value.query,
+                onQueryChange = viewModel::onQueryChange,
+                tabs = uiState.value.tabs,
+                selectedTab = uiState.value.selectedTab,
+                onTabSelected = viewModel::onTabSelected
             )
 
             HomeContent(
                 modifier = Modifier.weight(1f),
-                selectedTab = selectedTab.value,
-                shelters = shelters,
+                selectedTab = uiState.value.selectedTab,
+                shelters = uiState.value.filteredShelters,
                 onDetailClick = onDetailClick
             )
         }
@@ -188,7 +172,8 @@ fun BottomIcon(
 fun UserHomeScreenPreview() {
     AdoptionTheme {
         UserHomeScreen(
-            navController = NavHostController(LocalContext.current)
+            onDetailClick = {},
+            viewModel = UserHomeViewModel()
         )
     }
 }

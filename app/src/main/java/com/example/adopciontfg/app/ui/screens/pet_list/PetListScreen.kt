@@ -9,12 +9,10 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.adopciontfg.app.ui.screens.components.CardViewList
 import com.example.adopciontfg.app.ui.screens.components.ListCardView
 import com.example.adopciontfg.app.ui.screens.components.SearchBar
@@ -22,27 +20,23 @@ import com.example.adopciontfg.data.Pet
 import com.example.adopciontfg.ui.theme.AdoptionTheme
 
 @Composable
-fun PetListScreen(onDetailClick: (String) -> Unit ) {
-    var query by remember { mutableStateOf("") }
-
-    val pets = listOf(
-        Pet("1","Max", 3, "Labrador", "Male"),
-        Pet("2","Luna", 2, "Poodle", "Female")
-    )
-
-
+fun PetListScreen(
+    onDetailClick: (String) -> Unit,
+    viewModel: PetListViewModel = hiltViewModel()
+) {
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             HomeTopBar(
-                query = query,
-                onQueryChange = { query = it },
+                query = uiState.value.query,
+                onQueryChange = viewModel::onQueryChange
             )
         }
     ) { innerPadding ->
         PetContent(
             modifier = Modifier.padding(innerPadding),
-            pets = pets,
+            pets = uiState.value.filteredPets,
             onDetailClick = onDetailClick
         )
     }
@@ -90,7 +84,8 @@ fun HomeTopBar(
 fun PetListScreenPreview() {
     AdoptionTheme {
         PetListScreen(
-            onDetailClick = {}
+            onDetailClick = {},
+            viewModel = PetListViewModel()
         )
     }
 }
