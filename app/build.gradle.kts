@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.ksp)
     id("com.google.gms.google-services")
 
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -53,11 +54,18 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.animation.core.lint)
     implementation(libs.material.icons.extended)
-    implementation(libs.androidx.room.common.jvm)
-    implementation(libs.androidx.compose.animation.core.lint)
+    implementation(libs.androidx.navigation3.runtime)
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.compose.foundation.layout)
     implementation(libs.material.icons.extended)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.auth)
+    implementation(libs.osmdroid.android)
+    implementation(libs.androidx.compose.ui.test)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.kotlinx.serialization.json)
+
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

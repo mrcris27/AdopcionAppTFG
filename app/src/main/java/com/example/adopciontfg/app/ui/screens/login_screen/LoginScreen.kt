@@ -22,7 +22,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,31 +40,41 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.adopciontfg.R
+import com.example.adopciontfg.ui.theme.AdoptionTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true)
 @Composable
-fun Login_screen() {
+fun LoginScreen(
+    onBackClick: () -> Unit,
+    onContinueClick: () -> Unit
+) {
 
     var user by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
     var passwordHidden by rememberSaveable { mutableStateOf(true) }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
+
         topBar = {
             TopAppBar(
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface
+                ),
                 title = {
                     Text(
                         text = stringResource(R.string.login),
-                        style = MaterialTheme.typography.headlineLarge,
+                        style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = "Back",
+                            tint = MaterialTheme.colorScheme.primary
                         )
                     }
                 }
@@ -74,61 +86,79 @@ fun Login_screen() {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding( 50.dp ), // margen para que los botones sean del mismo tamaño
-
-            verticalArrangement = Arrangement.Top,
+                .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = 120.dp)
+                    .fillMaxWidth()
+                    .padding(top = 80.dp)
                     .verticalScroll(rememberScrollState()),
-                
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
 
                 TextField(
                     value = user,
-                    onValueChange = {user = it},
-                    label = { Text(stringResource(R.string.correo))},
-                    modifier = Modifier.fillMaxWidth()
+                    onValueChange = { user = it },
+                    label = { Text(stringResource(R.string.correo)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = MaterialTheme.shapes.medium,
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant
+                    )
                 )
+
                 TextField(
                     value = password,
                     onValueChange = { password = it },
                     singleLine = true,
-                    label = { Text(stringResource(R.string.contraseña) ) },
+                    label = { Text(stringResource(R.string.contraseña)) },
                     visualTransformation = if (passwordHidden)
                         PasswordVisualTransformation()
                     else
                         VisualTransformation.None,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     modifier = Modifier.fillMaxWidth(),
+                    shape = MaterialTheme.shapes.medium,
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant
+                    ),
                     trailingIcon = {
                         IconButton(onClick = { passwordHidden = !passwordHidden }) {
-                            val icon =
-                                if (passwordHidden) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                            val description =
-                                if (passwordHidden) "Show password" else "Hide password"
-
-                            Icon(imageVector = icon, contentDescription = description)
+                            Icon(
+                                imageVector = if (passwordHidden)
+                                    Icons.Filled.Visibility
+                                else
+                                    Icons.Filled.VisibilityOff,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
+                            )
                         }
                     }
                 )
 
                 Button(
-                    onClick = { },
-                    modifier = Modifier.fillMaxSize()
+                    onClick = onContinueClick,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp),
+                    shape = MaterialTheme.shapes.medium
                 ) {
                     Text(text = stringResource(R.string.continuar))
                 }
-
             }
         }
-
     }
+}
 
+@Preview(showBackground = true)
+@Composable
+fun LoginScreenPreview() {
+    AdoptionTheme {
+        LoginScreen(onBackClick = {},onContinueClick = {})
+    }
 }

@@ -36,11 +36,14 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.adopciontfg.R
+import com.example.adopciontfg.ui.theme.AdoptionTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true)
 @Composable
-fun UserRegistration() {
+fun UserRegistration(
+    onBackClick: () -> Unit,
+    onRegisterClick: () -> Unit
+) {
 
     var name by rememberSaveable { mutableStateOf("") }
     var surname by rememberSaveable { mutableStateOf("") }
@@ -59,7 +62,7 @@ fun UserRegistration() {
                     fontWeight = FontWeight.Bold
                 )},
                 navigationIcon = {
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Default.ArrowBack,
                             contentDescription = "Back"
@@ -159,4 +162,12 @@ fun UserRegistration() {
 
     }
 
+}
+
+@Preview(showBackground = true)
+@Composable
+fun UserRegistrationPreview() {
+    AdoptionTheme {
+        UserRegistration(onBackClick = {}, onRegisterClick = {})
+    }
 }
