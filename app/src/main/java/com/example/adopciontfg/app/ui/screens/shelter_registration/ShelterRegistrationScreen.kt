@@ -41,7 +41,7 @@ fun ShelterRegistration(onRegisterClick: () -> Unit, onBackClick: () -> Unit) {
                 ),
                 title = {
                     Text(
-                        "REGISTRO DE PROTECTORA",
+                        "Registro de protectora",
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 },
@@ -71,7 +71,7 @@ fun ShelterRegistration(onRegisterClick: () -> Unit, onBackClick: () -> Unit) {
             TextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { Text("NOMBRE") },
+                label = { Text("Nombre") },
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = MaterialTheme.colorScheme.primary,
@@ -82,7 +82,7 @@ fun ShelterRegistration(onRegisterClick: () -> Unit, onBackClick: () -> Unit) {
             TextField(
                 value = cif,
                 onValueChange = { cif = it },
-                label = { Text("CIF") },
+                label = { Text("Cif") },
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = MaterialTheme.colorScheme.primary,
@@ -93,7 +93,7 @@ fun ShelterRegistration(onRegisterClick: () -> Unit, onBackClick: () -> Unit) {
             TextField(
                 value = tel,
                 onValueChange = { tel = it },
-                label = { Text("TELÉFONO") },
+                label = { Text("Teléfono") },
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = MaterialTheme.colorScheme.primary,
@@ -104,7 +104,7 @@ fun ShelterRegistration(onRegisterClick: () -> Unit, onBackClick: () -> Unit) {
             TextField(
                 value = address,
                 onValueChange = { address = it },
-                label = { Text("DIRECCIÓN") },
+                label = { Text("Dirección") },
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = MaterialTheme.colorScheme.primary,
@@ -115,7 +115,7 @@ fun ShelterRegistration(onRegisterClick: () -> Unit, onBackClick: () -> Unit) {
             TextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("CORREO") },
+                label = { Text("Correo") },
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = MaterialTheme.colorScheme.primary,
@@ -126,7 +126,7 @@ fun ShelterRegistration(onRegisterClick: () -> Unit, onBackClick: () -> Unit) {
             TextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text("CONTRASEÑA") },
+                label = { Text("Contraseña") },
                 visualTransformation = if (passwordHidden)
                     PasswordVisualTransformation()
                 else
@@ -152,7 +152,7 @@ fun ShelterRegistration(onRegisterClick: () -> Unit, onBackClick: () -> Unit) {
 
             //maximo de fotos 1
             Text(
-                "SELECCIONE FOTO DE PERFIL",
+                "Seleccione foto de perfil",
                 color = MaterialTheme.colorScheme.onBackground
             )
 

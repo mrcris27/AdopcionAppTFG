@@ -3,7 +3,10 @@ package com.example.adopciontfg.app.ui.screens.user_home_screen
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -23,10 +26,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.adopciontfg.app.ui.screens.components.CardViewList
 import com.example.adopciontfg.app.ui.screens.components.ListCardView
-import com.example.adopciontfg.app.ui.screens.components.SearchSection
+import com.example.adopciontfg.app.ui.screens.components.SearchBar
 import com.example.adopciontfg.app.ui.screens.user_home_screen.components.ShelterMapView
 import com.example.adopciontfg.data.Shelter
 import com.example.adopciontfg.ui.theme.AdoptionTheme
@@ -44,12 +48,19 @@ fun UserHomeScreen(
 
     val shelters = listOf(
         Shelter("1", "Protectora 1", 40.4168, -3.7038),
-        Shelter("2","Protectora 2", 40.45, -3.70),
-        Shelter("3","Protectora 3", 40.40, -3.65)
+        Shelter("2", "Protectora 2", 40.45, -3.70),
+        Shelter("3", "Protectora 3", 40.40, -3.65)
     )
 
-    Scaffold(
-        topBar = {
+    Scaffold { padding ->
+
+        Column(
+            modifier = Modifier
+                .padding(padding)
+                .padding(horizontal = 8.dp)
+                .fillMaxSize()
+        ) {
+
             HomeTopBar(
                 query = query,
                 onQueryChange = { query = it },
@@ -57,13 +68,6 @@ fun UserHomeScreen(
                 selectedTab = selectedTab.value,
                 onTabSelected = { selectedTab.value = it }
             )
-        }
-    ) { padding ->
-
-        Column(modifier = Modifier
-            .padding(padding)
-            .fillMaxSize()
-        ) {
 
             HomeContent(
                 modifier = Modifier.weight(1f),
@@ -76,8 +80,6 @@ fun UserHomeScreen(
 }
 
 /* ---------------- TOP BAR ---------------- */
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeTopBar(
     query: String,
@@ -86,19 +88,36 @@ fun HomeTopBar(
     selectedTab: Int,
     onTabSelected: (Int) -> Unit
 ) {
-    Column {
-        SearchSection(query, onQueryChange)
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
 
-        HorizontalDivider()
+        Spacer(modifier = Modifier.height(12.dp))
+
+        SearchBar(
+            query = query,
+            onQueryChange = onQueryChange
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        HorizontalDivider(
+            thickness = 0.5.dp,
+            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
+            modifier = Modifier.padding(horizontal = 12.dp)
+        )
+
+        Spacer(modifier = Modifier.height(6.dp))
 
         TabsSection(
             tabs = tabs,
             selectedTab = selectedTab,
             onTabSelected = onTabSelected
         )
+
+        Spacer(modifier = Modifier.height(8.dp))
     }
 }
-
 
 
 @Composable
@@ -122,7 +141,8 @@ fun TabsSection(
     }
 }
 
-/* ---------------- CONTENT ---------------- */@Composable
+/* ---------------- CONTENT ---------------- */
+@Composable
 fun HomeContent(
     modifier: Modifier = Modifier,
     selectedTab: Int,

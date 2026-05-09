@@ -1,5 +1,6 @@
 package com.example.adopciontfg.app.ui.screens.components
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -11,55 +12,40 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun SearchSection(
-    query: String,
-    onQueryChange: (String) -> Unit
-) {
-    CenterAlignedTopAppBar(
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-            scrolledContainerColor = Color.Unspecified,
-            navigationIconContentColor = Color.Unspecified,
-            titleContentColor = Color.Unspecified,
-            actionIconContentColor = Color.Unspecified
-        ),
-        title = {
-            SearchBar(query, onQueryChange)
-        }
-    )
-}
-
-
 @Composable
 fun SearchBar(
     query: String,
     onQueryChange: (String) -> Unit
 ) {
+    var isFocused by remember { mutableStateOf(false) }
+
+    val widthFraction by animateFloatAsState(
+        targetValue = if (isFocused) 0.95f else 0.88f,
+        label = "searchWidth"
+    )
+
     Box(
         modifier = Modifier
-            .fillMaxWidth(0.9f)
-            .height(50.dp)
+            .fillMaxWidth(widthFraction)
+            .height(52.dp)
             .background(
                 color = MaterialTheme.colorScheme.surfaceVariant,
-                shape = RoundedCornerShape(20.dp)
+                shape = RoundedCornerShape(24.dp)
             ),
         contentAlignment = Alignment.CenterStart
     ) {
@@ -67,35 +53,34 @@ fun SearchBar(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(horizontal = 12.dp)
         ) {
+
             Icon(
-                Icons.Default.Search,
+                imageVector = Icons.Default.Search,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
+
             Spacer(modifier = Modifier.width(8.dp))
 
             TextField(
                 value = query,
                 onValueChange = onQueryChange,
-                placeholder = {
-                    Text(
-                        "Buscar...",
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                },
                 singleLine = true,
+                placeholder = {
+                    Text("Buscar protectoras, animales...")
+                },
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.Transparent,
                     unfocusedContainerColor = Color.Transparent,
                     disabledContainerColor = Color.Transparent,
                     focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    cursorColor = MaterialTheme.colorScheme.primary
+                    unfocusedIndicatorColor = Color.Transparent
                 ),
-                textStyle = LocalTextStyle.current.copy(
-                    color = MaterialTheme.colorScheme.onSurface
-                ),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .weight(1f)
+                    .onFocusChanged {
+                        isFocused = it.isFocused
+                    }
             )
         }
     }

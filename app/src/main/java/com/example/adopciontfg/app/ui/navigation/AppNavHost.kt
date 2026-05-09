@@ -27,9 +27,7 @@ fun AppNavHost(navController: NavHostController) {
 
         loginResScreen(
             onLoginClick = {
-                navController.navigate(LoginScreenRoute) {
-                    popUpTo(LoginResRoute) { inclusive = true }
-                }
+                navController.navigate(LoginScreenRoute)
             },
             onRegisterClick = {
                 navController.navigate(RegistrationScreenRoute)

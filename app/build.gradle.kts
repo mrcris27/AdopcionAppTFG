@@ -64,6 +64,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.test)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.androidx.foundation.layout)
 
 
     testImplementation(libs.junit)

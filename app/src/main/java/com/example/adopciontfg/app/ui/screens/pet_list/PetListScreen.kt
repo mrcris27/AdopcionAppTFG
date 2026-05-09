@@ -17,7 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.adopciontfg.app.ui.screens.components.CardViewList
 import com.example.adopciontfg.app.ui.screens.components.ListCardView
-import com.example.adopciontfg.app.ui.screens.components.SearchSection
+import com.example.adopciontfg.app.ui.screens.components.SearchBar
 import com.example.adopciontfg.data.Pet
 import com.example.adopciontfg.ui.theme.AdoptionTheme
 
@@ -80,7 +80,7 @@ fun HomeTopBar(
     onQueryChange: (String) -> Unit,
 ) {
     Column {
-        SearchSection(query, onQueryChange)
+        SearchBar(query, onQueryChange)
         HorizontalDivider()
     }
 }
