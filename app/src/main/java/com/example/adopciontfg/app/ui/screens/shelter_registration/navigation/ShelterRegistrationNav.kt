@@ -10,12 +10,12 @@ import kotlinx.serialization.Serializable
 
 fun NavGraphBuilder.shelterRegistrationScreen(
     onRegisterClick: () -> Unit,
-    onCancelClick: () -> Unit
+    onBackClick: () -> Unit
 ){
     composable<ShelterRegistrationRoute>{
         ShelterRegistration(
             onRegisterClick = onRegisterClick,
-            onCancelClick = onCancelClick
+            onBackClick = onBackClick
         )
     }
 }

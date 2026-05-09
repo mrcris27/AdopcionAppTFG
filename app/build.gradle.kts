@@ -57,8 +57,6 @@ dependencies {
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.compose.foundation.layout)
-    implementation(libs.androidx.room.common.jvm)
-    implementation(libs.androidx.compose.animation.core.lint)
     implementation(libs.material.icons.extended)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.auth)

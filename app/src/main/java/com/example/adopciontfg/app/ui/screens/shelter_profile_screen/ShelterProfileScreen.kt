@@ -20,8 +20,7 @@ import com.example.adopciontfg.ui.theme.AdoptionTheme
 @Composable
 fun ShelterProfileScreen(
     onBackClick: () -> Unit,
-
-    ) {
+) {
 
     val tabs = listOf("Adopción", "Apadrinar")
     var selectedTab by remember { mutableStateOf(0) }
@@ -30,24 +29,24 @@ fun ShelterProfileScreen(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                ),
                 title = {
                     Text(
-                        "PROTECTORA",
-                        color = MaterialTheme.colorScheme.onSurface
+                        text = "PROTECTORA",
+                        style = MaterialTheme.typography.titleLarge
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = "Volver",
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                )
             )
         }
     ) { innerPadding ->
@@ -56,42 +55,53 @@ fun ShelterProfileScreen(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
-                .padding(16.dp)
         ) {
 
-            OutlinedCard(
-                onClick = {},
+            Spacer(modifier = Modifier.height(8.dp))
+
+            ElevatedCard(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(120.dp),
-                shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(
+                    .padding(6.dp)
+                    .height(100.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.elevatedCardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceVariant
                 ),
-                elevation = CardDefaults.cardElevation(6.dp)
+                elevation = CardDefaults.elevatedCardElevation(
+                    defaultElevation = 4.dp
+                )
             ) {
+
                 Row(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(16.dp),
+                        .padding(horizontal = 18.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+
                     Icon(
                         imageVector = Icons.Default.AccountCircle,
                         contentDescription = null,
-                        modifier = Modifier.size(44.dp),
+                        modifier = Modifier.size(52.dp),
                         tint = MaterialTheme.colorScheme.primary
                     )
 
-                    Spacer(modifier = Modifier.width(12.dp))
+                    Spacer(modifier = Modifier.width(14.dp))
 
-                    Column {
+                    Column(
+                        verticalArrangement = Arrangement.Center
+                    ) {
+
                         Text(
-                            "Protectora X",
+                            text = "Protectora X",
                             style = MaterialTheme.typography.titleMedium
                         )
+
+                        Spacer(modifier = Modifier.height(2.dp))
+
                         Text(
-                            "Dirección",
+                            text = "Dirección",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -99,30 +109,43 @@ fun ShelterProfileScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
-            HorizontalDivider()
-
+            // TABS
             SecondaryTabRow(
                 selectedTabIndex = selectedTab,
-                containerColor = MaterialTheme.colorScheme.surface,
+                containerColor = MaterialTheme.colorScheme.background,
                 contentColor = MaterialTheme.colorScheme.primary
             ) {
+
                 tabs.forEachIndexed { index, title ->
+
                     Tab(
                         selected = selectedTab == index,
                         onClick = { selectedTab = index },
-                        text = { Text(title) }
+                        text = {
+                            Text(
+                                text = title,
+                                style = MaterialTheme.typography.titleSmall
+                            )
+                        }
                     )
                 }
             }
 
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // CONTENIDO
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
+                    .fillMaxSize()
             ) {
-                Crossfade(targetState = selectedTab, label = "tabs") { tab ->
+
+                Crossfade(
+                    targetState = selectedTab,
+                    label = "ShelterTabs"
+                ) { tab ->
+
                     when (tab) {
                         0 -> AdoptionList()
                         1 -> SponsorList()
@@ -133,10 +156,12 @@ fun ShelterProfileScreen(
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun ShelterProfileViewPreview() {
     AdoptionTheme {
-        ShelterProfileScreen(onBackClick = {})
+        ShelterProfileScreen(
+            onBackClick = {}
+        )
     }
 }

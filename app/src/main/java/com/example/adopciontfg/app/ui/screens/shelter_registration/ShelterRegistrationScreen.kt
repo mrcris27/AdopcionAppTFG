@@ -21,7 +21,7 @@ import com.example.adopciontfg.ui.theme.AdoptionTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ShelterRegistration(onRegisterClick: () -> Unit, onCancelClick: () -> Unit) {
+fun ShelterRegistration(onRegisterClick: () -> Unit, onBackClick: () -> Unit) {
 
     var name by rememberSaveable { mutableStateOf("") }
     var cif by rememberSaveable { mutableStateOf("") }
@@ -46,7 +46,7 @@ fun ShelterRegistration(onRegisterClick: () -> Unit, onCancelClick: () -> Unit) 
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = {}) {
+                    IconButton(onClick = onBackClick) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = null,
@@ -169,16 +169,6 @@ fun ShelterRegistration(onRegisterClick: () -> Unit, onCancelClick: () -> Unit) 
                 Text("Registrar")
             }
 
-            Button(
-                onClick = onCancelClick,
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
-                )
-            ) {
-                Text("Cancelar")
-            }
         }
     }
 }
@@ -187,6 +177,6 @@ fun ShelterRegistration(onRegisterClick: () -> Unit, onCancelClick: () -> Unit) 
 @Composable
 fun ShelterRegistrationPreview() {
     AdoptionTheme {
-        ShelterRegistration(onRegisterClick = {}, onCancelClick = {})
+        ShelterRegistration(onRegisterClick = {}, onBackClick = {})
     }
 }
