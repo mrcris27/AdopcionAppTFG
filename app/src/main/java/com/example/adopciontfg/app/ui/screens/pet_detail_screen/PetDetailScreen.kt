@@ -37,6 +37,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.adopciontfg.app.ui.components.skeleton.PetDetailBottomBarSkeleton
+import com.example.adopciontfg.app.ui.components.skeleton.PetDetailContentSkeleton
+import com.example.adopciontfg.app.ui.components.skeleton.PetDetailTopBarTitleSkeleton
 import com.example.adopciontfg.data.Pet
 import com.example.adopciontfg.ui.theme.AdoptionTheme
 
@@ -45,12 +48,20 @@ import com.example.adopciontfg.ui.theme.AdoptionTheme
 fun PetDetailScreen(
     pet: Pet,
     onBackClick: () -> Unit,
-    onAdoptClick: () -> Unit
+    onAdoptClick: () -> Unit,
+    /** Mientras se resuelve el detalle desde red o base de datos. */
+    isLoading: Boolean = false,
 ) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(pet.name) },
+                title = {
+                    if (isLoading) {
+                        PetDetailTopBarTitleSkeleton()
+                    } else {
+                        Text(pet.name)
+                    }
+                },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(
@@ -62,89 +73,101 @@ fun PetDetailScreen(
             )
         },
         bottomBar = {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Button(
-                    onClick = onAdoptClick,
-                    modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondary
-                    )
+            if (isLoading) {
+                PetDetailBottomBarSkeleton()
+            } else {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Text("Adoptar ahora")
-                }
-                OutlinedButton(
-                    onClick = { },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("Donar")
+                    Button(
+                        onClick = onAdoptClick,
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.secondary
+                        )
+                    ) {
+                        Text("Adoptar ahora")
+                    }
+                    OutlinedButton(
+                        onClick = { },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("Donar")
+                    }
                 }
             }
         }
     ) { padding ->
 
-        val photos = pet.photos
+        if (isLoading) {
+            PetDetailContentSkeleton(
+                modifier = Modifier
+                    .padding(padding)
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background)
+            )
+        } else {
+            val photos = pet.photos
+            LazyColumn(
+                modifier = Modifier
+                    .padding(padding)
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                contentPadding = PaddingValues(16.dp)
+            ) {
 
-        LazyColumn(
-            modifier = Modifier
-                .padding(padding)
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(16.dp)
-        ) {
-
-            item {
-                Card(
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surface
-                    ),
-                    shape = MaterialTheme.shapes.large,
-                    elevation = CardDefaults.cardElevation(4.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                item {
+                    Card(
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surface
+                        ),
+                        shape = MaterialTheme.shapes.large,
+                        elevation = CardDefaults.cardElevation(4.dp),
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        InfoRow("Nombre", pet.name)
-                        InfoRow("Edad", "${pet.age} años")
-                        InfoRow("Especie", pet.species.name)
-                        InfoRow("Raza", pet.breed)
-                        InfoRow("Género", pet.gender)
-                        if (pet.characteristics.isNotEmpty()) {
-                            InfoRow(
-                                "Características",
-                                pet.characteristics.joinToString(", ") {
-                                    it.name.replace("_", " ").lowercase().replaceFirstChar { c -> c.uppercase() }
-                                }
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            InfoRow("Nombre", pet.name)
+                            InfoRow("Edad", "${pet.age} años")
+                            InfoRow("Especie", pet.species.name)
+                            InfoRow("Raza", pet.breed)
+                            InfoRow("Género", pet.gender)
+                            if (pet.characteristics.isNotEmpty()) {
+                                InfoRow(
+                                    "Características",
+                                    pet.characteristics.joinToString(", ") {
+                                        it.name.replace("_", " ").lowercase().replaceFirstChar { c -> c.uppercase() }
+                                    }
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = "Sobre esta mascota",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = if (pet.description.isNotEmpty()) {
+                                    pet.description
+                                } else {
+                                    "Esta mascota busca un hogar lleno de amor. " +
+                                        "Está esperando a alguien especial que le dé una segunda oportunidad 🐾"
+                                },
+                                style = MaterialTheme.typography.bodyMedium
                             )
                         }
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = "Sobre esta mascota",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = if (pet.description.isNotEmpty()) {
-                                pet.description
-                            } else {
-                                "Esta mascota busca un hogar lleno de amor. " +
-                                    "Está esperando a alguien especial que le dé una segunda oportunidad 🐾"
-                            },
-                            style = MaterialTheme.typography.bodyMedium
-                        )
                     }
                 }
-            }
 
-            item {
-                PetPhotosCarousel(photos)
+                item {
+                    PetPhotosCarousel(photos)
+                }
             }
         }
     }
@@ -215,6 +238,26 @@ private fun InfoRow(label: String, value: String) {
             text = value,
             fontWeight = FontWeight.SemiBold,
             style = MaterialTheme.typography.bodyMedium
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Cargando")
+@Composable
+fun PetDetailLoadingPreview() {
+    AdoptionTheme {
+        PetDetailScreen(
+            pet = Pet(
+                id = "1",
+                name = "",
+                age = 0,
+                breed = "",
+                gender = "",
+                photos = emptyList()
+            ),
+            onBackClick = {},
+            onAdoptClick = {},
+            isLoading = true
         )
     }
 }

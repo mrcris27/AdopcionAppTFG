@@ -2,7 +2,16 @@ package com.example.adopciontfg.app.ui.screens.shelter_profile_screen
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -20,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.adopciontfg.app.ui.components.skeleton.ShelterCardListSkeleton
 import com.example.adopciontfg.app.ui.screens.components.CardViewList
 import com.example.adopciontfg.app.ui.screens.components.ListCardView
 import com.example.adopciontfg.data.Shelter
@@ -36,6 +46,8 @@ fun ShelterProfileScreen(
     shelter: Shelter,
     onBackClick: () -> Unit,
     onPetClick: (String) -> Unit,
+    /** Cuando los animales se cargan de red o base de datos, mostrar skeleton en la lista. */
+    isPetsLoading: Boolean = false,
 ) {
     var shelterCardExpanded by remember { mutableStateOf(false) }
     val chevronRotation by animateFloatAsState(
@@ -218,16 +230,20 @@ fun ShelterProfileScreen(
                     .weight(1f)
                     .fillMaxWidth()
             ) {
-                ListCardView(
-                    items = animals,
-                    onItemClick = { row -> onPetClick(row.id) },
-                    itemContent = { row, onClick ->
-                        CardViewList(
-                            name = row.displayName,
-                            onClick = onClick
-                        )
-                    }
-                )
+                if (isPetsLoading) {
+                    ShelterCardListSkeleton(modifier = Modifier.fillMaxSize())
+                } else {
+                    ListCardView(
+                        items = animals,
+                        onItemClick = { row -> onPetClick(row.id) },
+                        itemContent = { row, onClick ->
+                            CardViewList(
+                                name = row.displayName,
+                                onClick = onClick
+                            )
+                        }
+                    )
+                }
             }
         }
     }
@@ -251,6 +267,29 @@ fun ShelterProfileViewPreview() {
             ),
             onBackClick = {},
             onPetClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true, name = "Lista animales (cargando)")
+@Composable
+fun ShelterProfilePetsLoadingPreview() {
+    AdoptionTheme {
+        ShelterProfileScreen(
+            shelter = Shelter(
+                id = "1",
+                name = "Protectora Ejemplo",
+                lat = 0.0,
+                lng = 0.0,
+                cif = "A12345678",
+                profilePicture = "",
+                email = "contacto@protectora.com",
+                address = "Calle Ejemplo 123",
+                phone = "+34 123 456 789"
+            ),
+            onBackClick = {},
+            onPetClick = {},
+            isPetsLoading = true
         )
     }
 }

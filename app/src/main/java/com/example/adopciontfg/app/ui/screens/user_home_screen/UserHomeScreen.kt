@@ -25,11 +25,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.adopciontfg.app.ui.components.skeleton.MapAreaSkeleton
+import com.example.adopciontfg.app.ui.components.skeleton.ShelterCardListSkeleton
 import com.example.adopciontfg.app.ui.screens.components.CardViewList
 import com.example.adopciontfg.app.ui.screens.components.ListCardView
 import com.example.adopciontfg.app.ui.screens.components.SearchBar
 import com.example.adopciontfg.app.ui.screens.user_home_screen.components.ShelterMapView
 import com.example.adopciontfg.data.Shelter
+import com.example.adopciontfg.data.sampleShelters
 import com.example.adopciontfg.ui.theme.AdoptionTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,20 +43,36 @@ fun UserHomeScreen(
     viewModel: UserHomeViewModel = hiltViewModel()
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+    UserHomeScreenBody(
+        modifier = modifier,
+        uiState = uiState.value,
+        onQueryChange = viewModel::onQueryChange,
+        onTabSelected = viewModel::onTabSelected,
+        onDetailClick = onDetailClick
+    )
+}
+
+@Composable
+fun UserHomeScreenBody(
+    modifier: Modifier = Modifier,
+    uiState: UserHomeUiState,
+    onQueryChange: (String) -> Unit,
+    onTabSelected: (Int) -> Unit,
+    onDetailClick: (Shelter) -> Unit,
+) {
     Column(
         modifier = modifier
             .fillMaxSize()
             .statusBarsPadding()
     ) {
-        // TopBar
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp)
         ) {
             SearchBar(
-                query = uiState.value.query,
-                onQueryChange = viewModel::onQueryChange
+                query = uiState.query,
+                onQueryChange = onQueryChange
             )
 
             HorizontalDivider(
@@ -63,19 +82,19 @@ fun UserHomeScreen(
             )
 
             TabsSection(
-                tabs = uiState.value.tabs,
-                selectedTab = uiState.value.selectedTab,
-                onTabSelected = viewModel::onTabSelected
+                tabs = uiState.tabs,
+                selectedTab = uiState.selectedTab,
+                onTabSelected = onTabSelected
             )
         }
 
-        // Content
         HomeContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f),
-            selectedTab = uiState.value.selectedTab,
-            shelters = uiState.value.filteredShelters,
+            selectedTab = uiState.selectedTab,
+            isLoadingShelters = uiState.isLoadingShelters,
+            shelters = uiState.filteredShelters,
             onDetailClick = onDetailClick
         )
     }
@@ -107,6 +126,7 @@ fun TabsSection(
 fun HomeContent(
     modifier: Modifier = Modifier,
     selectedTab: Int,
+    isLoadingShelters: Boolean,
     shelters: List<Shelter>,
     onDetailClick: (Shelter) -> Unit
 
@@ -120,22 +140,30 @@ fun HomeContent(
     ) {
         when (selectedTab) {
             0 -> Box(Modifier.fillMaxSize()) {
-                ListCardView(
-                    items = shelters,
-                    onItemClick = onDetailClick,
-                    itemContent = { shelter, onClick ->
-                        CardViewList(
-                            name = shelter.name,
-                            onClick = onClick
-                        )
-                    }
-                )
+                if (isLoadingShelters) {
+                    ShelterCardListSkeleton(modifier = Modifier.fillMaxSize())
+                } else {
+                    ListCardView(
+                        items = shelters,
+                        onItemClick = onDetailClick,
+                        itemContent = { shelter, onClick ->
+                            CardViewList(
+                                name = shelter.name,
+                                onClick = onClick
+                            )
+                        }
+                    )
+                }
             }
 
-            1 -> ShelterMapView(
-                shelters = shelters,
-                modifier = Modifier.fillMaxSize()
-            )
+            1 -> if (isLoadingShelters) {
+                MapAreaSkeleton(modifier = Modifier.fillMaxSize())
+            } else {
+                ShelterMapView(
+                    shelters = shelters,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
         }
     }
 }
@@ -155,9 +183,15 @@ fun BottomIcon(
 @Composable
 fun UserHomeScreenPreview() {
     AdoptionTheme {
-        UserHomeScreen(
-            onDetailClick = {},
-            viewModel = UserHomeViewModel()
+        UserHomeScreenBody(
+            uiState = UserHomeUiState(
+                isLoadingShelters = false,
+                shelters = sampleShelters,
+                filteredShelters = sampleShelters
+            ),
+            onQueryChange = {},
+            onTabSelected = {},
+            onDetailClick = {}
         )
     }
 }
