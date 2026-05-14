@@ -47,7 +47,7 @@ fun MapCard(
                 )
 
                 Text(
-                    text = "Ver detalles",
+                    text = "Ver más información",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.primary
                 )

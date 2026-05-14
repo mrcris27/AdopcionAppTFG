@@ -7,15 +7,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -27,6 +26,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -62,21 +62,32 @@ fun PetDetailScreen(
             )
         },
         bottomBar = {
-            Button(
-                onClick = onAdoptClick,
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.secondary
-                )
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Text("Adoptar ahora")
+                Button(
+                    onClick = onAdoptClick,
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.secondary
+                    )
+                ) {
+                    Text("Adoptar ahora")
+                }
+                OutlinedButton(
+                    onClick = { },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Donar")
+                }
             }
         }
     ) { padding ->
 
-        val photos = pet.photos.take(6)
+        val photos = pet.photos
 
         LazyColumn(
             modifier = Modifier
@@ -86,45 +97,6 @@ fun PetDetailScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(16.dp)
         ) {
-
-            /* ---------------------------------------------------- */
-            /* 🖼️ FOTO PRINCIPAL                                  */
-            /* ---------------------------------------------------- */
-
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(260.dp)
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(MaterialTheme.colorScheme.surfaceVariant),
-                    contentAlignment = Alignment.Center
-                ) {
-                    if (photos.isNotEmpty()) {
-                        Text(
-                            text = "🐶 FOTO PRINCIPAL",
-                            style = MaterialTheme.typography.titleLarge
-                        )
-                    } else {
-                        Text(
-                            text = "Sin fotos disponibles",
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-            }
-
-            /* ---------------------------------------------------- */
-            /* 🖼️ GALERÍA                                         */
-            /* ---------------------------------------------------- */
-
-            item {
-                PetPhotosGrid(photos)
-            }
-
-            /* ---------------------------------------------------- */
-            /* 📦 INFO                                             */
-            /* ---------------------------------------------------- */
 
             item {
                 Card(
@@ -141,34 +113,85 @@ fun PetDetailScreen(
                     ) {
                         InfoRow("Nombre", pet.name)
                         InfoRow("Edad", "${pet.age} años")
+                        InfoRow("Especie", pet.species.name)
                         InfoRow("Raza", pet.breed)
                         InfoRow("Género", pet.gender)
-                    }
-                }
-            }
-
-            /* ---------------------------------------------------- */
-            /* 💚 DESCRIPCIÓN                                      */
-            /* ---------------------------------------------------- */
-
-            item {
-                Card(
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant
-                    ),
-                    shape = MaterialTheme.shapes.large
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
+                        if (pet.characteristics.isNotEmpty()) {
+                            InfoRow(
+                                "Características",
+                                pet.characteristics.joinToString(", ") {
+                                    it.name.replace("_", " ").lowercase().replaceFirstChar { c -> c.uppercase() }
+                                }
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = "Sobre esta mascota",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Esta mascota busca un hogar lleno de amor. " +
-                                    "Está esperando a alguien especial que le dé una segunda oportunidad 🐾",
+                            text = if (pet.description.isNotEmpty()) {
+                                pet.description
+                            } else {
+                                "Esta mascota busca un hogar lleno de amor. " +
+                                    "Está esperando a alguien especial que le dé una segunda oportunidad 🐾"
+                            },
                             style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
+            }
+
+            item {
+                PetPhotosCarousel(photos)
+            }
+        }
+    }
+}
+
+@Composable
+private fun PetPhotosCarousel(photos: List<String>) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(
+            text = "Fotos",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold
+        )
+        if (photos.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Sin fotos disponibles",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        } else {
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                contentPadding = PaddingValues(vertical = 4.dp)
+            ) {
+                itemsIndexed(photos, key = { index, _ -> index }) { _, _ ->
+                    Box(
+                        modifier = Modifier
+                            .width(280.dp)
+                            .height(200.dp)
+                            .clip(RoundedCornerShape(20.dp))
+                            .background(MaterialTheme.colorScheme.surfaceVariant),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "🐶",
+                            style = MaterialTheme.typography.displaySmall
                         )
                     }
                 }
@@ -176,38 +199,6 @@ fun PetDetailScreen(
         }
     }
 }
-
-/* ---------------------------------------------------- */
-/* 🖼️ GALERÍA GRID                                     */
-/* ---------------------------------------------------- */
-
-@Composable
-fun PetPhotosGrid(photos: List<String>) {
-
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(3),
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(250.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        userScrollEnabled = false
-    ) {
-        items(photos) {
-            Box(
-                modifier = Modifier
-                    .aspectRatio(1f)
-                    .clip(MaterialTheme.shapes.medium)
-                    .background(MaterialTheme.colorScheme.surfaceVariant),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("🐶")
-            }
-        }
-    }
-}
-
-/* ---------------------------------------------------- */
 
 @Composable
 private fun InfoRow(label: String, value: String) {
@@ -227,8 +218,6 @@ private fun InfoRow(label: String, value: String) {
         )
     }
 }
-
-/* ---------------------------------------------------- */
 
 @Preview
 @Composable

@@ -54,8 +54,27 @@ class ShelterSettingsViewModel @Inject constructor(
     fun onPhoneChange(value: String) = _uiState.update { it.copy(phone = value) }
     fun onAddressChange(value: String) = _uiState.update { it.copy(address = value) }
     fun onCifChange(value: String) = _uiState.update { it.copy(cif = value) }
+    
     fun onAdoptionAlertsChange(enabled: Boolean) = _uiState.update { it.copy(adoptionAlertsEnabled = enabled) }
-    fun onDarkModeChange(enabled: Boolean) = _uiState.update { it.copy(darkModeEnabled = enabled) }
+    
+    fun onDarkModeChange(enabled: Boolean) {
+        _uiState.update { it.copy(darkModeEnabled = enabled) }
+        // Guardar inmediatamente el cambio de tema
+        viewModelScope.launch {
+            val current = _uiState.value
+            settingsRepository.saveShelterSettings(
+                ShelterSettingsData(
+                    shelterName = current.shelterName,
+                    email = current.email,
+                    phone = current.phone,
+                    address = current.address,
+                    cif = current.cif,
+                    adoptionAlertsEnabled = current.adoptionAlertsEnabled,
+                    darkModeEnabled = enabled
+                )
+            )
+        }
+    }
 
     fun onSaveClick() {
         viewModelScope.launch {

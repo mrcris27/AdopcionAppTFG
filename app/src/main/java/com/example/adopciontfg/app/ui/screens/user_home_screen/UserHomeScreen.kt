@@ -1,6 +1,5 @@
 package com.example.adopciontfg.app.ui.screens.user_home_screen
 
-import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -8,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -19,6 +19,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -34,75 +35,51 @@ import com.example.adopciontfg.ui.theme.AdoptionTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserHomeScreen(
+    modifier: Modifier = Modifier,
     onDetailClick: (Shelter) -> Unit = {},
     viewModel: UserHomeViewModel = hiltViewModel()
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
-    Scaffold { padding ->
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .statusBarsPadding()
+    ) {
+        // TopBar
         Column(
             modifier = Modifier
-                .padding(padding)
+                .fillMaxWidth()
                 .padding(horizontal = 8.dp)
-                .fillMaxSize()
         ) {
-            HomeTopBar(
+            SearchBar(
                 query = uiState.value.query,
-                onQueryChange = viewModel::onQueryChange,
+                onQueryChange = viewModel::onQueryChange
+            )
+
+            HorizontalDivider(
+                thickness = 0.5.dp,
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
+                modifier = Modifier.padding(horizontal = 12.dp)
+            )
+
+            TabsSection(
                 tabs = uiState.value.tabs,
                 selectedTab = uiState.value.selectedTab,
                 onTabSelected = viewModel::onTabSelected
             )
-
-            HomeContent(
-                modifier = Modifier.weight(1f),
-                selectedTab = uiState.value.selectedTab,
-                shelters = uiState.value.filteredShelters,
-                onDetailClick = onDetailClick
-            )
         }
+
+        // Content
+        HomeContent(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            selectedTab = uiState.value.selectedTab,
+            shelters = uiState.value.filteredShelters,
+            onDetailClick = onDetailClick
+        )
     }
 }
-
-/* ---------------- TOP BAR ---------------- */
-@Composable
-fun HomeTopBar(
-    query: String,
-    onQueryChange: (String) -> Unit,
-    tabs: List<String>,
-    selectedTab: Int,
-    onTabSelected: (Int) -> Unit
-) {
-    Column(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        SearchBar(
-            query = query,
-            onQueryChange = onQueryChange
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        HorizontalDivider(
-            thickness = 0.5.dp,
-            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
-            modifier = Modifier.padding(horizontal = 12.dp)
-        )
-
-        Spacer(modifier = Modifier.height(6.dp))
-
-        TabsSection(
-            tabs = tabs,
-            selectedTab = selectedTab,
-            onTabSelected = onTabSelected
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-    }
-}
-
 
 @Composable
 fun TabsSection(
@@ -134,12 +111,16 @@ fun HomeContent(
     onDetailClick: (Shelter) -> Unit
 
 ) {
+    // Box + clipToBounds: AnimatedContent/Crossfade apila hijos y el MapView (AndroidView)
+    // puede medirse a pantalla completa y solaparse con la cabecera; aquí el mapa queda acotado.
     Box(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier
+            .fillMaxSize()
+            .clipToBounds()
     ) {
-        Crossfade(targetState = selectedTab) { tab ->
-            when (tab) {
-                0 -> ListCardView(
+        when (selectedTab) {
+            0 -> Box(Modifier.fillMaxSize()) {
+                ListCardView(
                     items = shelters,
                     onItemClick = onDetailClick,
                     itemContent = { shelter, onClick ->
@@ -149,9 +130,12 @@ fun HomeContent(
                         )
                     }
                 )
-
-                1 -> ShelterMapView(shelters)
             }
+
+            1 -> ShelterMapView(
+                shelters = shelters,
+                modifier = Modifier.fillMaxSize()
+            )
         }
     }
 }

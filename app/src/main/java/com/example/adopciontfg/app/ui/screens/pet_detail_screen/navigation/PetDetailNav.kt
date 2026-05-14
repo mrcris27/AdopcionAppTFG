@@ -5,6 +5,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.example.adopciontfg.app.ui.screens.pet_detail_screen.PetDetailScreen
 import com.example.adopciontfg.data.Pet
+import com.example.adopciontfg.model.Characteristic
+import com.example.adopciontfg.model.Species
 import kotlinx.serialization.Serializable
 
 fun NavGraphBuilder.petDetail(
@@ -34,7 +36,13 @@ fun getPetById(id: String): Pet {
         age = 3,
         breed = "Labrador",
         gender = "Macho",
-        photos = listOf("", "", "", "")
+        photos = listOf("", "", "", ""),
+        description = "Max es un perro muy cariñoso y juguetón. Le encanta pasear y jugar con la pelota.",
+        species = Species.PERRO,
+        characteristics = listOf(Characteristic.SOCIABLE_CON_PERROS, Characteristic.JUGUETON),
+        birthDate = 1672531200000L, // ejemplo timestamp
+        mainPhoto = "",
+        shelterId = "1"
     )
 }
 

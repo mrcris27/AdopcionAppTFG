@@ -6,7 +6,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import com.example.adopciontfg.app.ui.screens.pet_detail_screen.navigation.PetDetailRoute
 import com.example.adopciontfg.app.ui.screens.pet_detail_screen.navigation.petDetail
-import com.example.adopciontfg.app.ui.screens.pet_list.navigation.petListScreen
 import com.example.adopciontfg.app.ui.screens.settings.navigation.settingsHubScreen
 import com.example.adopciontfg.app.ui.screens.settings.shelter.navigation.ShelterSettingsRoute
 import com.example.adopciontfg.app.ui.screens.settings.shelter.navigation.shelterSettingsScreen
@@ -30,14 +29,8 @@ fun MainNavHost(
     ) {
 
         userScreen(
-            onDetailClick = {
-                navController.navigate(ShelterProfileRoute)
-            }
-        )
-
-        petListScreen(
-            onDetailClick = { petId ->
-                navController.navigate(PetDetailRoute(petId))
+            onDetailClick = { shelter ->
+                navController.navigate(ShelterProfileRoute(shelter.id))
             }
         )
 
@@ -47,7 +40,10 @@ fun MainNavHost(
         )
 
         shelterProfileScreen(
-            onBackClick = { navController.popBackStack() }
+            onBackClick = { navController.popBackStack() },
+            onPetClick = { petId ->
+                navController.navigate(PetDetailRoute(petId))
+            }
         )
 
         settingsHubScreen(

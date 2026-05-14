@@ -1,29 +1,47 @@
 package com.example.adopciontfg.app.ui.screens.shelter_profile_screen
 
-import androidx.compose.animation.Crossfade
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.adopciontfg.app.ui.screens.shelter_profile_screen.components.AdoptionList
-import com.example.adopciontfg.app.ui.screens.shelter_profile_screen.components.SponsorList
+import com.example.adopciontfg.app.ui.screens.components.CardViewList
+import com.example.adopciontfg.app.ui.screens.components.ListCardView
+import com.example.adopciontfg.data.Shelter
 import com.example.adopciontfg.ui.theme.AdoptionTheme
+
+private data class AdoptionPetRow(
+    val id: String,
+    val displayName: String,
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShelterProfileScreen(
+    shelter: Shelter,
     onBackClick: () -> Unit,
+    onPetClick: (String) -> Unit,
 ) {
-
-    val tabs = listOf("Adopción", "Apadrinar")
-    var selectedTab by remember { mutableStateOf(0) }
+    var shelterCardExpanded by remember { mutableStateOf(false) }
+    val chevronRotation by animateFloatAsState(
+        targetValue = if (shelterCardExpanded) 180f else 0f,
+        label = "shelterCardChevron",
+    )
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -60,10 +78,11 @@ fun ShelterProfileScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             ElevatedCard(
+                onClick = { shelterCardExpanded = !shelterCardExpanded },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(6.dp)
-                    .height(100.dp),
+                    .animateContentSize(),
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.elevatedCardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceVariant
@@ -72,85 +91,143 @@ fun ShelterProfileScreen(
                     defaultElevation = 4.dp
                 )
             ) {
-
-                Row(
+                Column(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 18.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                        .fillMaxWidth()
+                        .padding(horizontal = 14.dp, vertical = 12.dp)
                 ) {
-
-                    Icon(
-                        imageVector = Icons.Default.AccountCircle,
-                        contentDescription = null,
-                        modifier = Modifier.size(52.dp),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-
-                    Spacer(modifier = Modifier.width(14.dp))
-
-                    Column(
-                        verticalArrangement = Arrangement.Center
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
+                        Surface(
+                            modifier = Modifier.size(48.dp),
+                            shape = CircleShape,
+                            color = MaterialTheme.colorScheme.primaryContainer
+                        ) {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.AccountCircle,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(40.dp),
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.width(12.dp))
 
                         Text(
-                            text = "Protectora X",
-                            style = MaterialTheme.typography.titleMedium
+                            text = shelter.name,
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.weight(1f)
                         )
 
-                        Spacer(modifier = Modifier.height(2.dp))
-
-                        Text(
-                            text = "Dirección",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        Icon(
+                            imageVector = Icons.Default.ExpandMore,
+                            contentDescription = if (shelterCardExpanded) {
+                                "Ocultar información de la protectora"
+                            } else {
+                                "Mostrar información de la protectora"
+                            },
+                            modifier = Modifier.rotate(chevronRotation),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
+                    }
+
+                    if (shelterCardExpanded) {
+                        Spacer(modifier = Modifier.height(10.dp))
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.35f))
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        val hasContactDetails = shelter.address.isNotBlank() ||
+                            shelter.cif.isNotBlank() ||
+                            shelter.email.isNotBlank() ||
+                            shelter.phone.isNotBlank()
+
+                        if (!hasContactDetails) {
+                            Text(
+                                text = "Aquí se mostrará la información de la protectora cuando esté disponible.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        } else {
+                            if (shelter.address.isNotBlank()) {
+                                Text(
+                                    text = shelter.address,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+
+                            if (shelter.cif.isNotBlank()) {
+                                Spacer(modifier = Modifier.height(6.dp))
+                                Text(
+                                    text = "CIF: ${shelter.cif}",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+
+                            if (shelter.email.isNotBlank()) {
+                                Spacer(modifier = Modifier.height(6.dp))
+                                Text(
+                                    text = shelter.email,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+
+                            if (shelter.phone.isNotBlank()) {
+                                Spacer(modifier = Modifier.height(6.dp))
+                                Text(
+                                    text = shelter.phone,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
                     }
                 }
             }
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // TABS
-            SecondaryTabRow(
-                selectedTabIndex = selectedTab,
-                containerColor = MaterialTheme.colorScheme.background,
-                contentColor = MaterialTheme.colorScheme.primary
-            ) {
-
-                tabs.forEachIndexed { index, title ->
-
-                    Tab(
-                        selected = selectedTab == index,
-                        onClick = { selectedTab = index },
-                        text = {
-                            Text(
-                                text = title,
-                                style = MaterialTheme.typography.titleSmall
-                            )
-                        }
-                    )
-                }
-            }
+            Text(
+                text = "Animales disponibles",
+                modifier = Modifier.padding(horizontal = 12.dp),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onBackground
+            )
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // CONTENIDO
+            val animals = listOf(
+                AdoptionPetRow("1", "Animal 1"),
+                AdoptionPetRow("2", "Animal 2"),
+                AdoptionPetRow("3", "Animal 3"),
+                AdoptionPetRow("4", "Animal 4"),
+                AdoptionPetRow("5", "Animal 5"),
+            )
+
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .weight(1f)
+                    .fillMaxWidth()
             ) {
-
-                Crossfade(
-                    targetState = selectedTab,
-                    label = "ShelterTabs"
-                ) { tab ->
-
-                    when (tab) {
-                        0 -> AdoptionList()
-                        1 -> SponsorList()
+                ListCardView(
+                    items = animals,
+                    onItemClick = { row -> onPetClick(row.id) },
+                    itemContent = { row, onClick ->
+                        CardViewList(
+                            name = row.displayName,
+                            onClick = onClick
+                        )
                     }
-                }
+                )
             }
         }
     }
@@ -161,7 +238,19 @@ fun ShelterProfileScreen(
 fun ShelterProfileViewPreview() {
     AdoptionTheme {
         ShelterProfileScreen(
-            onBackClick = {}
+            shelter = Shelter(
+                id = "1",
+                name = "Protectora Ejemplo",
+                lat = 0.0,
+                lng = 0.0,
+                cif = "A12345678",
+                profilePicture = "",
+                email = "contacto@protectora.com",
+                address = "Calle Ejemplo 123",
+                phone = "+34 123 456 789"
+            ),
+            onBackClick = {},
+            onPetClick = {}
         )
     }
 }

@@ -51,8 +51,26 @@ class UserSettingsViewModel @Inject constructor(
     fun onEmailChange(value: String) = _uiState.update { it.copy(email = value) }
     fun onPhoneChange(value: String) = _uiState.update { it.copy(phone = value) }
     fun onCityChange(value: String) = _uiState.update { it.copy(city = value) }
+    
     fun onNotificationsChange(enabled: Boolean) = _uiState.update { it.copy(notificationsEnabled = enabled) }
-    fun onDarkModeChange(enabled: Boolean) = _uiState.update { it.copy(darkModeEnabled = enabled) }
+    
+    fun onDarkModeChange(enabled: Boolean) {
+        _uiState.update { it.copy(darkModeEnabled = enabled) }
+        // Guardar inmediatamente el cambio de tema
+        viewModelScope.launch {
+            val current = _uiState.value
+            settingsRepository.saveUserSettings(
+                UserSettingsData(
+                    name = current.name,
+                    email = current.email,
+                    phone = current.phone,
+                    city = current.city,
+                    notificationsEnabled = current.notificationsEnabled,
+                    darkModeEnabled = enabled
+                )
+            )
+        }
+    }
 
     fun onSaveClick() {
         viewModelScope.launch {
