@@ -40,16 +40,21 @@ import androidx.compose.ui.unit.dp
 import com.example.adopciontfg.app.ui.components.skeleton.PetDetailBottomBarSkeleton
 import com.example.adopciontfg.app.ui.components.skeleton.PetDetailContentSkeleton
 import com.example.adopciontfg.app.ui.components.skeleton.PetDetailTopBarTitleSkeleton
-import com.example.adopciontfg.data.Pet
+import com.example.adopciontfg.data.local.entity.AnimalEntity
+import com.example.adopciontfg.data.local.entity.ageInYears
+import com.example.adopciontfg.data.local.entity.displayPhotos
+import com.example.adopciontfg.data.local.entity.formattedCharacteristics
+import com.example.adopciontfg.data.local.entity.genderLabel
+import com.example.adopciontfg.model.Characteristic
+import com.example.adopciontfg.model.Species
 import com.example.adopciontfg.ui.theme.AdoptionTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PetDetailScreen(
-    pet: Pet,
+    animal: AnimalEntity?,
     onBackClick: () -> Unit,
     onAdoptClick: () -> Unit,
-    /** Mientras se resuelve el detalle desde red o base de datos. */
     isLoading: Boolean = false,
 ) {
     Scaffold(
@@ -59,7 +64,7 @@ fun PetDetailScreen(
                     if (isLoading) {
                         PetDetailTopBarTitleSkeleton()
                     } else {
-                        Text(pet.name)
+                        Text(animal?.name.orEmpty())
                     }
                 },
                 navigationIcon = {
@@ -101,8 +106,7 @@ fun PetDetailScreen(
             }
         }
     ) { padding ->
-
-        if (isLoading) {
+        if (isLoading || animal == null) {
             PetDetailContentSkeleton(
                 modifier = Modifier
                     .padding(padding)
@@ -110,7 +114,7 @@ fun PetDetailScreen(
                     .background(MaterialTheme.colorScheme.background)
             )
         } else {
-            val photos = pet.photos
+            val photos = animal.displayPhotos()
             LazyColumn(
                 modifier = Modifier
                     .padding(padding)
@@ -119,7 +123,6 @@ fun PetDetailScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 contentPadding = PaddingValues(16.dp)
             ) {
-
                 item {
                     Card(
                         colors = CardDefaults.cardColors(
@@ -133,18 +136,12 @@ fun PetDetailScreen(
                             modifier = Modifier.padding(16.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            InfoRow("Nombre", pet.name)
-                            InfoRow("Edad", "${pet.age} años")
-                            InfoRow("Especie", pet.species.name)
-                            InfoRow("Raza", pet.breed)
-                            InfoRow("Género", pet.gender)
-                            if (pet.characteristics.isNotEmpty()) {
-                                InfoRow(
-                                    "Características",
-                                    pet.characteristics.joinToString(", ") {
-                                        it.name.replace("_", " ").lowercase().replaceFirstChar { c -> c.uppercase() }
-                                    }
-                                )
+                            InfoRow("Nombre", animal.name.orEmpty())
+                            InfoRow("Edad", "${animal.ageInYears()} años")
+                            InfoRow("Especie", animal.species?.name.orEmpty())
+                            InfoRow("Género", animal.genderLabel())
+                            if (!animal.characteristics.isNullOrEmpty()) {
+                                InfoRow("Características", animal.formattedCharacteristics())
                             }
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
@@ -153,12 +150,9 @@ fun PetDetailScreen(
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
-                                text = if (pet.description.isNotEmpty()) {
-                                    pet.description
-                                } else {
-                                    "Esta mascota busca un hogar lleno de amor. " +
-                                        "Está esperando a alguien especial que le dé una segunda oportunidad 🐾"
-                                },
+                                text = animal.description?.takeIf { it.isNotBlank() }
+                                    ?: "Esta mascota busca un hogar lleno de amor. " +
+                                    "Está esperando a alguien especial que le dé una segunda oportunidad 🐾",
                                 style = MaterialTheme.typography.bodyMedium
                             )
                         }
@@ -242,22 +236,28 @@ private fun InfoRow(label: String, value: String) {
     }
 }
 
+private fun previewAnimal(): AnimalEntity = AnimalEntity(
+    "1",
+    "Max",
+    false,
+    "",
+    listOf("", "", ""),
+    1672531200000L,
+    "Max es un perro muy cariñoso y juguetón. Le encanta pasear y jugar con la pelota.",
+    Species.PERRO,
+    listOf(Characteristic.SOCIABLE_CON_PERROS, Characteristic.JUGUETON),
+    "1",
+)
+
 @Preview(showBackground = true, name = "Cargando")
 @Composable
 fun PetDetailLoadingPreview() {
     AdoptionTheme {
         PetDetailScreen(
-            pet = Pet(
-                id = "1",
-                name = "",
-                age = 0,
-                breed = "",
-                gender = "",
-                photos = emptyList()
-            ),
+            animal = null,
             onBackClick = {},
             onAdoptClick = {},
-            isLoading = true
+            isLoading = true,
         )
     }
 }
@@ -267,16 +267,9 @@ fun PetDetailLoadingPreview() {
 fun PetDetailPreview() {
     AdoptionTheme {
         PetDetailScreen(
-            pet = Pet(
-                id = "1",
-                name = "Max",
-                age = 3,
-                breed = "Labrador",
-                gender = "Macho",
-                photos = listOf("", "", "", "")
-            ),
+            animal = previewAnimal(),
             onBackClick = {},
-            onAdoptClick = {}
+            onAdoptClick = {},
         )
     }
 }

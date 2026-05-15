@@ -18,6 +18,10 @@ public interface ShelterDao {
     @Query("SELECT * FROM shelters")
     LiveData<List<ShelterEntity>> getAllShelters();
 
+    // Obtener protectora por id
+    @Query("SELECT * FROM shelters WHERE id = :id LIMIT 1")
+    LiveData<ShelterEntity> getShelterById(String id);
+
     // Obtener protectora por nombre
     //Con el LIKE busca por coincidencia parcial no total
     @Query("SELECT * FROM shelters WHERE name LIKE '%' || :name || '%'")

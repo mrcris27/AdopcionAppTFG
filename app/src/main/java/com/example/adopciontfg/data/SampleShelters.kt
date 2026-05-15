@@ -1,10 +1,33 @@
 package com.example.adopciontfg.data
 
-val sampleShelters: List<Shelter> = listOf(
-    Shelter("1", "Protectora 1", 40.4168, -3.7038),
-    Shelter("2", "Protectora 2", 40.45, -3.70),
-    Shelter("3", "Protectora 3", 40.40, -3.65)
-)
+import com.example.adopciontfg.data.local.entity.ShelterEntity
 
-fun shelterByIdOrDefault(id: String): Shelter =
-    sampleShelters.find { it.id == id } ?: sampleShelters.first()
+val sampleShelters: List<ShelterEntity> = listOf(
+    ShelterEntity(
+        "1",
+        "Protectora 1",
+        "",
+        "",
+        "",
+        "Puerta del Sol, 1, Madrid",
+        ""
+    ),
+    ShelterEntity(
+        "2",
+        "Protectora 2",
+        "",
+        "",
+        "",
+        "Plaza de Cibeles, Madrid",
+        ""
+    ),
+    ShelterEntity(
+        "3",
+        "Protectora 3",
+        "",
+        "",
+        "",
+        "Paseo del Prado, 1, Madrid",
+        ""
+    )
+)

@@ -15,7 +15,8 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import com.example.adopciontfg.data.Shelter
+import com.example.adopciontfg.data.local.entity.ShelterEntity
+import com.example.adopciontfg.data.util.geocodeAddress
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
@@ -23,13 +24,21 @@ import org.osmdroid.views.overlay.Marker
 
 private const val GoogleMapsPackage = "com.google.android.apps.maps"
 
+private data class ShelterMapMarker(
+    val shelter: ShelterEntity,
+    val position: GeoPoint,
+)
+
 /**
  * Abre la ubicación en la app Google Maps si está instalada; si no, en el navegador (Google Maps web).
  */
-private fun openShelterInGoogleMaps(context: Context, shelter: Shelter) {
-    val lat = shelter.lat
-    val lng = shelter.lng
-    val uri = Uri.parse("https://www.google.com/maps/search/?api=1&query=$lat,$lng")
+private fun openShelterInGoogleMaps(context: Context, shelter: ShelterEntity) {
+    val address = shelter.address?.trim().orEmpty()
+    if (address.isEmpty()) return
+
+    val uri = Uri.parse(
+        "https://www.google.com/maps/search/?api=1&query=${Uri.encode(address)}"
+    )
     val intent = Intent(Intent.ACTION_VIEW, uri).apply {
         setPackage(GoogleMapsPackage)
     }
@@ -43,28 +52,34 @@ private fun openShelterInGoogleMaps(context: Context, shelter: Shelter) {
 
 @Composable
 fun ShelterMapView(
-    shelters: List<Shelter>,
+    shelters: List<ShelterEntity>,
     modifier: Modifier = Modifier
 ) {
     val madrid = GeoPoint(40.4168, -3.7038)
-
-    //añadir una x en la card para salirse
-    // estado del marcador seleccionado
-    var selectedShelter by remember { mutableStateOf<Shelter?>(null) }
+    var selectedShelter by remember { mutableStateOf<ShelterEntity?>(null) }
+    var mapMarkers by remember { mutableStateOf<List<ShelterMapMarker>>(emptyList()) }
     val context = LocalContext.current
+
+    LaunchedEffect(shelters) {
+        mapMarkers = shelters.mapNotNull { shelter ->
+            val address = shelter.address?.trim().orEmpty()
+            if (address.isEmpty()) return@mapNotNull null
+            val position = geocodeAddress(context, address) ?: return@mapNotNull null
+            ShelterMapMarker(shelter, position)
+        }
+    }
 
     Box(
         modifier = modifier
             .fillMaxSize()
             .clipToBounds()
     ) {
-
         AndroidView(
             modifier = Modifier
                 .fillMaxSize()
                 .clipToBounds(),
-            factory = { context ->
-                MapView(context).apply {
+            factory = { ctx ->
+                MapView(ctx).apply {
                     layoutParams = ViewGroup.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.MATCH_PARENT
@@ -76,22 +91,20 @@ fun ShelterMapView(
                 }
             },
             update = { mapView ->
-
                 mapView.controller.setZoom(12.5)
                 mapView.controller.setCenter(madrid)
 
                 mapView.overlays.clear()
 
-                shelters.forEach { shelter ->
-
+                mapMarkers.forEach { markerData ->
                     val marker = Marker(mapView).apply {
-                        position = GeoPoint(shelter.lat, shelter.lng)
+                        position = markerData.position
                         setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                        title = shelter.name
+                        title = markerData.shelter.name
 
                         setOnMarkerClickListener { _, _ ->
-                            mapView.controller.animateTo(GeoPoint(shelter.lat, shelter.lng))
-                            selectedShelter = shelter
+                            mapView.controller.animateTo(markerData.position)
+                            selectedShelter = markerData.shelter
                             true
                         }
                     }
@@ -102,7 +115,6 @@ fun ShelterMapView(
                 mapView.invalidate()
             }
         )
-
 
         AnimatedVisibility(
             visible = selectedShelter != null,

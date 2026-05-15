@@ -1,10 +1,16 @@
 package com.example.adopciontfg.app.ui.screens.shelter_profile_screen.navigation
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import com.example.adopciontfg.app.ui.components.skeleton.ShelterProfileScreenSkeleton
 import com.example.adopciontfg.app.ui.screens.shelter_profile_screen.ShelterProfileScreen
-import com.example.adopciontfg.data.shelterByIdOrDefault
+import com.example.adopciontfg.app.ui.screens.shelter_profile_screen.ShelterProfileViewModel
 import kotlinx.serialization.Serializable
 
 fun NavGraphBuilder.shelterProfileScreen(
@@ -13,11 +19,36 @@ fun NavGraphBuilder.shelterProfileScreen(
 ) {
     composable<ShelterProfileRoute> { backStackEntry ->
         val route = backStackEntry.toRoute<ShelterProfileRoute>()
-        val shelter = shelterByIdOrDefault(route.shelterId)
-        ShelterProfileScreen(
-            shelter = shelter,
+        ShelterProfileRouteContent(
+            shelterId = route.shelterId,
             onBackClick = onBackClick,
             onPetClick = onPetClick,
+        )
+    }
+}
+
+@Composable
+private fun ShelterProfileRouteContent(
+    shelterId: String,
+    onBackClick: () -> Unit,
+    onPetClick: (String) -> Unit,
+    viewModel: ShelterProfileViewModel = hiltViewModel(),
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(shelterId) {
+        viewModel.loadShelter(shelterId)
+    }
+
+    val shelter = uiState.shelter
+    when {
+        uiState.isLoading && shelter == null -> ShelterProfileScreenSkeleton()
+        shelter != null -> ShelterProfileScreen(
+            shelter = shelter,
+            animals = uiState.animals,
+            onBackClick = onBackClick,
+            onPetClick = onPetClick,
+            isPetsLoading = uiState.isPetsLoading,
         )
     }
 }

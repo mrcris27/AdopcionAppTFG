@@ -37,6 +37,12 @@ public class ShelterRepository {
         return shelterDao.getAllShelters();
     }
 
+    // ------------ Obtener protectora por id -------------
+    public LiveData<ShelterEntity> getShelterById(String id) {
+        syncSheltersFromFirebase();
+        return shelterDao.getShelterById(id);
+    }
+
     // ------------ Obtener todas las protectoras por nombre -------------
     public LiveData<List<ShelterEntity>> getSheltersByName(String name) {
         syncSheltersFromFirebase();

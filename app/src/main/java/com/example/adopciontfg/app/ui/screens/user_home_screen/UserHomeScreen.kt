@@ -31,7 +31,7 @@ import com.example.adopciontfg.app.ui.screens.components.CardViewList
 import com.example.adopciontfg.app.ui.screens.components.ListCardView
 import com.example.adopciontfg.app.ui.screens.components.SearchBar
 import com.example.adopciontfg.app.ui.screens.user_home_screen.components.ShelterMapView
-import com.example.adopciontfg.data.Shelter
+import com.example.adopciontfg.data.local.entity.ShelterEntity
 import com.example.adopciontfg.data.sampleShelters
 import com.example.adopciontfg.ui.theme.AdoptionTheme
 
@@ -39,7 +39,7 @@ import com.example.adopciontfg.ui.theme.AdoptionTheme
 @Composable
 fun UserHomeScreen(
     modifier: Modifier = Modifier,
-    onDetailClick: (Shelter) -> Unit = {},
+    onDetailClick: (ShelterEntity) -> Unit = {},
     viewModel: UserHomeViewModel = hiltViewModel()
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
@@ -58,7 +58,7 @@ fun UserHomeScreenBody(
     uiState: UserHomeUiState,
     onQueryChange: (String) -> Unit,
     onTabSelected: (Int) -> Unit,
-    onDetailClick: (Shelter) -> Unit,
+    onDetailClick: (ShelterEntity) -> Unit,
 ) {
     Column(
         modifier = modifier
@@ -127,8 +127,8 @@ fun HomeContent(
     modifier: Modifier = Modifier,
     selectedTab: Int,
     isLoadingShelters: Boolean,
-    shelters: List<Shelter>,
-    onDetailClick: (Shelter) -> Unit
+    shelters: List<ShelterEntity>,
+    onDetailClick: (ShelterEntity) -> Unit
 
 ) {
     // Box + clipToBounds: AnimatedContent/Crossfade apila hijos y el MapView (AndroidView)
@@ -148,7 +148,7 @@ fun HomeContent(
                         onItemClick = onDetailClick,
                         itemContent = { shelter, onClick ->
                             CardViewList(
-                                name = shelter.name,
+                                name = shelter.name.orEmpty(),
                                 onClick = onClick
                             )
                         }

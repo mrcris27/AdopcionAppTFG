@@ -33,6 +33,12 @@ public class AnimalRepository {
         return animalDao.getAllAnimals();
     }
 
+    // ─── Obtener animal por id ──────────────────────────────────────────
+    public LiveData<AnimalEntity> getAnimalById(String id) {
+        syncAnimalsFromFirebase();
+        return animalDao.getAnimalById(id);
+    }
+
     // ─── Obtener animales por protectora ────────────────────────────────
     public LiveData<List<AnimalEntity>> getAnimalsByShelter(String shelterId) {
         syncAnimalsByShelterFromFirebase(shelterId);

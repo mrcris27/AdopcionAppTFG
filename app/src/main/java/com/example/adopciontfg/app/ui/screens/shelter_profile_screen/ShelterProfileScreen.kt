@@ -32,21 +32,18 @@ import androidx.compose.ui.unit.dp
 import com.example.adopciontfg.app.ui.components.skeleton.ShelterCardListSkeleton
 import com.example.adopciontfg.app.ui.screens.components.CardViewList
 import com.example.adopciontfg.app.ui.screens.components.ListCardView
-import com.example.adopciontfg.data.Shelter
+import com.example.adopciontfg.data.local.entity.AnimalEntity
+import com.example.adopciontfg.data.local.entity.ShelterEntity
+import com.example.adopciontfg.data.sampleShelters
 import com.example.adopciontfg.ui.theme.AdoptionTheme
-
-private data class AdoptionPetRow(
-    val id: String,
-    val displayName: String,
-)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShelterProfileScreen(
-    shelter: Shelter,
+    shelter: ShelterEntity,
+    animals: List<AnimalEntity>,
     onBackClick: () -> Unit,
     onPetClick: (String) -> Unit,
-    /** Cuando los animales se cargan de red o base de datos, mostrar skeleton en la lista. */
     isPetsLoading: Boolean = false,
 ) {
     var shelterCardExpanded by remember { mutableStateOf(false) }
@@ -133,7 +130,7 @@ fun ShelterProfileScreen(
                         Spacer(modifier = Modifier.width(12.dp))
 
                         Text(
-                            text = shelter.name,
+                            text = shelter.name.orEmpty(),
                             style = MaterialTheme.typography.titleMedium,
                             modifier = Modifier.weight(1f)
                         )
@@ -155,10 +152,10 @@ fun ShelterProfileScreen(
                         HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.35f))
                         Spacer(modifier = Modifier.height(10.dp))
 
-                        val hasContactDetails = shelter.address.isNotBlank() ||
-                            shelter.cif.isNotBlank() ||
-                            shelter.email.isNotBlank() ||
-                            shelter.phone.isNotBlank()
+                        val hasContactDetails = shelter.address.orEmpty().isNotBlank() ||
+                            shelter.cif.orEmpty().isNotBlank() ||
+                            shelter.email.orEmpty().isNotBlank() ||
+                            shelter.phone.orEmpty().isNotBlank()
 
                         if (!hasContactDetails) {
                             Text(
@@ -167,36 +164,36 @@ fun ShelterProfileScreen(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         } else {
-                            if (shelter.address.isNotBlank()) {
+                            if (shelter.address.orEmpty().isNotBlank()) {
                                 Text(
-                                    text = shelter.address,
+                                    text = shelter.address.orEmpty(),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
 
-                            if (shelter.cif.isNotBlank()) {
+                            if (shelter.cif.orEmpty().isNotBlank()) {
                                 Spacer(modifier = Modifier.height(6.dp))
                                 Text(
-                                    text = "CIF: ${shelter.cif}",
+                                    text = "CIF: ${shelter.cif.orEmpty()}",
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
 
-                            if (shelter.email.isNotBlank()) {
+                            if (shelter.email.orEmpty().isNotBlank()) {
                                 Spacer(modifier = Modifier.height(6.dp))
                                 Text(
-                                    text = shelter.email,
+                                    text = shelter.email.orEmpty(),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
 
-                            if (shelter.phone.isNotBlank()) {
+                            if (shelter.phone.orEmpty().isNotBlank()) {
                                 Spacer(modifier = Modifier.height(6.dp))
                                 Text(
-                                    text = shelter.phone,
+                                    text = shelter.phone.orEmpty(),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -217,14 +214,6 @@ fun ShelterProfileScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            val animals = listOf(
-                AdoptionPetRow("1", "Animal 1"),
-                AdoptionPetRow("2", "Animal 2"),
-                AdoptionPetRow("3", "Animal 3"),
-                AdoptionPetRow("4", "Animal 4"),
-                AdoptionPetRow("5", "Animal 5"),
-            )
-
             Box(
                 modifier = Modifier
                     .weight(1f)
@@ -232,16 +221,23 @@ fun ShelterProfileScreen(
             ) {
                 if (isPetsLoading) {
                     ShelterCardListSkeleton(modifier = Modifier.fillMaxSize())
+                } else if (animals.isEmpty()) {
+                    Text(
+                        text = "No hay animales disponibles en esta protectora.",
+                        modifier = Modifier.padding(horizontal = 12.dp),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
                 } else {
                     ListCardView(
                         items = animals,
-                        onItemClick = { row -> onPetClick(row.id) },
-                        itemContent = { row, onClick ->
+                        onItemClick = { animal -> onPetClick(animal.id) },
+                        itemContent = { animal, onClick ->
                             CardViewList(
-                                name = row.displayName,
-                                onClick = onClick
+                                name = animal.name.orEmpty(),
+                                onClick = onClick,
                             )
-                        }
+                        },
                     )
                 }
             }
@@ -254,19 +250,10 @@ fun ShelterProfileScreen(
 fun ShelterProfileViewPreview() {
     AdoptionTheme {
         ShelterProfileScreen(
-            shelter = Shelter(
-                id = "1",
-                name = "Protectora Ejemplo",
-                lat = 0.0,
-                lng = 0.0,
-                cif = "A12345678",
-                profilePicture = "",
-                email = "contacto@protectora.com",
-                address = "Calle Ejemplo 123",
-                phone = "+34 123 456 789"
-            ),
+            shelter = sampleShelters.first(),
+            animals = emptyList(),
             onBackClick = {},
-            onPetClick = {}
+            onPetClick = {},
         )
     }
 }
@@ -276,20 +263,11 @@ fun ShelterProfileViewPreview() {
 fun ShelterProfilePetsLoadingPreview() {
     AdoptionTheme {
         ShelterProfileScreen(
-            shelter = Shelter(
-                id = "1",
-                name = "Protectora Ejemplo",
-                lat = 0.0,
-                lng = 0.0,
-                cif = "A12345678",
-                profilePicture = "",
-                email = "contacto@protectora.com",
-                address = "Calle Ejemplo 123",
-                phone = "+34 123 456 789"
-            ),
+            shelter = sampleShelters.first(),
+            animals = emptyList(),
             onBackClick = {},
             onPetClick = {},
-            isPetsLoading = true
+            isPetsLoading = true,
         )
     }
 }

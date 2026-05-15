@@ -15,11 +15,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.adopciontfg.data.Shelter
+import com.example.adopciontfg.data.local.entity.ShelterEntity
 
 @Composable
 fun MapCard(
-    shelter: Shelter,
+    shelter: ShelterEntity,
     onClick: () -> Unit
 ) {
     Card(
@@ -42,7 +42,7 @@ fun MapCard(
 
             Column {
                 Text(
-                    text = shelter.name,
+                    text = shelter.name.orEmpty(),
                     style = MaterialTheme.typography.titleMedium
                 )
 
