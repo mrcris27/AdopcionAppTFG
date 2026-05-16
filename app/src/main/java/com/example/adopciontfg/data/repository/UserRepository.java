@@ -53,7 +53,6 @@ public class UserRepository {
                         // si funciona bien en firebase se actualiza en room
                         executor.execute(() -> userDao.deleteUser(user))
                 );
-
     }
 
     // ----- Sincronización desde Firebase -----
