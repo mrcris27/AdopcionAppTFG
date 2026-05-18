@@ -99,10 +99,15 @@ public class FirebaseService {
     // ─── Recuperar contraseña ─────────────────────────────────────────────
     //se le manda un email al usuario que quiere reestablecer su contraseña
     //todo el proceso lo gestiona firebase de manera automática
-    //Se debe comprobar desde donde se llama a este método que el correo esté registrado con On succes/F    ailure
+    //Se debe comprobar desde donde se llama a este método que el correo esté registrado con On succes / Failure
     public void resetPassword(String email, OnSuccessListener<Void> onSuccess, OnFailureListener onFailure) {
         auth.sendPasswordResetEmail(email)
                 .addOnSuccessListener(onSuccess)
                 .addOnFailureListener(onFailure);
     }
+
+
+
+
+
 }

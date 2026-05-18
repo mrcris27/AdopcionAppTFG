@@ -6,6 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import com.example.adopciontfg.data.local.entity.ShelterEntity
 import com.example.adopciontfg.data.local.entity.UserEntity
 import com.example.adopciontfg.data.remote.FirebaseService
+import com.example.adopciontfg.data.remote.RoleCallback
 import com.example.adopciontfg.data.repository.ShelterRepository
 import com.example.adopciontfg.data.repository.UserRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -47,14 +48,22 @@ class AuthViewModel (application: Application) : AndroidViewModel(application) {
         _authState.value = AuthState.Loading
         firebase.login(email, password,
             {
-                //Almacena el ID, si es null sale del método sin hacer nada más
-                val uid = firebase.currentUser?.uid ?: return@login
+                //Almacena el ID, si es null manda mensaje de error y sale del método sin hacer nada más
+                val uid = firebase.currentUser?.uid ?: run {
+                    _authState.value = AuthState.Error("Error obteniendo usuario")
+                    return@login
+                }
+                firebase.getUserRole(uid, object : RoleCallback {
+                    override fun onRole(role: String) {
+                        _authState.value = AuthState.Success(role)
+                    }
 
-
-
-                _authState.value = AuthState.Success
-            },
-            { exception ->
+                    override fun onError(message: String) {
+                        _authState.value = AuthState.Error(message)
+                    }
+                })
+            }, {
+                exception ->
                 _authState.value = AuthState.Error(exception.message ?: "Unknown error")
             })
     }
