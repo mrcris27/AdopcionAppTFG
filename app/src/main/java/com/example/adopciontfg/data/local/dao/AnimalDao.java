@@ -39,6 +39,8 @@ public interface AnimalDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAnimal(AnimalEntity animal);
 
+    @Query("SELECT COUNT(*) FROM animals")
+    int getAnimalCount();
 
     // Eliminar animal
     @Delete

@@ -24,12 +24,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -40,6 +39,9 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.example.adopciontfg.ui.theme.Dimens
+import com.example.adopciontfg.ui.theme.elevatedSurface
+import com.example.adopciontfg.ui.theme.subtleDivider
 
 private const val SHIMMER_DURATION_MS = 1100
 
@@ -47,9 +49,9 @@ private const val SHIMMER_DURATION_MS = 1100
 fun rememberShimmerBrush(): Brush {
     val base = MaterialTheme.colorScheme.surfaceVariant
     val colors = listOf(
-        base.copy(alpha = 0.38f),
-        base.copy(alpha = 0.92f),
-        base.copy(alpha = 0.38f),
+        base.copy(alpha = 0.35f),
+        base.copy(alpha = 0.85f),
+        base.copy(alpha = 0.35f),
     )
     val transition = rememberInfiniteTransition(label = "skeleton_shimmer")
     val shift by transition.animateFloat(
@@ -71,7 +73,7 @@ fun rememberShimmerBrush(): Brush {
 @Composable
 fun SkeletonBox(
     modifier: Modifier = Modifier,
-    shape: Shape = RoundedCornerShape(8.dp),
+    shape: Shape = MaterialTheme.shapes.small,
 ) {
     val brush = rememberShimmerBrush()
     Box(
@@ -81,45 +83,51 @@ fun SkeletonBox(
     )
 }
 
-/**
- * Fila tipo [com.example.adopciontfg.app.ui.screens.components.CardViewList]: imagen + título + subtítulo.
- */
+/** Fila alineada con [CardViewList]: thumbnail + textos + chevron. */
 @Composable
 fun ShelterCardRowSkeleton(
     modifier: Modifier = Modifier,
 ) {
-    Surface(
+    ElevatedCard(
         modifier = modifier
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(horizontal = Dimens.spacingLg)
             .fillMaxWidth(),
         shape = MaterialTheme.shapes.large,
-        color = MaterialTheme.colorScheme.surfaceVariant,
-        tonalElevation = 2.dp,
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = MaterialTheme.colorScheme.elevatedSurface()
+        ),
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(Dimens.cardPadding),
             verticalAlignment = Alignment.CenterVertically
         ) {
             SkeletonBox(
-                modifier = Modifier.size(70.dp),
+                modifier = Modifier.size(Dimens.thumbnailSize),
                 shape = MaterialTheme.shapes.medium
             )
-            Spacer(modifier = Modifier.width(16.dp))
-            Column(modifier = Modifier.weight(1f)) {
+            Spacer(modifier = Modifier.width(Dimens.spacingLg))
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(Dimens.spacingXs)
+            ) {
                 SkeletonBox(
                     modifier = Modifier
-                        .fillMaxWidth(0.72f)
-                        .height(18.dp)
+                        .fillMaxWidth(0.7f)
+                        .height(16.dp)
                 )
-                Spacer(modifier = Modifier.height(8.dp))
                 SkeletonBox(
                     modifier = Modifier
-                        .fillMaxWidth(0.48f)
+                        .fillMaxWidth(0.45f)
                         .height(12.dp)
                 )
             }
+            SkeletonBox(
+                modifier = Modifier.size(24.dp),
+                shape = MaterialTheme.shapes.small
+            )
         }
     }
 }
@@ -128,11 +136,11 @@ fun ShelterCardRowSkeleton(
 fun ShelterCardListSkeleton(
     modifier: Modifier = Modifier,
     itemCount: Int = 6,
-    contentPadding: PaddingValues = PaddingValues(vertical = 8.dp),
+    contentPadding: PaddingValues = PaddingValues(vertical = Dimens.spacingSm),
 ) {
     LazyColumn(
         modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(0.dp),
+        verticalArrangement = Arrangement.spacedBy(Dimens.listItemSpacing),
         contentPadding = contentPadding,
     ) {
         items(itemCount) {
@@ -145,18 +153,58 @@ fun ShelterCardListSkeleton(
 fun MapAreaSkeleton(
     modifier: Modifier = Modifier,
 ) {
-    Box(
+    Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(8.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(rememberShimmerBrush())
-    )
+            .padding(Dimens.spacingSm),
+        verticalArrangement = Arrangement.spacedBy(Dimens.spacingMd)
+    ) {
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .clip(MaterialTheme.shapes.large)
+                .background(rememberShimmerBrush())
+        )
+        ElevatedCard(
+            modifier = Modifier.fillMaxWidth(),
+            shape = MaterialTheme.shapes.large,
+            colors = CardDefaults.elevatedCardColors(
+                containerColor = MaterialTheme.colorScheme.elevatedSurface()
+            ),
+            elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(Dimens.cardPadding),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                SkeletonBox(
+                    modifier = Modifier.size(44.dp),
+                    shape = MaterialTheme.shapes.medium
+                )
+                Spacer(modifier = Modifier.width(Dimens.spacingMd))
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(Dimens.spacingXs)
+                ) {
+                    SkeletonBox(
+                        modifier = Modifier
+                            .fillMaxWidth(0.55f)
+                            .height(14.dp)
+                    )
+                    SkeletonBox(
+                        modifier = Modifier
+                            .fillMaxWidth(0.35f)
+                            .height(12.dp)
+                    )
+                }
+            }
+        }
+    }
 }
 
-/**
- * Cabecera tipo tarjeta de protectora en [com.example.adopciontfg.app.ui.screens.shelter_profile_screen.ShelterProfileScreen].
- */
 @Composable
 fun ShelterProfileHeaderCardSkeleton(
     modifier: Modifier = Modifier,
@@ -164,30 +212,29 @@ fun ShelterProfileHeaderCardSkeleton(
     ElevatedCard(
         modifier = modifier
             .fillMaxWidth()
-            .padding(6.dp),
-        shape = RoundedCornerShape(16.dp),
+            .padding(horizontal = Dimens.spacingLg, vertical = Dimens.spacingSm),
+        shape = MaterialTheme.shapes.large,
         colors = CardDefaults.elevatedCardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
+            containerColor = MaterialTheme.colorScheme.elevatedSurface()
         ),
-        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 14.dp, vertical = 12.dp),
+                .padding(Dimens.cardPadding),
             verticalAlignment = Alignment.CenterVertically
         ) {
             SkeletonBox(
-                modifier = Modifier.size(48.dp),
+                modifier = Modifier.size(Dimens.avatarSize),
                 shape = CircleShape
             )
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(Dimens.spacingMd))
             SkeletonBox(
                 modifier = Modifier
                     .weight(1f)
                     .height(20.dp)
             )
-            Spacer(modifier = Modifier.width(8.dp))
             SkeletonBox(
                 modifier = Modifier.size(24.dp),
                 shape = CircleShape
@@ -204,11 +251,10 @@ fun ShelterProfilePetsSectionSkeleton(
     Column(modifier = modifier) {
         SkeletonBox(
             modifier = Modifier
-                .padding(horizontal = 12.dp)
-                .fillMaxWidth(0.45f)
-                .height(22.dp)
+                .padding(horizontal = Dimens.spacingLg, vertical = Dimens.spacingSm)
+                .fillMaxWidth(0.4f)
+                .height(16.dp)
         )
-        Spacer(modifier = Modifier.height(8.dp))
         ShelterCardListSkeleton(
             modifier = Modifier
                 .weight(1f)
@@ -218,20 +264,14 @@ fun ShelterProfilePetsSectionSkeleton(
     }
 }
 
-/**
- * Contenido de perfil completo en carga (cabecera + lista de animales).
- */
 @Composable
 fun ShelterProfileScreenSkeleton(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(top = 8.dp)
+        modifier = modifier.fillMaxSize()
     ) {
         ShelterProfileHeaderCardSkeleton()
-        Spacer(modifier = Modifier.height(14.dp))
         ShelterProfilePetsSectionSkeleton(
             modifier = Modifier
                 .weight(1f)
@@ -250,7 +290,7 @@ fun PetDetailTopBarTitleSkeleton(
         modifier = modifier
             .width(152.dp)
             .height(22.dp),
-        shape = RoundedCornerShape(6.dp)
+        shape = MaterialTheme.shapes.small
     )
 }
 
@@ -261,20 +301,20 @@ fun PetDetailBottomBarSkeleton(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+            .padding(Dimens.cardPadding),
+        horizontalArrangement = Arrangement.spacedBy(Dimens.spacingMd)
     ) {
         SkeletonBox(
             modifier = Modifier
                 .weight(1f)
-                .height(48.dp),
-            shape = RoundedCornerShape(24.dp)
+                .height(Dimens.buttonHeight),
+            shape = MaterialTheme.shapes.large
         )
         SkeletonBox(
             modifier = Modifier
                 .weight(1f)
-                .height(48.dp),
-            shape = RoundedCornerShape(24.dp)
+                .height(Dimens.buttonHeight),
+            shape = MaterialTheme.shapes.large
         )
     }
 }
@@ -308,24 +348,29 @@ fun PetDetailInfoCardSkeleton(
     Card(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = MaterialTheme.colorScheme.elevatedSurface()
         ),
         shape = MaterialTheme.shapes.large,
-        elevation = CardDefaults.cardElevation(4.dp),
+        elevation = CardDefaults.cardElevation(2.dp),
     ) {
         val valueWidths = listOf(118.dp, 92.dp, 132.dp, 104.dp, 88.dp)
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            modifier = Modifier.padding(Dimens.cardPadding),
+            verticalArrangement = Arrangement.spacedBy(Dimens.spacingMd)
         ) {
-            valueWidths.forEach { w ->
+            valueWidths.forEachIndexed { index, w ->
                 PetDetailInfoRowSkeleton(valueWidth = w)
+                if (index == 0) {
+                    HorizontalDivider(
+                        color = MaterialTheme.colorScheme.subtleDivider()
+                    )
+                }
             }
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(Dimens.spacingXs))
             SkeletonBox(
                 modifier = Modifier
-                    .fillMaxWidth(0.48f)
-                    .height(18.dp)
+                    .fillMaxWidth(0.42f)
+                    .height(14.dp)
             )
             SkeletonBox(
                 modifier = Modifier
@@ -334,12 +379,7 @@ fun PetDetailInfoCardSkeleton(
             )
             SkeletonBox(
                 modifier = Modifier
-                    .fillMaxWidth(0.92f)
-                    .height(12.dp)
-            )
-            SkeletonBox(
-                modifier = Modifier
-                    .fillMaxWidth(0.72f)
+                    .fillMaxWidth(0.88f)
                     .height(12.dp)
             )
         }
@@ -352,40 +392,37 @@ fun PetDetailPhotosSectionSkeleton(
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(Dimens.spacingSm)
     ) {
         SkeletonBox(
             modifier = Modifier
-                .fillMaxWidth(0.22f)
+                .fillMaxWidth(0.2f)
                 .height(18.dp)
         )
         LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            contentPadding = PaddingValues(vertical = 4.dp)
+            horizontalArrangement = Arrangement.spacedBy(Dimens.spacingMd),
+            contentPadding = PaddingValues(vertical = Dimens.spacingXs)
         ) {
             items(3) {
                 SkeletonBox(
                     modifier = Modifier
                         .width(280.dp)
                         .height(200.dp),
-                    shape = RoundedCornerShape(20.dp)
+                    shape = MaterialTheme.shapes.large
                 )
             }
         }
     }
 }
 
-/**
- * Cuerpo scrollable del detalle de mascota ([com.example.adopciontfg.app.ui.screens.pet_detail_screen.PetDetailScreen]) en carga.
- */
 @Composable
 fun PetDetailContentSkeleton(
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        contentPadding = PaddingValues(16.dp)
+        verticalArrangement = Arrangement.spacedBy(Dimens.spacingLg),
+        contentPadding = PaddingValues(Dimens.screenPadding)
     ) {
         item { PetDetailInfoCardSkeleton() }
         item { PetDetailPhotosSectionSkeleton() }

@@ -31,5 +31,7 @@ public interface ShelterDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertShelter(ShelterEntity shelter);
 
+    @Query("SELECT COUNT(*) FROM shelters")
+    int getShelterCount();
 
 }

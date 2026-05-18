@@ -9,23 +9,24 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Palette
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Button
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import com.example.adopciontfg.app.ui.screens.components.AppPrimaryButton
+import com.example.adopciontfg.app.ui.screens.components.AppSectionTitle
+import com.example.adopciontfg.app.ui.screens.components.AppTopAppBar
+import com.example.adopciontfg.ui.theme.Dimens
+import com.example.adopciontfg.ui.theme.elevatedSurface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -81,14 +82,11 @@ private fun UserSettingsContent(
 ) {
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            TopAppBar(
-                title = { Text("Ajustes de usuario") },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
-                    }
-                }
+            AppTopAppBar(
+                title = "Ajustes de usuario",
+                onBackClick = onBackClick
             )
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
@@ -98,14 +96,16 @@ private fun UserSettingsContent(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                .padding(Dimens.screenPadding),
+            verticalArrangement = Arrangement.spacedBy(Dimens.spacingMd)
         ) {
-            SectionHeader("Perfil")
+            AppSectionTitle("Perfil")
             ElevatedCard(
+                shape = MaterialTheme.shapes.large,
                 colors = CardDefaults.elevatedCardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerLow
-                )
+                    containerColor = MaterialTheme.colorScheme.elevatedSurface()
+                ),
+                elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
             ) {
                 Column(
                     modifier = Modifier.padding(12.dp),
@@ -142,11 +142,13 @@ private fun UserSettingsContent(
                 }
             }
 
-            SectionHeader("Preferencias")
+            AppSectionTitle("Preferencias")
             ElevatedCard(
+                shape = MaterialTheme.shapes.large,
                 colors = CardDefaults.elevatedCardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerLow
-                )
+                    containerColor = MaterialTheme.colorScheme.elevatedSurface()
+                ),
+                elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
             ) {
                 Column(modifier = Modifier.padding(12.dp)) {
                     SettingsSwitchRow(
@@ -164,12 +166,10 @@ private fun UserSettingsContent(
                 }
             }
 
-            Button(
-                onClick = onSaveClick,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Guardar")
-            }
+            AppPrimaryButton(
+                text = "Guardar",
+                onClick = onSaveClick
+            )
         }
     }
 }
@@ -214,11 +214,3 @@ private fun SettingsSwitchRow(
     }
 }
 
-@Composable
-private fun SectionHeader(title: String) {
-    Text(
-        text = title,
-        style = MaterialTheme.typography.titleSmall,
-        color = MaterialTheme.colorScheme.onSurfaceVariant
-    )
-}

@@ -15,21 +15,20 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,14 +39,19 @@ import androidx.compose.ui.unit.dp
 import com.example.adopciontfg.app.ui.components.skeleton.PetDetailBottomBarSkeleton
 import com.example.adopciontfg.app.ui.components.skeleton.PetDetailContentSkeleton
 import com.example.adopciontfg.app.ui.components.skeleton.PetDetailTopBarTitleSkeleton
+import com.example.adopciontfg.app.ui.screens.components.AppOutlinedButton
+import com.example.adopciontfg.app.ui.screens.components.AppSecondaryButton
+import com.example.adopciontfg.app.ui.screens.components.AppSectionTitle
 import com.example.adopciontfg.data.local.entity.AnimalEntity
 import com.example.adopciontfg.data.local.entity.ageInYears
 import com.example.adopciontfg.data.local.entity.displayPhotos
 import com.example.adopciontfg.data.local.entity.formattedCharacteristics
 import com.example.adopciontfg.data.local.entity.genderLabel
-import com.example.adopciontfg.model.Characteristic
-import com.example.adopciontfg.model.Species
+import com.example.adopciontfg.data.sampleAnimals
 import com.example.adopciontfg.ui.theme.AdoptionTheme
+import com.example.adopciontfg.ui.theme.Dimens
+import com.example.adopciontfg.ui.theme.elevatedSurface
+import com.example.adopciontfg.ui.theme.subtleDivider
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,49 +62,58 @@ fun PetDetailScreen(
     isLoading: Boolean = false,
 ) {
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 title = {
                     if (isLoading) {
                         PetDetailTopBarTitleSkeleton()
                     } else {
-                        Text(animal?.name.orEmpty())
+                        Text(
+                            text = animal?.name.orEmpty(),
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.SemiBold
+                        )
                     }
                 },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver"
+                            contentDescription = "Volver",
+                            tint = MaterialTheme.colorScheme.primary
                         )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.elevatedSurface()
+                )
             )
         },
         bottomBar = {
             if (isLoading) {
                 PetDetailBottomBarSkeleton()
             } else {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                Surface(
+                    shadowElevation = 8.dp,
+                    color = MaterialTheme.colorScheme.elevatedSurface(),
                 ) {
-                    Button(
-                        onClick = onAdoptClick,
-                        modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.secondary
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(Dimens.cardPadding),
+                        horizontalArrangement = Arrangement.spacedBy(Dimens.spacingMd)
+                    ) {
+                        AppSecondaryButton(
+                            text = "Adoptar ahora",
+                            onClick = onAdoptClick,
+                            modifier = Modifier.weight(1f)
                         )
-                    ) {
-                        Text("Adoptar ahora")
-                    }
-                    OutlinedButton(
-                        onClick = { },
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text("Donar")
+                        AppOutlinedButton(
+                            text = "Donar",
+                            onClick = { },
+                            modifier = Modifier.weight(1f)
+                        )
                     }
                 }
             }
@@ -118,42 +131,41 @@ fun PetDetailScreen(
             LazyColumn(
                 modifier = Modifier
                     .padding(padding)
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                contentPadding = PaddingValues(16.dp)
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(Dimens.spacingLg),
+                contentPadding = PaddingValues(Dimens.screenPadding)
             ) {
                 item {
                     Card(
                         colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surface
+                            containerColor = MaterialTheme.colorScheme.elevatedSurface()
                         ),
                         shape = MaterialTheme.shapes.large,
-                        elevation = CardDefaults.cardElevation(4.dp),
+                        elevation = CardDefaults.cardElevation(2.dp),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Column(
-                            modifier = Modifier.padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                            modifier = Modifier.padding(Dimens.cardPadding),
+                            verticalArrangement = Arrangement.spacedBy(Dimens.spacingMd)
                         ) {
                             InfoRow("Nombre", animal.name.orEmpty())
+                            HorizontalDivider(
+                                color = MaterialTheme.colorScheme.subtleDivider()
+                            )
                             InfoRow("Edad", "${animal.ageInYears()} años")
                             InfoRow("Especie", animal.species?.name.orEmpty())
                             InfoRow("Género", animal.genderLabel())
                             if (!animal.characteristics.isNullOrEmpty()) {
                                 InfoRow("Características", animal.formattedCharacteristics())
                             }
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = "Sobre esta mascota",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold
-                            )
+                            Spacer(modifier = Modifier.height(Dimens.spacingXs))
+                            AppSectionTitle(text = "Sobre esta mascota")
                             Text(
                                 text = animal.description?.takeIf { it.isNotBlank() }
                                     ?: "Esta mascota busca un hogar lleno de amor. " +
                                     "Está esperando a alguien especial que le dé una segunda oportunidad 🐾",
-                                style = MaterialTheme.typography.bodyMedium
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
@@ -171,19 +183,19 @@ fun PetDetailScreen(
 private fun PetPhotosCarousel(photos: List<String>) {
     Column(
         modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(Dimens.spacingSm)
     ) {
         Text(
             text = "Fotos",
             style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.SemiBold
         )
         if (photos.isEmpty()) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
-                    .clip(RoundedCornerShape(20.dp))
+                    .clip(MaterialTheme.shapes.large)
                     .background(MaterialTheme.colorScheme.surfaceVariant),
                 contentAlignment = Alignment.Center
             ) {
@@ -194,15 +206,15 @@ private fun PetPhotosCarousel(photos: List<String>) {
             }
         } else {
             LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                contentPadding = PaddingValues(vertical = 4.dp)
+                horizontalArrangement = Arrangement.spacedBy(Dimens.spacingMd),
+                contentPadding = PaddingValues(vertical = Dimens.spacingXs)
             ) {
                 itemsIndexed(photos, key = { index, _ -> index }) { _, _ ->
                     Box(
                         modifier = Modifier
                             .width(280.dp)
                             .height(200.dp)
-                            .clip(RoundedCornerShape(20.dp))
+                            .clip(MaterialTheme.shapes.large)
                             .background(MaterialTheme.colorScheme.surfaceVariant),
                         contentAlignment = Alignment.Center
                     ) {
@@ -231,23 +243,11 @@ private fun InfoRow(label: String, value: String) {
         Text(
             text = value,
             fontWeight = FontWeight.SemiBold,
-            style = MaterialTheme.typography.bodyMedium
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
 }
-
-private fun previewAnimal(): AnimalEntity = AnimalEntity(
-    "1",
-    "Max",
-    false,
-    "",
-    listOf("", "", ""),
-    1672531200000L,
-    "Max es un perro muy cariñoso y juguetón. Le encanta pasear y jugar con la pelota.",
-    Species.PERRO,
-    listOf(Characteristic.SOCIABLE_CON_PERROS, Characteristic.JUGUETON),
-    "1",
-)
 
 @Preview(showBackground = true, name = "Cargando")
 @Composable
@@ -267,7 +267,7 @@ fun PetDetailLoadingPreview() {
 fun PetDetailPreview() {
     AdoptionTheme {
         PetDetailScreen(
-            animal = previewAnimal(),
+            animal = sampleAnimals.first(),
             onBackClick = {},
             onAdoptClick = {},
         )

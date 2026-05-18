@@ -1,24 +1,32 @@
 package com.example.adopciontfg.app.ui.screens.shelter_registration
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.*
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.adopciontfg.R
+import com.example.adopciontfg.app.ui.screens.components.AppSecondaryButton
+import com.example.adopciontfg.app.ui.screens.components.AppTopAppBar
+import com.example.adopciontfg.app.ui.screens.components.RegistrationPasswordField
+import com.example.adopciontfg.app.ui.screens.components.RegistrationTextField
 import com.example.adopciontfg.app.ui.screens.components.SavePhotos
 import com.example.adopciontfg.ui.theme.AdoptionTheme
+import com.example.adopciontfg.ui.theme.Dimens
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,118 +36,85 @@ fun ShelterRegistration(
     viewModel: ShelterRegistrationViewModel = hiltViewModel()
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
+
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
-
         topBar = {
-            TopAppBar(
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                ),
-                title = {
-                    Text(
-                        "Registro de protectora",
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                }
+            AppTopAppBar(
+                title = stringResource(R.string.registro_protectora),
+                onBackClick = onBackClick
             )
         }
     ) { innerPadding ->
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(16.dp)
+                .padding(Dimens.screenPadding)
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(Dimens.spacingMd),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             RegistrationTextField(
                 value = uiState.value.name,
                 onValueChange = viewModel::onNameChange,
-                label = "Nombre"
+                label = stringResource(R.string.nombre)
             )
             RegistrationTextField(
                 value = uiState.value.cif,
                 onValueChange = viewModel::onCifChange,
-                label = "CIF"
+                label = stringResource(R.string.cif)
             )
             RegistrationTextField(
-                value = uiState.value.tel,
-                onValueChange = viewModel::onTelChange,
-                label = "Telefono"
+                value = uiState.value.phone,
+                onValueChange = viewModel::onPhoneChange,
+                label = stringResource(R.string.telefono),
+                keyboardType = KeyboardType.Phone
             )
             RegistrationTextField(
                 value = uiState.value.address,
                 onValueChange = viewModel::onAddressChange,
-                label = "Direccion"
+                label = stringResource(R.string.direccion)
             )
             RegistrationTextField(
                 value = uiState.value.email,
                 onValueChange = viewModel::onEmailChange,
-                label = "Correo"
+                label = stringResource(R.string.correo),
+                keyboardType = KeyboardType.Email
             )
 
-            TextField(
+            RegistrationPasswordField(
                 value = uiState.value.password,
                 onValueChange = viewModel::onPasswordChange,
-                label = { Text("Contraseña") },
-                visualTransformation = if (uiState.value.passwordHidden)
-                    PasswordVisualTransformation()
-                else
-                    VisualTransformation.None,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                trailingIcon = {
-                    IconButton(onClick = viewModel::togglePasswordVisibility) {
-                        Icon(
-                            imageVector =
-                                if (uiState.value.passwordHidden) Icons.Default.Visibility
-                                else Icons.Default.VisibilityOff,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                colors = TextFieldDefaults.colors(
-                    focusedIndicatorColor = MaterialTheme.colorScheme.primary,
-                    cursorColor = MaterialTheme.colorScheme.primary
-                )
+                label = stringResource(R.string.contraseña),
+                hidden = uiState.value.passwordHidden,
+                onToggleVisibility = viewModel::togglePasswordVisibility
+            )
+            RegistrationPasswordField(
+                value = uiState.value.confirmPassword,
+                onValueChange = viewModel::onConfirmPasswordChange,
+                label = stringResource(R.string.contraseña2),
+                hidden = uiState.value.confirmPasswordHidden,
+                onToggleVisibility = viewModel::toggleConfirmPasswordVisibility
             )
 
-            //maximo de fotos 1
             Text(
-                "Seleccione foto de perfil",
-                color = MaterialTheme.colorScheme.onBackground
+                text = stringResource(R.string.foto_perfil),
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.fillMaxWidth()
             )
-
             SavePhotos()
 
-            Button(
+            AppSecondaryButton(
+                text = stringResource(R.string.registrar),
                 onClick = {
                     viewModel.onRegisterClick()
                     onRegisterClick()
                 },
                 enabled = uiState.value.canRegister,
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.secondary,
-                    contentColor = MaterialTheme.colorScheme.onSecondary
-                )
-            ) {
-                Text("Registrar")
-            }
-
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }
@@ -154,22 +129,4 @@ fun ShelterRegistrationPreview() {
             viewModel = ShelterRegistrationViewModel()
         )
     }
-}
-
-@Composable
-private fun RegistrationTextField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    label: String
-) {
-    TextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = { Text(label) },
-        modifier = Modifier.fillMaxWidth(),
-        colors = TextFieldDefaults.colors(
-            focusedIndicatorColor = MaterialTheme.colorScheme.primary,
-            cursorColor = MaterialTheme.colorScheme.primary
-        )
-    )
 }

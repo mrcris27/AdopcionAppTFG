@@ -4,21 +4,27 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ExpandMore
-import androidx.compose.material3.*
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,15 +33,23 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.adopciontfg.app.ui.components.skeleton.ShelterCardListSkeleton
+import com.example.adopciontfg.app.ui.screens.components.AppSectionTitle
+import com.example.adopciontfg.app.ui.screens.components.AppTopAppBar
 import com.example.adopciontfg.app.ui.screens.components.CardViewList
 import com.example.adopciontfg.app.ui.screens.components.ListCardView
 import com.example.adopciontfg.data.local.entity.AnimalEntity
 import com.example.adopciontfg.data.local.entity.ShelterEntity
+import com.example.adopciontfg.data.local.entity.listSubtitle
+import com.example.adopciontfg.data.sampleAnimals
 import com.example.adopciontfg.data.sampleShelters
 import com.example.adopciontfg.ui.theme.AdoptionTheme
+import com.example.adopciontfg.ui.theme.Dimens
+import com.example.adopciontfg.ui.theme.elevatedSurface
+import com.example.adopciontfg.ui.theme.subtleDivider
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,62 +69,40 @@ fun ShelterProfileScreen(
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "PROTECTORA",
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver",
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                )
+            AppTopAppBar(
+                title = "Protectora",
+                onBackClick = onBackClick
             )
         }
     ) { innerPadding ->
-
         Column(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
         ) {
-
-            Spacer(modifier = Modifier.height(8.dp))
-
             ElevatedCard(
                 onClick = { shelterCardExpanded = !shelterCardExpanded },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(6.dp)
+                    .padding(horizontal = Dimens.spacingLg, vertical = Dimens.spacingSm)
                     .animateContentSize(),
-                shape = RoundedCornerShape(16.dp),
+                shape = MaterialTheme.shapes.large,
                 colors = CardDefaults.elevatedCardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    containerColor = MaterialTheme.colorScheme.elevatedSurface()
                 ),
-                elevation = CardDefaults.elevatedCardElevation(
-                    defaultElevation = 4.dp
-                )
+                elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 14.dp, vertical = 12.dp)
+                        .padding(Dimens.cardPadding)
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Surface(
-                            modifier = Modifier.size(48.dp),
+                            modifier = Modifier.size(Dimens.avatarSize),
                             shape = CircleShape,
                             color = MaterialTheme.colorScheme.primaryContainer
                         ) {
@@ -121,17 +113,18 @@ fun ShelterProfileScreen(
                                 Icon(
                                     imageVector = Icons.Default.AccountCircle,
                                     contentDescription = null,
-                                    modifier = Modifier.size(40.dp),
+                                    modifier = Modifier.size(44.dp),
                                     tint = MaterialTheme.colorScheme.primary
                                 )
                             }
                         }
 
-                        Spacer(modifier = Modifier.width(12.dp))
+                        Spacer(modifier = Modifier.width(Dimens.spacingMd))
 
                         Text(
                             text = shelter.name.orEmpty(),
-                            style = MaterialTheme.typography.titleMedium,
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.SemiBold,
                             modifier = Modifier.weight(1f)
                         )
 
@@ -148,9 +141,11 @@ fun ShelterProfileScreen(
                     }
 
                     if (shelterCardExpanded) {
-                        Spacer(modifier = Modifier.height(10.dp))
-                        HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.35f))
-                        Spacer(modifier = Modifier.height(10.dp))
+                        Spacer(modifier = Modifier.height(Dimens.spacingMd))
+                        HorizontalDivider(
+                            color = MaterialTheme.colorScheme.subtleDivider()
+                        )
+                        Spacer(modifier = Modifier.height(Dimens.spacingMd))
 
                         val hasContactDetails = shelter.address.orEmpty().isNotBlank() ||
                             shelter.cif.orEmpty().isNotBlank() ||
@@ -171,27 +166,24 @@ fun ShelterProfileScreen(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
-
                             if (shelter.cif.orEmpty().isNotBlank()) {
-                                Spacer(modifier = Modifier.height(6.dp))
+                                Spacer(modifier = Modifier.height(Dimens.spacingSm))
                                 Text(
                                     text = "CIF: ${shelter.cif.orEmpty()}",
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
-
                             if (shelter.email.orEmpty().isNotBlank()) {
-                                Spacer(modifier = Modifier.height(6.dp))
+                                Spacer(modifier = Modifier.height(Dimens.spacingSm))
                                 Text(
                                     text = shelter.email.orEmpty(),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
-
                             if (shelter.phone.orEmpty().isNotBlank()) {
-                                Spacer(modifier = Modifier.height(6.dp))
+                                Spacer(modifier = Modifier.height(Dimens.spacingSm))
                                 Text(
                                     text = shelter.phone.orEmpty(),
                                     style = MaterialTheme.typography.bodySmall,
@@ -203,16 +195,13 @@ fun ShelterProfileScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
-
-            Text(
+            AppSectionTitle(
                 text = "Animales disponibles",
-                modifier = Modifier.padding(horizontal = 12.dp),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onBackground
+                modifier = Modifier.padding(
+                    horizontal = Dimens.spacingLg,
+                    vertical = Dimens.spacingSm
+                )
             )
-
-            Spacer(modifier = Modifier.height(8.dp))
 
             Box(
                 modifier = Modifier
@@ -224,7 +213,7 @@ fun ShelterProfileScreen(
                 } else if (animals.isEmpty()) {
                     Text(
                         text = "No hay animales disponibles en esta protectora.",
-                        modifier = Modifier.padding(horizontal = 12.dp),
+                        modifier = Modifier.padding(horizontal = Dimens.spacingLg),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -235,6 +224,7 @@ fun ShelterProfileScreen(
                         itemContent = { animal, onClick ->
                             CardViewList(
                                 name = animal.name.orEmpty(),
+                                subtitle = animal.listSubtitle(),
                                 onClick = onClick,
                             )
                         },
@@ -251,7 +241,7 @@ fun ShelterProfileViewPreview() {
     AdoptionTheme {
         ShelterProfileScreen(
             shelter = sampleShelters.first(),
-            animals = emptyList(),
+            animals = sampleAnimals.filter { it.shelterId == "1" },
             onBackClick = {},
             onPetClick = {},
         )
