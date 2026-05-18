@@ -19,6 +19,10 @@ public interface AnimalDao {
     @Query("SELECT * FROM animals")
     LiveData<List<AnimalEntity>> getAllAnimals();
 
+    // Obtener animal por id
+    @Query("SELECT * FROM animals WHERE id = :id LIMIT 1")
+    LiveData<AnimalEntity> getAnimalById(String id);
+
     // Obtener animales por protectora
     @Query("SELECT * FROM animals WHERE shelterId = :shelterId")
     LiveData<List<AnimalEntity>> getAnimalsByShelter(String shelterId);
@@ -35,6 +39,8 @@ public interface AnimalDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAnimal(AnimalEntity animal);
 
+    @Query("SELECT COUNT(*) FROM animals")
+    int getAnimalCount();
 
     // Eliminar animal
     @Delete

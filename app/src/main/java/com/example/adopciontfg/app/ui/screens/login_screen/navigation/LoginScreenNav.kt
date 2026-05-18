@@ -13,7 +13,8 @@ fun NavGraphBuilder.loginScreen(
     composable<LoginScreenRoute> {
         LoginScreen(
             onBackClick = onBackClick,
-            onContinueClick = onContinueClick
+            onContinueClick = onContinueClick,
+//            authViewModel = authViewModel
             )
     }
 }

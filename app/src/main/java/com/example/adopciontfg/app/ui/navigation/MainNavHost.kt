@@ -6,7 +6,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import com.example.adopciontfg.app.ui.screens.pet_detail_screen.navigation.PetDetailRoute
 import com.example.adopciontfg.app.ui.screens.pet_detail_screen.navigation.petDetail
-import com.example.adopciontfg.app.ui.screens.pet_list.navigation.petListScreen
+import com.example.adopciontfg.app.ui.screens.settings.navigation.settingsHubScreen
+import com.example.adopciontfg.app.ui.screens.settings.shelter.navigation.ShelterSettingsRoute
+import com.example.adopciontfg.app.ui.screens.settings.shelter.navigation.shelterSettingsScreen
+import com.example.adopciontfg.app.ui.screens.settings.user.navigation.UserSettingsRoute
+import com.example.adopciontfg.app.ui.screens.settings.user.navigation.userSettingsScreen
 import com.example.adopciontfg.app.ui.screens.shelter_profile_screen.navigation.ShelterProfileRoute
 import com.example.adopciontfg.app.ui.screens.shelter_profile_screen.navigation.shelterProfileScreen
 import com.example.adopciontfg.app.ui.screens.user_home_screen.navigation.UserScreenRoute
@@ -25,15 +29,8 @@ fun MainNavHost(
     ) {
 
         userScreen(
-            onDetailClick = {
-                navController.navigate(ShelterProfileRoute)
-            },
-            navController = navController
-        )
-
-        petListScreen(
-            onDetailClick = { petId ->
-                navController.navigate(PetDetailRoute(petId))
+            onDetailClick = { shelter ->
+                navController.navigate(ShelterProfileRoute(shelter.id))
             }
         )
 
@@ -43,6 +40,22 @@ fun MainNavHost(
         )
 
         shelterProfileScreen(
+            onBackClick = { navController.popBackStack() },
+            onPetClick = { petId ->
+                navController.navigate(PetDetailRoute(petId))
+            }
+        )
+
+        settingsHubScreen(
+            onUserSettingsClick = { navController.navigate(UserSettingsRoute) },
+            onShelterSettingsClick = { navController.navigate(ShelterSettingsRoute) }
+        )
+
+        userSettingsScreen(
+            onBackClick = { navController.popBackStack() }
+        )
+
+        shelterSettingsScreen(
             onBackClick = { navController.popBackStack() }
         )
     }

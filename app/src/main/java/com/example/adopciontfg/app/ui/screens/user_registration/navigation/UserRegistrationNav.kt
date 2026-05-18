@@ -12,7 +12,8 @@ fun NavGraphBuilder.userRegistrationScreen(
     composable<UserRegistrationRoute> {
         UserRegistration(
             onBackClick = onBackClick,
-            onRegisterClick = onRegisterClick
+            onRegisterClick = onRegisterClick,
+            //            authViewModel = authViewModel
         )
     }
 }

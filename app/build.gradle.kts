@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt.android)
     id("com.google.gms.google-services")
 
     alias(libs.plugins.kotlin.serialization)
@@ -40,12 +41,15 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
@@ -63,7 +67,11 @@ dependencies {
     implementation(libs.osmdroid.android)
     implementation(libs.androidx.compose.ui.test)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.datastore.preferences)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.androidx.foundation.layout)
+    implementation(libs.hilt.android)
 
 
     testImplementation(libs.junit)
@@ -76,6 +84,7 @@ dependencies {
 
     implementation(libs.room.runtime)
     ksp(libs.room.compiler)
+    ksp(libs.hilt.compiler)
 
     // Import the Firebase BoM (Bill of Materials) to manage your Firebase library versions
     // Always use the latest version available.

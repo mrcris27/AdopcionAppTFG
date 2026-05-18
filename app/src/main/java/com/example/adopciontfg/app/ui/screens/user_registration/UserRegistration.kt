@@ -6,168 +6,123 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.adopciontfg.R
+import com.example.adopciontfg.app.ui.screens.components.AppSecondaryButton
+import com.example.adopciontfg.app.ui.screens.components.AppTopAppBar
+import com.example.adopciontfg.app.ui.screens.components.RegistrationPasswordField
+import com.example.adopciontfg.app.ui.screens.components.RegistrationTextField
+import com.example.adopciontfg.app.ui.screens.components.SavePhotos
 import com.example.adopciontfg.ui.theme.AdoptionTheme
+import com.example.adopciontfg.ui.theme.Dimens
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserRegistration(
     onBackClick: () -> Unit,
-    onRegisterClick: () -> Unit
+    onRegisterClick: () -> Unit,
+    viewModel: UserRegistrationViewModel = hiltViewModel()
 ) {
-
-    var name by rememberSaveable { mutableStateOf("") }
-    var surname by rememberSaveable { mutableStateOf("") }
-    var email by rememberSaveable { mutableStateOf("") }
-    var password1 by rememberSaveable { mutableStateOf("") }
-    var passwordHidden1 by rememberSaveable { mutableStateOf(true) }
-    var password2 by rememberSaveable { mutableStateOf("") }
-    var passwordHidden2 by rememberSaveable { mutableStateOf(true) }
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            TopAppBar(
-                title ={ Text(
-                    text = stringResource(R.string.registro_usuario),
-                    style = MaterialTheme.typography.headlineLarge,
-                    fontWeight = FontWeight.Bold
-                )},
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                }
+            AppTopAppBar(
+                title = stringResource(R.string.registro_usuario),
+                onBackClick = onBackClick
             )
         }
     ) { innerPadding ->
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(16.dp) // margen general bonito
+                .padding(Dimens.screenPadding)
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(Dimens.spacingMd),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
-            TextField(
-                value = name,
-                onValueChange = { name = it },
-                singleLine = true,
-                label = { Text(stringResource(R.string.nombre) ) },
-                modifier = Modifier
-                    .fillMaxWidth()
+            RegistrationTextField(
+                value = uiState.value.name,
+                onValueChange = viewModel::onNameChange,
+                label = stringResource(R.string.nombre)
             )
-            TextField(
-                value = surname,
-                onValueChange = { surname = it },
-                singleLine = true,
-                label = { Text(stringResource(R.string.apellidos)) },
-                modifier = Modifier
-                    .fillMaxWidth()
+            RegistrationTextField(
+                value = uiState.value.surname,
+                onValueChange = viewModel::onSurnameChange,
+                label = stringResource(R.string.apellidos)
+            )
+            RegistrationTextField(
+                value = uiState.value.email,
+                onValueChange = viewModel::onEmailChange,
+                label = stringResource(R.string.correo),
+                keyboardType = KeyboardType.Email
+            )
+            RegistrationTextField(
+                value = uiState.value.biography,
+                onValueChange = viewModel::onBiographyChange,
+                label = stringResource(R.string.biografia),
+                singleLine = false,
+                minLines = 3
             )
 
-            TextField(
-                value = email,
-                onValueChange = {email = it},
-                label = { Text(stringResource(R.string.correo))},
+            Text(
+                text = stringResource(R.string.foto_perfil),
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.fillMaxWidth()
             )
+            SavePhotos()
 
-            TextField(
-                value = password1,
-                onValueChange = { password1 = it },
-                singleLine = true,
-                label = { Text(stringResource(R.string.contraseña) ) },
-                visualTransformation = if (passwordHidden1)
-                    PasswordVisualTransformation()
-                else
-                    VisualTransformation.None,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                modifier = Modifier.fillMaxWidth(),
-                trailingIcon = {
-                    IconButton(onClick = { passwordHidden1 = !passwordHidden1 }) {
-                        val icon =
-                            if (passwordHidden1) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                        val description =
-                            if (passwordHidden1) "Show password" else "Hide password"
-
-                        Icon(imageVector = icon, contentDescription = description)
-                    }
-                }
+            RegistrationPasswordField(
+                value = uiState.value.password,
+                onValueChange = viewModel::onPasswordChange,
+                label = stringResource(R.string.contraseña),
+                hidden = uiState.value.passwordHidden,
+                onToggleVisibility = viewModel::togglePasswordVisibility
             )
-            TextField(
-                value = password2,
-                onValueChange = { password2 = it },
-                singleLine = true,
-                label = { Text(stringResource(R.string.contraseña2) ) },
-                visualTransformation = if (passwordHidden2)
-                    PasswordVisualTransformation()
-                else
-                    VisualTransformation.None,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                modifier = Modifier.fillMaxWidth(),
-                trailingIcon = {
-                    IconButton(onClick = { passwordHidden2 = !passwordHidden2 }) {
-                        val icon =
-                            if (passwordHidden2) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                        val description =
-                            if (passwordHidden2) "Show password" else "Hide password"
-
-                        Icon(imageVector = icon, contentDescription = description)
-                    }
-                }
+            RegistrationPasswordField(
+                value = uiState.value.confirmPassword,
+                onValueChange = viewModel::onConfirmPasswordChange,
+                label = stringResource(R.string.contraseña2),
+                hidden = uiState.value.confirmPasswordHidden,
+                onToggleVisibility = viewModel::toggleConfirmPasswordVisibility
             )
-            Button(
-                onClick = { },
+
+            AppSecondaryButton(
+                text = stringResource(R.string.registrar),
+                onClick = {
+                    viewModel.onRegisterClick()
+                    onRegisterClick()
+                },
+                enabled = uiState.value.canRegister,
                 modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(stringResource(R.string.continuar))
-            }
-
+            )
         }
-
     }
-
 }
 
 @Preview(showBackground = true)
 @Composable
 fun UserRegistrationPreview() {
     AdoptionTheme {
-        UserRegistration(onBackClick = {}, onRegisterClick = {})
+        UserRegistration(
+            onBackClick = {},
+            onRegisterClick = {},
+            viewModel = UserRegistrationViewModel()
+        )
     }
 }

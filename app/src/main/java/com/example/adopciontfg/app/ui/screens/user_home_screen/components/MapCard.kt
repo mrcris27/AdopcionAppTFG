@@ -7,51 +7,82 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Card
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.adopciontfg.data.Shelter
+import com.example.adopciontfg.data.local.entity.ShelterEntity
+import com.example.adopciontfg.ui.theme.Dimens
+import com.example.adopciontfg.ui.theme.elevatedSurface
 
 @Composable
 fun MapCard(
-    shelter: Shelter,
+    shelter: ShelterEntity,
     onClick: () -> Unit
 ) {
-    Card(
+    ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
-            .height(100.dp)
+            .height(96.dp)
             .clickable { onClick() },
         shape = MaterialTheme.shapes.large,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = MaterialTheme.colorScheme.elevatedSurface()
         ),
-        elevation = CardDefaults.cardElevation(8.dp)
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
+                .padding(Dimens.cardPadding),
             verticalAlignment = Alignment.CenterVertically
         ) {
-
-            Column {
-                Text(
-                    text = shelter.name,
-                    style = MaterialTheme.typography.titleMedium
+            Surface(
+                modifier = Modifier.size(44.dp),
+                shape = MaterialTheme.shapes.medium,
+                color = MaterialTheme.colorScheme.primaryContainer
+            ) {
+                Icon(
+                    imageVector = Icons.Default.LocationOn,
+                    contentDescription = null,
+                    modifier = Modifier.padding(10.dp),
+                    tint = MaterialTheme.colorScheme.primary
                 )
+            }
 
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = Dimens.spacingMd)
+            ) {
                 Text(
-                    text = "Ver detalles",
-                    style = MaterialTheme.typography.bodyMedium,
+                    text = shelter.name.orEmpty(),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    text = "Ver más información",
+                    style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.primary
                 )
             }
+
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }

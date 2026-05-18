@@ -17,19 +17,18 @@ import com.example.adopciontfg.app.ui.screens.user_registration.navigation.userR
 
 @Composable
 fun AppNavHost(navController: NavHostController) {
+//    val authViewModel: AuthViewModel = viewModel()
 
     NavHost(
         navController = navController,
         startDestination = LoginResRoute
     ) {
 
-        /* ---------------- AUTH (SIN Scaffold) ---------------- */
+        /* ---------------- AUTH ---------------- */
 
         loginResScreen(
             onLoginClick = {
-                navController.navigate(LoginScreenRoute) {
-                    popUpTo(LoginResRoute) { inclusive = true }
-                }
+                navController.navigate(LoginScreenRoute)
             },
             onRegisterClick = {
                 navController.navigate(RegistrationScreenRoute)
@@ -42,7 +41,8 @@ fun AppNavHost(navController: NavHostController) {
                 navController.navigate("main") {
                     popUpTo(LoginScreenRoute) { inclusive = true }
                 }
-            }
+            },
+//            authViewModel = authViewModel
         )
 
         registrationScreen(
@@ -57,7 +57,8 @@ fun AppNavHost(navController: NavHostController) {
 
         userRegistrationScreen(
             onBackClick = { navController.popBackStack() },
-            onRegisterClick = {}
+            onRegisterClick = {},
+            //            authViewModel = authViewModel
         )
 
         shelterRegistrationScreen(
@@ -65,10 +66,10 @@ fun AppNavHost(navController: NavHostController) {
             onBackClick = { navController.popBackStack() }
         )
 
-        /* ---------------- MAIN (CON Scaffold) ---------------- */
+        /* ---------------- MAIN ---------------- */
 
         composable("main") {
-            AppScaffold() // 👈 IMPORTANTE: sin pasar navController
+            AppScaffold()
         }
     }
 }

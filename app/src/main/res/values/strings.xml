@@ -1,5 +1,9 @@
 <resources>
     <string name="app_name">AdopcionTFG</string>
+    <string name="app_tagline">Encuentra a tu compañero ideal</string>
+    <string name="buscar_protectoras">Buscar protectoras</string>
+    <string name="buscar_animales">Buscar animales</string>
+    <string name="limpiar_busqueda">Limpiar búsqueda</string>
 
     <!--  Botones   -->
     <string name="soy_usuario">Soy usuario</string>
@@ -8,7 +12,9 @@
 
     <string name="volver_inicio">Volver al inicio</string>
     <string name="registro">Registro</string>
+    <string name="registro_subtitle">Elige cómo quieres usar la aplicación</string>
     <string name="login">Login</string>
+    <string name="login_subtitle">Accede con tu correo y contraseña</string>
     <string name="registro_usuario">Registro de usuario</string>
     <string name="registro_protectora">Registro de protectora</string>
 
@@ -19,7 +25,32 @@
     <string name="contraseña2"> Repite la contraseña </string>
     <string name="telefono"> Teléfono </string>
     <string name="correo"> Correo electrónico </string>
+    <string name="cif"> CIF </string>
+    <string name="direccion"> Dirección </string>
+    <string name="biografia"> Biografía </string>
+    <string name="foto_perfil"> Seleccione foto de perfil </string>
+    <string name="registrar"> Registrar </string>
 
+    <string name="registro_animal">Registrar animal</string>
+    <string name="datos_basicos">Datos básicos</string>
+    <string name="especie">Especie</string>
+    <string name="sexo">Sexo</string>
+    <string name="macho">Macho</string>
+    <string name="hembra">Hembra</string>
+    <string name="fecha_nacimiento">Fecha de nacimiento</string>
+    <string name="seleccionar_fecha">Seleccionar fecha</string>
+    <string name="descripcion">Descripción</string>
+    <string name="descripcion_animal_hint">Cuéntanos su carácter, necesidades o historial…</string>
+    <string name="fotos">Fotos</string>
+    <string name="foto_principal">Foto principal</string>
+    <string name="foto_principal_hint">Será la imagen que verán los usuarios en el listado.</string>
+    <string name="mas_fotos">Más fotos</string>
+    <string name="mas_fotos_hint">Opcional. Añade fotos adicionales para el detalle del animal.</string>
+    <string name="caracteristicas">Características</string>
+    <string name="caracteristicas_hint">Selecciona las que mejor describan al animal.</string>
+    <string name="registrar_animal">Registrar animal</string>
 
+    <string name="nav_bar_inicio">Inicio</string>
+    <string name="nav_bar_ajustes">Ajustes</string>
 
 </resources>

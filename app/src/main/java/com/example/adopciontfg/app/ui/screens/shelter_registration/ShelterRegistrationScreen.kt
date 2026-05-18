@@ -1,174 +1,120 @@
 package com.example.adopciontfg.app.ui.screens.shelter_registration
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.*
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.adopciontfg.R
+import com.example.adopciontfg.app.ui.screens.components.AppSecondaryButton
+import com.example.adopciontfg.app.ui.screens.components.AppTopAppBar
+import com.example.adopciontfg.app.ui.screens.components.RegistrationPasswordField
+import com.example.adopciontfg.app.ui.screens.components.RegistrationTextField
 import com.example.adopciontfg.app.ui.screens.components.SavePhotos
 import com.example.adopciontfg.ui.theme.AdoptionTheme
+import com.example.adopciontfg.ui.theme.Dimens
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ShelterRegistration(onRegisterClick: () -> Unit, onBackClick: () -> Unit) {
-
-    var name by rememberSaveable { mutableStateOf("") }
-    var cif by rememberSaveable { mutableStateOf("") }
-    var tel by rememberSaveable { mutableStateOf("") }
-    var address by rememberSaveable { mutableStateOf("") }
-    var email by rememberSaveable { mutableStateOf("") }
-    var password by rememberSaveable { mutableStateOf("") }
-    var passwordHidden by rememberSaveable { mutableStateOf(true) }
+fun ShelterRegistration(
+    onRegisterClick: () -> Unit,
+    onBackClick: () -> Unit,
+    viewModel: ShelterRegistrationViewModel = hiltViewModel()
+) {
+    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
-
         topBar = {
-            TopAppBar(
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                ),
-                title = {
-                    Text(
-                        "REGISTRO DE PROTECTORA",
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                }
+            AppTopAppBar(
+                title = stringResource(R.string.registro_protectora),
+                onBackClick = onBackClick
             )
         }
     ) { innerPadding ->
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(16.dp)
+                .padding(Dimens.screenPadding)
                 .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(Dimens.spacingMd),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
-            TextField(
-                value = name,
-                onValueChange = { name = it },
-                label = { Text("NOMBRE") },
-                modifier = Modifier.fillMaxWidth(),
-                colors = TextFieldDefaults.colors(
-                    focusedIndicatorColor = MaterialTheme.colorScheme.primary,
-                    cursorColor = MaterialTheme.colorScheme.primary
-                )
+            RegistrationTextField(
+                value = uiState.value.name,
+                onValueChange = viewModel::onNameChange,
+                label = stringResource(R.string.nombre)
+            )
+            RegistrationTextField(
+                value = uiState.value.cif,
+                onValueChange = viewModel::onCifChange,
+                label = stringResource(R.string.cif)
+            )
+            RegistrationTextField(
+                value = uiState.value.phone,
+                onValueChange = viewModel::onPhoneChange,
+                label = stringResource(R.string.telefono),
+                keyboardType = KeyboardType.Phone
+            )
+            RegistrationTextField(
+                value = uiState.value.address,
+                onValueChange = viewModel::onAddressChange,
+                label = stringResource(R.string.direccion)
+            )
+            RegistrationTextField(
+                value = uiState.value.email,
+                onValueChange = viewModel::onEmailChange,
+                label = stringResource(R.string.correo),
+                keyboardType = KeyboardType.Email
             )
 
-            TextField(
-                value = cif,
-                onValueChange = { cif = it },
-                label = { Text("CIF") },
-                modifier = Modifier.fillMaxWidth(),
-                colors = TextFieldDefaults.colors(
-                    focusedIndicatorColor = MaterialTheme.colorScheme.primary,
-                    cursorColor = MaterialTheme.colorScheme.primary
-                )
+            RegistrationPasswordField(
+                value = uiState.value.password,
+                onValueChange = viewModel::onPasswordChange,
+                label = stringResource(R.string.contraseña),
+                hidden = uiState.value.passwordHidden,
+                onToggleVisibility = viewModel::togglePasswordVisibility
+            )
+            RegistrationPasswordField(
+                value = uiState.value.confirmPassword,
+                onValueChange = viewModel::onConfirmPasswordChange,
+                label = stringResource(R.string.contraseña2),
+                hidden = uiState.value.confirmPasswordHidden,
+                onToggleVisibility = viewModel::toggleConfirmPasswordVisibility
             )
 
-            TextField(
-                value = tel,
-                onValueChange = { tel = it },
-                label = { Text("TELÉFONO") },
-                modifier = Modifier.fillMaxWidth(),
-                colors = TextFieldDefaults.colors(
-                    focusedIndicatorColor = MaterialTheme.colorScheme.primary,
-                    cursorColor = MaterialTheme.colorScheme.primary
-                )
-            )
-
-            TextField(
-                value = address,
-                onValueChange = { address = it },
-                label = { Text("DIRECCIÓN") },
-                modifier = Modifier.fillMaxWidth(),
-                colors = TextFieldDefaults.colors(
-                    focusedIndicatorColor = MaterialTheme.colorScheme.primary,
-                    cursorColor = MaterialTheme.colorScheme.primary
-                )
-            )
-
-            TextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("CORREO") },
-                modifier = Modifier.fillMaxWidth(),
-                colors = TextFieldDefaults.colors(
-                    focusedIndicatorColor = MaterialTheme.colorScheme.primary,
-                    cursorColor = MaterialTheme.colorScheme.primary
-                )
-            )
-
-            TextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text("CONTRASEÑA") },
-                visualTransformation = if (passwordHidden)
-                    PasswordVisualTransformation()
-                else
-                    VisualTransformation.None,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                trailingIcon = {
-                    IconButton(onClick = { passwordHidden = !passwordHidden }) {
-                        Icon(
-                            imageVector =
-                                if (passwordHidden) Icons.Default.Visibility
-                                else Icons.Default.VisibilityOff,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                colors = TextFieldDefaults.colors(
-                    focusedIndicatorColor = MaterialTheme.colorScheme.primary,
-                    cursorColor = MaterialTheme.colorScheme.primary
-                )
-            )
-
-            //maximo de fotos 1
             Text(
-                "SELECCIONE FOTO DE PERFIL",
-                color = MaterialTheme.colorScheme.onBackground
+                text = stringResource(R.string.foto_perfil),
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.fillMaxWidth()
             )
-
             SavePhotos()
 
-            Button(
-                onClick = onRegisterClick,
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.secondary,
-                    contentColor = MaterialTheme.colorScheme.onSecondary
-                )
-            ) {
-                Text("Registrar")
-            }
-
+            AppSecondaryButton(
+                text = stringResource(R.string.registrar),
+                onClick = {
+                    viewModel.onRegisterClick()
+                    onRegisterClick()
+                },
+                enabled = uiState.value.canRegister,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }
@@ -177,6 +123,10 @@ fun ShelterRegistration(onRegisterClick: () -> Unit, onBackClick: () -> Unit) {
 @Composable
 fun ShelterRegistrationPreview() {
     AdoptionTheme {
-        ShelterRegistration(onRegisterClick = {}, onBackClick = {})
+        ShelterRegistration(
+            onRegisterClick = {},
+            onBackClick = {},
+            viewModel = ShelterRegistrationViewModel()
+        )
     }
 }
