@@ -5,9 +5,15 @@ import androidx.navigation.compose.composable
 import com.example.adopciontfg.app.ui.screens.settings.shelter.ShelterSettingsScreen
 import kotlinx.serialization.Serializable
 
-fun NavGraphBuilder.shelterSettingsScreen(onBackClick: () -> Unit) {
+fun NavGraphBuilder.shelterSettingsScreen(
+    onBackClick: () -> Unit,
+    onLogout: () -> Unit
+) {
     composable<ShelterSettingsRoute> {
-        ShelterSettingsScreen(onBackClick = onBackClick)
+        ShelterSettingsScreen(
+            onBackClick = onBackClick,
+            onLogout = onLogout
+        )
     }
 }
 

@@ -4,6 +4,12 @@
     <string name="buscar_protectoras">Buscar protectoras</string>
     <string name="buscar_animales">Buscar animales</string>
     <string name="limpiar_busqueda">Limpiar búsqueda</string>
+    <string name="abrir_filtros_animales">Abrir filtros de animales</string>
+    <string name="filtros">Filtros</string>
+    <string name="todos">Todos</string>
+    <string name="limpiar_filtros">Limpiar filtros</string>
+    <string name="aplicar_filtros">Aplicar filtros</string>
+    <string name="sin_resultados_animales">No hay animales que coincidan con tu búsqueda.</string>
 
     <!--  Botones   -->
     <string name="soy_usuario">Soy usuario</string>

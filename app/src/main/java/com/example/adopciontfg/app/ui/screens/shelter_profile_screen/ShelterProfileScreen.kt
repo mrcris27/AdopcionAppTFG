@@ -2,8 +2,11 @@ package com.example.adopciontfg.app.ui.screens.shelter_profile_screen
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,15 +19,23 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,19 +44,24 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.adopciontfg.R
 import com.example.adopciontfg.app.ui.components.skeleton.ShelterCardListSkeleton
 import com.example.adopciontfg.app.ui.screens.components.AppSectionTitle
 import com.example.adopciontfg.app.ui.screens.components.AppTopAppBar
 import com.example.adopciontfg.app.ui.screens.components.CardViewList
 import com.example.adopciontfg.app.ui.screens.components.ListCardView
+import com.example.adopciontfg.app.ui.screens.components.SearchSection
 import com.example.adopciontfg.data.local.entity.AnimalEntity
 import com.example.adopciontfg.data.local.entity.ShelterEntity
 import com.example.adopciontfg.data.local.entity.listSubtitle
 import com.example.adopciontfg.data.sampleAnimals
 import com.example.adopciontfg.data.sampleShelters
+import com.example.adopciontfg.model.Characteristic
+import com.example.adopciontfg.model.Species
 import com.example.adopciontfg.ui.theme.AdoptionTheme
 import com.example.adopciontfg.ui.theme.Dimens
 import com.example.adopciontfg.ui.theme.elevatedSurface
@@ -56,11 +72,25 @@ import com.example.adopciontfg.ui.theme.subtleDivider
 fun ShelterProfileScreen(
     shelter: ShelterEntity,
     animals: List<AnimalEntity>,
+    hasAnimals: Boolean = animals.isNotEmpty(),
+    query: String = "",
+    selectedSpecies: Species? = null,
+    selectedSex: Boolean? = null,
+    selectedCharacteristics: Set<Characteristic> = emptySet(),
+    hasActiveFilters: Boolean = false,
+    isFiltering: Boolean = query.isNotBlank() || hasActiveFilters,
     onBackClick: () -> Unit,
     onPetClick: (String) -> Unit,
+    onQueryChange: (String) -> Unit = {},
+    onSpeciesFilterChange: (Species?) -> Unit = {},
+    onSexFilterChange: (Boolean?) -> Unit = {},
+    onCharacteristicToggle: (Characteristic) -> Unit = {},
+    onClearFilters: () -> Unit = {},
     isPetsLoading: Boolean = false,
 ) {
     var shelterCardExpanded by remember { mutableStateOf(false) }
+    var showFilters by remember { mutableStateOf(false) }
+    val filterSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val chevronRotation by animateFloatAsState(
         targetValue = if (shelterCardExpanded) 180f else 0f,
         label = "shelterCardChevron",
@@ -195,13 +225,52 @@ fun ShelterProfileScreen(
                 }
             }
 
-            AppSectionTitle(
-                text = "Animales disponibles",
-                modifier = Modifier.padding(
-                    horizontal = Dimens.spacingLg,
-                    vertical = Dimens.spacingSm
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        start = Dimens.spacingLg,
+                        end = Dimens.spacingSm,
+                        top = Dimens.spacingSm,
+                        bottom = Dimens.spacingXs
+                    ),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                AppSectionTitle(
+                    text = "Animales disponibles",
+                    modifier = Modifier.weight(1f)
                 )
-            )
+                IconButton(
+                    onClick = { showFilters = true },
+                    enabled = !isPetsLoading && hasAnimals,
+                ) {
+                    BadgedBox(
+                        badge = {
+                            if (hasActiveFilters) {
+                                Badge()
+                            }
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.FilterList,
+                            contentDescription = stringResource(R.string.abrir_filtros_animales),
+                            tint = if (hasActiveFilters) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            }
+                        )
+                    }
+                }
+            }
+
+            if (!isPetsLoading && hasAnimals) {
+                SearchSection(
+                    query = query,
+                    onQueryChange = onQueryChange,
+                    placeholder = stringResource(R.string.buscar_animales),
+                )
+            }
 
             Box(
                 modifier = Modifier
@@ -210,9 +279,16 @@ fun ShelterProfileScreen(
             ) {
                 if (isPetsLoading) {
                     ShelterCardListSkeleton(modifier = Modifier.fillMaxSize())
-                } else if (animals.isEmpty()) {
+                } else if (!hasAnimals) {
                     Text(
                         text = "No hay animales disponibles en esta protectora.",
+                        modifier = Modifier.padding(horizontal = Dimens.spacingLg),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                } else if (animals.isEmpty() && isFiltering) {
+                    Text(
+                        text = stringResource(R.string.sin_resultados_animales),
                         modifier = Modifier.padding(horizontal = Dimens.spacingLg),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -233,7 +309,137 @@ fun ShelterProfileScreen(
             }
         }
     }
+
+    if (showFilters) {
+        AnimalFiltersBottomSheet(
+            selectedSpecies = selectedSpecies,
+            selectedSex = selectedSex,
+            selectedCharacteristics = selectedCharacteristics,
+            onSpeciesFilterChange = onSpeciesFilterChange,
+            onSexFilterChange = onSexFilterChange,
+            onCharacteristicToggle = onCharacteristicToggle,
+            onClearFilters = onClearFilters,
+            onDismiss = { showFilters = false },
+            sheetState = filterSheetState,
+        )
+    }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun AnimalFiltersBottomSheet(
+    selectedSpecies: Species?,
+    selectedSex: Boolean?,
+    selectedCharacteristics: Set<Characteristic>,
+    onSpeciesFilterChange: (Species?) -> Unit,
+    onSexFilterChange: (Boolean?) -> Unit,
+    onCharacteristicToggle: (Characteristic) -> Unit,
+    onClearFilters: () -> Unit,
+    onDismiss: () -> Unit,
+    sheetState: androidx.compose.material3.SheetState,
+) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = Dimens.spacingLg)
+                .padding(bottom = Dimens.spacingXl),
+            verticalArrangement = Arrangement.spacedBy(Dimens.spacingMd)
+        ) {
+            Text(
+                text = stringResource(R.string.filtros),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.SemiBold,
+            )
+
+            FilterSection(title = stringResource(R.string.especie)) {
+                FilterChip(
+                    selected = selectedSpecies == null,
+                    onClick = { onSpeciesFilterChange(null) },
+                    label = { Text(stringResource(R.string.todos)) }
+                )
+                Species.entries.forEach { species ->
+                    FilterChip(
+                        selected = selectedSpecies == species,
+                        onClick = { onSpeciesFilterChange(species) },
+                        label = { Text(enumLabel(species.name)) }
+                    )
+                }
+            }
+
+            FilterSection(title = stringResource(R.string.sexo)) {
+                FilterChip(
+                    selected = selectedSex == null,
+                    onClick = { onSexFilterChange(null) },
+                    label = { Text(stringResource(R.string.todos)) }
+                )
+                FilterChip(
+                    selected = selectedSex == false,
+                    onClick = { onSexFilterChange(false) },
+                    label = { Text(stringResource(R.string.macho)) }
+                )
+                FilterChip(
+                    selected = selectedSex == true,
+                    onClick = { onSexFilterChange(true) },
+                    label = { Text(stringResource(R.string.hembra)) }
+                )
+            }
+
+            FilterSection(title = stringResource(R.string.caracteristicas)) {
+                Characteristic.entries.forEach { characteristic ->
+                    FilterChip(
+                        selected = characteristic in selectedCharacteristics,
+                        onClick = { onCharacteristicToggle(characteristic) },
+                        label = { Text(enumLabel(characteristic.name)) }
+                    )
+                }
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                TextButton(onClick = onClearFilters) {
+                    Text(stringResource(R.string.limpiar_filtros))
+                }
+                TextButton(onClick = onDismiss) {
+                    Text(stringResource(R.string.aplicar_filtros))
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun FilterSection(
+    title: String,
+    content: @Composable () -> Unit,
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(Dimens.spacingSm)
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        FlowRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(Dimens.spacingSm),
+            verticalArrangement = Arrangement.spacedBy(Dimens.spacingSm),
+        ) {
+            content()
+        }
+    }
+}
+
+private fun enumLabel(name: String): String =
+    name.replace("_", " ").lowercase().replaceFirstChar { it.uppercase() }
 
 @Preview(showBackground = true)
 @Composable

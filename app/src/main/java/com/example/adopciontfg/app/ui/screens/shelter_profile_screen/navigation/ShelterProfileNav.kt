@@ -45,9 +45,21 @@ private fun ShelterProfileRouteContent(
         uiState.isLoading && shelter == null -> ShelterProfileScreenSkeleton()
         shelter != null -> ShelterProfileScreen(
             shelter = shelter,
-            animals = uiState.animals,
+            animals = uiState.filteredAnimals,
+            hasAnimals = uiState.animals.isNotEmpty(),
+            query = uiState.query,
+            selectedSpecies = uiState.selectedSpecies,
+            selectedSex = uiState.selectedSex,
+            selectedCharacteristics = uiState.selectedCharacteristics,
+            hasActiveFilters = uiState.hasActiveFilters,
+            isFiltering = uiState.isFiltering,
             onBackClick = onBackClick,
             onPetClick = onPetClick,
+            onQueryChange = viewModel::onQueryChange,
+            onSpeciesFilterChange = viewModel::onSpeciesFilterChange,
+            onSexFilterChange = viewModel::onSexFilterChange,
+            onCharacteristicToggle = viewModel::onCharacteristicToggle,
+            onClearFilters = viewModel::clearFilters,
             isPetsLoading = uiState.isPetsLoading,
         )
     }

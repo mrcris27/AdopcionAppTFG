@@ -19,6 +19,7 @@ import com.example.adopciontfg.app.ui.screens.user_home_screen.navigation.userSc
 @Composable
 fun MainNavHost(
     navController: NavHostController,
+    onLogout: () -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -52,11 +53,13 @@ fun MainNavHost(
         )
 
         userSettingsScreen(
-            onBackClick = { navController.popBackStack() }
+            onBackClick = { navController.popBackStack() },
+            onLogout = onLogout
         )
 
         shelterSettingsScreen(
-            onBackClick = { navController.popBackStack() }
+            onBackClick = { navController.popBackStack() },
+            onLogout = onLogout
         )
     }
 }

@@ -18,7 +18,7 @@ import com.example.adopciontfg.app.ui.screens.settings.navigation.SettingsHubRou
 import com.example.adopciontfg.app.ui.screens.user_home_screen.navigation.UserScreenRoute
 
 @Composable
-fun AppScaffold() {
+fun AppScaffold(onLogout: () -> Unit) {
 
     val navController = rememberNavController()
 
@@ -59,6 +59,7 @@ fun AppScaffold() {
 
         MainNavHost(
             navController = navController,
+            onLogout = onLogout,
             modifier = Modifier.padding(padding)
         )
     }

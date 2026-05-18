@@ -69,7 +69,14 @@ fun AppNavHost(navController: NavHostController) {
         /* ---------------- MAIN ---------------- */
 
         composable("main") {
-            AppScaffold()
+            AppScaffold(
+                onLogout = {
+                    navController.navigate(LoginResRoute) {
+                        popUpTo("main") { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
+            )
         }
     }
 }
