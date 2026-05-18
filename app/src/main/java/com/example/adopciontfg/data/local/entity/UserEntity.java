@@ -18,6 +18,9 @@ public class UserEntity {
     private String biography;
 
     // Constructor
+
+
+
     public UserEntity(@NonNull String id, String name, String surname,
                       String profilePicture, String email, String biography) {
         this.id = id;
