@@ -13,6 +13,7 @@ data class UserRegistrationUiState(
     val surname: String = "",
     val email: String = "",
     val biography: String = "",
+    val profilePhotoUri: String = "",
     val password: String = "",
     val confirmPassword: String = "",
     val passwordHidden: Boolean = true,
@@ -29,6 +30,7 @@ class UserRegistrationViewModel @Inject constructor() : ViewModel() {
     fun onSurnameChange(value: String) = updateForm { it.copy(surname = value) }
     fun onEmailChange(value: String) = updateForm { it.copy(email = value) }
     fun onBiographyChange(value: String) = updateForm { it.copy(biography = value) }
+    fun onProfilePhotoChange(value: String) = _uiState.update { it.copy(profilePhotoUri = value) }
     fun onPasswordChange(value: String) = updateForm { it.copy(password = value) }
     fun onConfirmPasswordChange(value: String) = updateForm { it.copy(confirmPassword = value) }
 

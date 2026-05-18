@@ -1,6 +1,5 @@
 package com.example.adopciontfg.app.ui.navigation
 
-import android.R
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.example.adopciontfg.data.local.entity.ShelterEntity
@@ -125,6 +124,6 @@ class AuthViewModel (application: Application) : AndroidViewModel(application) {
         firebase.logout()
     }
 
-    fun isLogged(): Boolean = firebase.isLoggedIn()
+    fun isLogged(): Boolean = firebase.isLoggedIn
 
 }

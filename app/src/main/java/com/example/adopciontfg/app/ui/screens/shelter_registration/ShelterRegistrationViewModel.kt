@@ -14,6 +14,7 @@ data class ShelterRegistrationUiState(
     val phone: String = "",
     val address: String = "",
     val email: String = "",
+    val profilePhotoUri: String = "",
     val password: String = "",
     val confirmPassword: String = "",
     val passwordHidden: Boolean = true,
@@ -31,6 +32,7 @@ class ShelterRegistrationViewModel @Inject constructor() : ViewModel() {
     fun onPhoneChange(phone: String) = updateForm { it.copy(phone = phone) }
     fun onAddressChange(address: String) = updateForm { it.copy(address = address) }
     fun onEmailChange(email: String) = updateForm { it.copy(email = email) }
+    fun onProfilePhotoChange(value: String) = _uiState.update { it.copy(profilePhotoUri = value) }
     fun onPasswordChange(password: String) = updateForm { it.copy(password = password) }
     fun onConfirmPasswordChange(confirmPassword: String) =
         updateForm { it.copy(confirmPassword = confirmPassword) }
