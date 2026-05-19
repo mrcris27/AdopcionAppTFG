@@ -27,7 +27,7 @@ import com.example.adopciontfg.data.local.entity.UserEntity;
                 FavoriteEntity.class,
                 SponsorshipEntity.class
         },
-        version = 1,
+        version = 2,
         exportSchema = false
 )
 @TypeConverters(Converters.class)
@@ -61,7 +61,9 @@ public abstract class AppDatabase extends RoomDatabase {
                             context.getApplicationContext(),
                             AppDatabase.class,
                             "adopcion_tfg_db"
-                    ).build();
+                    )
+                    .fallbackToDestructiveMigration()
+                    .build();
                 }
             }
         }

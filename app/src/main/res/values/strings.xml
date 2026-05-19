@@ -21,6 +21,7 @@
     <string name="registro_subtitle">Elige cómo quieres usar la aplicación</string>
     <string name="login">Login</string>
     <string name="login_subtitle">Accede con tu correo y contraseña</string>
+    <string name="login_como_protectora">Iniciar con protectora (prueba)</string>
     <string name="registro_usuario">Registro de usuario</string>
     <string name="registro_protectora">Registro de protectora</string>
 
@@ -58,6 +59,21 @@
 
     <string name="nav_bar_inicio">Inicio</string>
     <string name="nav_bar_anadir">Añadir</string>
+    <string name="nav_bar_mis_animales">Mis animales</string>
     <string name="nav_bar_ajustes">Ajustes</string>
+
+    <string name="mis_animales">Mis animales</string>
+    <string name="animales_registrados">Animales registrados</string>
+    <string name="buscar_mis_animales">Buscar en mis animales…</string>
+    <string name="disponibles">Disponibles</string>
+    <string name="reservados">Reservados</string>
+    <string name="adoptados">Adoptados</string>
+    <string name="shelter_sin_animales">Aún no has registrado animales. Pulsa + para añadir el primero.</string>
+    <string name="shelter_sin_sesion">Inicia sesión como protectora para gestionar tus animales.</string>
+    <string name="cambiar_estado">Cambiar estado</string>
+    <string name="editar_animal">Editar animal</string>
+    <string name="guardar_cambios">Guardar cambios</string>
+    <string name="estado_publicacion">Estado de publicación</string>
+    <string name="estado_publicacion_hint">Los adoptados dejan de mostrarse a los usuarios. Usa reservado si hay una adopción en curso.</string>
 
 </resources>

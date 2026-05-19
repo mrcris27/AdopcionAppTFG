@@ -31,10 +31,8 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -47,6 +45,7 @@ import com.example.adopciontfg.app.ui.screens.components.AppSecondaryButton
 import com.example.adopciontfg.app.ui.screens.components.AppTopAppBar
 import com.example.adopciontfg.app.ui.screens.components.RegistrationTextField
 import com.example.adopciontfg.app.ui.screens.components.SavePhotos
+import com.example.adopciontfg.model.AnimalStatus
 import com.example.adopciontfg.model.Characteristic
 import com.example.adopciontfg.model.Species
 import com.example.adopciontfg.ui.theme.AdoptionTheme
@@ -60,31 +59,42 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun PetRegistration(
+    title: String,
+    saveButtonText: String,
+    name: String,
+    onNameChange: (String) -> Unit,
+    isFemale: Boolean,
+    onSexChange: (Boolean) -> Unit,
+    mainPhotoUri: Uri?,
+    onMainPhotoChange: (Uri?) -> Unit,
+    galleryUris: List<Uri>,
+    onGalleryChange: (List<Uri>) -> Unit,
+    birthDateMillis: Long,
+    onBirthDateChange: (Long) -> Unit,
+    description: String,
+    onDescriptionChange: (String) -> Unit,
+    species: Species?,
+    onSpeciesChange: (Species) -> Unit,
+    selectedCharacteristics: Set<Characteristic>,
+    onCharacteristicToggle: (Characteristic) -> Unit,
+    status: AnimalStatus = AnimalStatus.AVAILABLE,
+    onStatusChange: (AnimalStatus) -> Unit = {},
+    showStatusSection: Boolean = false,
+    canSave: Boolean,
+    isLoading: Boolean = false,
     onBackClick: (() -> Unit)? = null,
-    onRegisterClick: () -> Unit = {},
+    onSaveClick: () -> Unit = {},
 ) {
-    var name by rememberSaveable { mutableStateOf("") }
-    var isFemale by rememberSaveable { mutableStateOf(false) }
-    var mainPhotoUri by remember { mutableStateOf<Uri?>(null) }
-    var galleryUris by remember { mutableStateOf<List<Uri>>(emptyList()) }
-    var birthDateMillis by rememberSaveable { mutableLongStateOf(0L) }
-    var description by rememberSaveable { mutableStateOf("") }
-    var species by remember { mutableStateOf<Species?>(null) }
     var speciesExpanded by remember { mutableStateOf(false) }
-    var selectedCharacteristics by remember { mutableStateOf(setOf<Characteristic>()) }
     var showDatePicker by remember { mutableStateOf(false) }
 
     val dateFormatter = remember { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) }
-    val canRegister = name.isNotBlank() &&
-        species != null &&
-        birthDateMillis > 0L &&
-        mainPhotoUri != null
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             AppTopAppBar(
-                title = stringResource(R.string.registro_animal),
+                title = title,
                 onBackClick = onBackClick,
             )
         }
@@ -100,7 +110,7 @@ fun PetRegistration(
             AppFormSection(title = stringResource(R.string.datos_basicos)) {
                 RegistrationTextField(
                     value = name,
-                    onValueChange = { name = it },
+                    onValueChange = onNameChange,
                     label = stringResource(R.string.nombre),
                     capitalization = KeyboardCapitalization.Words
                 )
@@ -137,7 +147,7 @@ fun PetRegistration(
                             DropdownMenuItem(
                                 text = { Text(enumLabel(option.name)) },
                                 onClick = {
-                                    species = option
+                                    onSpeciesChange(option)
                                     speciesExpanded = false
                                 }
                             )
@@ -156,13 +166,13 @@ fun PetRegistration(
                 ) {
                     FilterChip(
                         selected = !isFemale,
-                        onClick = { isFemale = false },
+                        onClick = { onSexChange(false) },
                         label = { Text(stringResource(R.string.macho)) },
                         modifier = Modifier.weight(1f)
                     )
                     FilterChip(
                         selected = isFemale,
-                        onClick = { isFemale = true },
+                        onClick = { onSexChange(true) },
                         label = { Text(stringResource(R.string.hembra)) },
                         modifier = Modifier.weight(1f)
                     )
@@ -183,10 +193,33 @@ fun PetRegistration(
                 )
             }
 
+            if (showStatusSection) {
+                AppFormSection(title = stringResource(R.string.estado_publicacion)) {
+                    Text(
+                        text = stringResource(R.string.estado_publicacion_hint),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(Dimens.spacingSm),
+                        verticalArrangement = Arrangement.spacedBy(Dimens.spacingSm),
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        AnimalStatus.entries.forEach { option ->
+                            FilterChip(
+                                selected = status == option,
+                                onClick = { onStatusChange(option) },
+                                label = { Text(statusLabelFor(option)) },
+                            )
+                        }
+                    }
+                }
+            }
+
             AppFormSection(title = stringResource(R.string.descripcion)) {
                 RegistrationTextField(
                     value = description,
-                    onValueChange = { description = it },
+                    onValueChange = onDescriptionChange,
                     label = stringResource(R.string.descripcion),
                     singleLine = false,
                     minLines = 4
@@ -205,7 +238,7 @@ fun PetRegistration(
                 )
                 SavePhotos(
                     uris = listOfNotNull(mainPhotoUri),
-                    onUrisChange = { uris -> mainPhotoUri = uris.firstOrNull() },
+                    onUrisChange = { uris -> onMainPhotoChange(uris.firstOrNull()) },
                     maxPhotos = 1
                 )
 
@@ -224,7 +257,7 @@ fun PetRegistration(
                 )
                 SavePhotos(
                     uris = galleryUris,
-                    onUrisChange = { galleryUris = it }
+                    onUrisChange = onGalleryChange
                 )
             }
 
@@ -242,14 +275,7 @@ fun PetRegistration(
                     Characteristic.entries.forEach { characteristic ->
                         FilterChip(
                             selected = characteristic in selectedCharacteristics,
-                            onClick = {
-                                selectedCharacteristics =
-                                    if (characteristic in selectedCharacteristics) {
-                                        selectedCharacteristics - characteristic
-                                    } else {
-                                        selectedCharacteristics + characteristic
-                                    }
-                            },
+                            onClick = { onCharacteristicToggle(characteristic) },
                             label = { Text(enumLabel(characteristic.name)) }
                         )
                     }
@@ -257,9 +283,9 @@ fun PetRegistration(
             }
 
             AppSecondaryButton(
-                text = stringResource(R.string.registrar_animal),
-                onClick = onRegisterClick,
-                enabled = canRegister
+                text = saveButtonText,
+                onClick = onSaveClick,
+                enabled = canSave && !isLoading
             )
 
             Spacer(modifier = Modifier.height(Dimens.spacingSm))
@@ -275,7 +301,7 @@ fun PetRegistration(
             confirmButton = {
                 TextButton(
                     onClick = {
-                        birthDateMillis = datePickerState.selectedDateMillis ?: 0L
+                        onBirthDateChange(datePickerState.selectedDateMillis ?: 0L)
                         showDatePicker = false
                     }
                 ) {
@@ -296,10 +322,38 @@ fun PetRegistration(
 private fun enumLabel(name: String): String =
     name.replace("_", " ").lowercase().replaceFirstChar { it.uppercase() }
 
+private fun statusLabelFor(status: AnimalStatus): String = when (status) {
+    AnimalStatus.AVAILABLE -> "Disponible"
+    AnimalStatus.RESERVED -> "Reservado"
+    AnimalStatus.ADOPTED -> "Adoptado"
+    AnimalStatus.UNAVAILABLE -> "No disponible"
+}
+
 @Preview(showBackground = true)
 @Composable
 fun PetRegistrationPreview() {
     AdoptionTheme {
-        PetRegistration()
+        PetRegistration(
+            title = "Registrar animal",
+            saveButtonText = "Registrar animal",
+            name = "Luna",
+            onNameChange = {},
+            isFemale = true,
+            onSexChange = {},
+            mainPhotoUri = null,
+            onMainPhotoChange = {},
+            galleryUris = emptyList(),
+            onGalleryChange = {},
+            birthDateMillis = 0L,
+            onBirthDateChange = {},
+            description = "",
+            onDescriptionChange = {},
+            species = Species.GATO,
+            onSpeciesChange = {},
+            selectedCharacteristics = emptySet(),
+            onCharacteristicToggle = {},
+            showStatusSection = true,
+            canSave = false,
+        )
     }
 }
