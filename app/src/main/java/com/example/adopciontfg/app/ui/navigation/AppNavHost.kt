@@ -4,16 +4,17 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.adopciontfg.app.ui.screens.login_registration_screen.navigation.LoginResRoute
-import com.example.adopciontfg.app.ui.screens.login_registration_screen.navigation.loginResScreen
-import com.example.adopciontfg.app.ui.screens.login_screen.navigation.LoginScreenRoute
-import com.example.adopciontfg.app.ui.screens.login_screen.navigation.loginScreen
-import com.example.adopciontfg.app.ui.screens.registration_screen.navigation.RegistrationScreenRoute
-import com.example.adopciontfg.app.ui.screens.registration_screen.navigation.registrationScreen
-import com.example.adopciontfg.app.ui.screens.shelter_registration.navigation.ShelterRegistrationRoute
-import com.example.adopciontfg.app.ui.screens.shelter_registration.navigation.shelterRegistrationScreen
-import com.example.adopciontfg.app.ui.screens.user_registration.navigation.UserRegistrationRoute
-import com.example.adopciontfg.app.ui.screens.user_registration.navigation.userRegistrationScreen
+import com.example.adopciontfg.app.ui.screens.auth.welcome.navigation.LoginResRoute
+import com.example.adopciontfg.app.ui.screens.auth.welcome.navigation.loginResScreen
+import com.example.adopciontfg.app.ui.screens.auth.login.navigation.LoginScreenRoute
+import com.example.adopciontfg.app.ui.screens.auth.login.navigation.loginScreen
+import com.example.adopciontfg.app.ui.screens.auth.register.navigation.RegistrationScreenRoute
+import com.example.adopciontfg.app.ui.screens.auth.register.navigation.registrationScreen
+import com.example.adopciontfg.app.ui.screens.shelter.registration.navigation.ShelterRegistrationRoute
+import com.example.adopciontfg.app.ui.screens.shelter.registration.navigation.shelterRegistrationScreen
+import com.example.adopciontfg.app.ui.screens.shelter.home.ShelterHomeScreen
+import com.example.adopciontfg.app.ui.screens.user.registration.navigation.UserRegistrationRoute
+import com.example.adopciontfg.app.ui.screens.user.registration.navigation.userRegistrationScreen
 
 @Composable
 fun AppNavHost(navController: NavHostController) {
@@ -38,7 +39,7 @@ fun AppNavHost(navController: NavHostController) {
         loginScreen(
             onBackClick = { navController.popBackStack() },
             onContinueClick = {
-                navController.navigate("main") {
+                navController.navigate(USER_MAIN_ROUTE) {
                     popUpTo(LoginScreenRoute) { inclusive = true }
                 }
             },
@@ -62,21 +63,40 @@ fun AppNavHost(navController: NavHostController) {
         )
 
         shelterRegistrationScreen(
-            onRegisterClick = {},
-            onBackClick = { navController.popBackStack() }
+            onRegisterClick = {
+                navController.navigate(SHELTER_MAIN_ROUTE) {
+                    popUpTo(ShelterRegistrationRoute) { inclusive = true }
+                }
+            },
+            onBackClick = { navController.popBackStack() },
         )
 
         /* ---------------- MAIN ---------------- */
 
-        composable("main") {
+        composable(USER_MAIN_ROUTE) {
             AppScaffold(
-                onLogout = {
-                    navController.navigate(LoginResRoute) {
-                        popUpTo("main") { inclusive = true }
-                        launchSingleTop = true
-                    }
-                }
+                onLogout = { navigateToLogin(navController) },
             )
         }
+
+        composable(SHELTER_MAIN_ROUTE) {
+            ShelterHomeScreen(
+                onLogout = { navigateToLogin(navController, fromShelter = true) },
+            )
+        }
+    }
+}
+
+private const val USER_MAIN_ROUTE = "main"
+private const val SHELTER_MAIN_ROUTE = "main/shelter"
+
+private fun navigateToLogin(
+    navController: NavHostController,
+    fromShelter: Boolean = false,
+) {
+    val mainRoute = if (fromShelter) SHELTER_MAIN_ROUTE else USER_MAIN_ROUTE
+    navController.navigate(LoginResRoute) {
+        popUpTo(mainRoute) { inclusive = true }
+        launchSingleTop = true
     }
 }

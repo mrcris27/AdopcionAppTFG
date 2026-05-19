@@ -20,6 +20,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,22 +30,19 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.adopciontfg.R
-import com.example.adopciontfg.app.ui.screens.components.bottom_tab.BottomTab
+import com.example.adopciontfg.app.ui.screens.components.bottom_tab.NavBarTab
 import com.example.adopciontfg.ui.theme.Dimens
 import com.example.adopciontfg.ui.theme.elevatedSurface
 import com.example.adopciontfg.ui.theme.subtleDivider
 
+private val DefaultUserTabs = listOf(NavBarTab.UserHome, NavBarTab.UserSettings)
+
 @Composable
 fun BottomNavBar(
-    selectedTab: BottomTab,
-    onSelect: (BottomTab) -> Unit
+    selectedTab: NavBarTab,
+    onSelect: (NavBarTab) -> Unit,
+    tabs: List<NavBarTab> = DefaultUserTabs,
 ) {
-    val items = listOf(
-        BottomTab.Home,
-        BottomTab.Settings
-    )
-
     Surface(
         modifier = Modifier.fillMaxWidth(),
         color = MaterialTheme.colorScheme.elevatedSurface(),
@@ -54,7 +52,7 @@ fun BottomNavBar(
         Column(modifier = Modifier.fillMaxWidth()) {
             HorizontalDivider(
                 thickness = 1.dp,
-                color = MaterialTheme.colorScheme.subtleDivider()
+                color = MaterialTheme.colorScheme.subtleDivider(),
             )
             Row(
                 modifier = Modifier
@@ -65,15 +63,17 @@ fun BottomNavBar(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceEvenly,
             ) {
-                items.forEach { tab ->
-                    BottomNavDestination(
-                        tab = tab,
-                        selected = selectedTab == tab,
-                        onClick = { onSelect(tab) },
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxHeight()
-                    )
+                tabs.forEach { tab ->
+                    key(tab) {
+                        BottomNavDestination(
+                            tab = tab,
+                            selected = selectedTab == tab,
+                            onClick = { onSelect(tab) },
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxHeight(),
+                        )
+                    }
                 }
             }
         }
@@ -82,15 +82,12 @@ fun BottomNavBar(
 
 @Composable
 private fun BottomNavDestination(
-    tab: BottomTab,
+    tab: NavBarTab,
     selected: Boolean,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
-    val label = when (tab) {
-        BottomTab.Home -> stringResource(R.string.nav_bar_inicio)
-        BottomTab.Settings -> stringResource(R.string.nav_bar_ajustes)
-    }
+    val label = stringResource(tab.labelRes)
     val interactionSource = remember { MutableInteractionSource() }
     val pillColor = if (selected) {
         MaterialTheme.colorScheme.primaryContainer
@@ -110,13 +107,13 @@ private fun BottomNavDestination(
                 interactionSource = interactionSource,
                 indication = ripple(
                     bounded = true,
-                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.22f)
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.22f),
                 ),
                 role = Role.Tab,
                 onClickLabel = label,
-                onClick = onClick
+                onClick = onClick,
             ),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         Column(
             modifier = Modifier
@@ -129,7 +126,9 @@ private fun BottomNavDestination(
             Icon(
                 imageVector = tab.icon,
                 contentDescription = label,
-                modifier = Modifier.size(22.dp),
+                modifier = Modifier.size(
+                    if (tab == NavBarTab.ShelterAddPet) 26.dp else 22.dp
+                ),
                 tint = contentColor,
             )
             Text(

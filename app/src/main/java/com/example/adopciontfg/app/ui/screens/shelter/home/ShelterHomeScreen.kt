@@ -1,4 +1,4 @@
-package com.example.adopciontfg.app.ui.navigation
+package com.example.adopciontfg.app.ui.screens.shelter.home
 
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -9,25 +9,34 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.adopciontfg.app.ui.screens.components.BottomNavBar
 import com.example.adopciontfg.app.ui.screens.components.bottom_tab.NavBarTab
+import com.example.adopciontfg.app.ui.screens.shelter.home.navigation.ShelterAddPetRoute
+import com.example.adopciontfg.app.ui.screens.shelter.home.navigation.ShelterMainNavHost
+import com.example.adopciontfg.app.ui.screens.shelter.home.navigation.ShelterSettingsTabRoute
 
 @Composable
-fun AppScaffold(onLogout: () -> Unit) {
+fun ShelterHomeScreen(
+    onLogout: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val destination = navBackStackEntry?.destination
 
-    val showBottomBar = destination.showsUserBottomBar()
+    val showBottomBar = destination?.hasRoute<ShelterAddPetRoute>() == true ||
+        destination?.hasRoute<ShelterSettingsTabRoute>() == true
 
     val currentTab = when {
-        destination.isUserSettingsHubRoute() -> NavBarTab.UserSettings
-        else -> NavBarTab.UserHome
+        destination?.hasRoute<ShelterSettingsTabRoute>() == true -> NavBarTab.ShelterSettings
+        else -> NavBarTab.ShelterAddPet
     }
 
     Scaffold(
+        modifier = modifier,
         contentWindowInsets = WindowInsets.safeDrawing.only(
             WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom,
         ),
@@ -44,11 +53,12 @@ fun AppScaffold(onLogout: () -> Unit) {
                             restoreState = true
                         }
                     },
+                    tabs = NavBarTab.shelterTabs,
                 )
             }
         },
     ) { padding ->
-        MainNavHost(
+        ShelterMainNavHost(
             navController = navController,
             onLogout = onLogout,
             modifier = Modifier.padding(padding),

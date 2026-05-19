@@ -11,8 +11,8 @@ import kotlin.math.max
  * para mostrar en Compose, sin duplicar lógica en cada pantalla.
  *
  * Se usan principalmente en:
- * - [com.example.adopciontfg.app.ui.screens.pet_detail_screen.PetDetailScreen] (detalle)
- * - [com.example.adopciontfg.app.ui.screens.pet_list.PetListScreen] y perfil de protectora (lista)
+ * - [com.example.adopciontfg.app.ui.screens.user.pet_detail.PetDetailScreen] (detalle)
+ * - [com.example.adopciontfg.app.ui.screens.user.pet_list.PetListScreen] y perfil de protectora (lista)
  */
 
 /**

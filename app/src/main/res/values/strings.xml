@@ -57,6 +57,7 @@
     <string name="registrar_animal">Registrar animal</string>
 
     <string name="nav_bar_inicio">Inicio</string>
+    <string name="nav_bar_anadir">Añadir</string>
     <string name="nav_bar_ajustes">Ajustes</string>
 
 </resources>
