@@ -3,6 +3,8 @@ package com.example.adopciontfg.app.ui.screens.shelter.settings
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.adopciontfg.data.local.entity.ShelterEntity
+import com.example.adopciontfg.data.repository.ShelterRepository
 import com.example.adopciontfg.domain.settings.SettingsRepository
 import com.example.adopciontfg.domain.settings.ShelterSettingsData
 import com.google.firebase.auth.EmailAuthProvider
@@ -24,6 +26,7 @@ data class ShelterSettingsUiState(
     val address: String = "",
     val cif: String = "",
     val profilePhotoUri: String = "",
+    val adoptionFormUrl: String = "",
     val adoptionAlertsEnabled: Boolean = true,
     val darkModeEnabled: Boolean = false,
     val currentPassword: String = "",
@@ -39,7 +42,8 @@ data class ShelterSettingsUiState(
 
 @HiltViewModel
 class ShelterSettingsViewModel @Inject constructor(
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    private val shelterRepository: ShelterRepository,
 ) : ViewModel() {
     private val auth = FirebaseAuth.getInstance()
     private val _uiState = MutableStateFlow(ShelterSettingsUiState())
@@ -59,6 +63,7 @@ class ShelterSettingsViewModel @Inject constructor(
                         profilePhotoUri = data.profilePhotoUri.ifBlank {
                             firebaseUser?.photoUrl?.toString().orEmpty()
                         },
+                        adoptionFormUrl = data.adoptionFormUrl,
                         adoptionAlertsEnabled = data.adoptionAlertsEnabled,
                         darkModeEnabled = data.darkModeEnabled
                     )
@@ -73,6 +78,7 @@ class ShelterSettingsViewModel @Inject constructor(
     fun onAddressChange(value: String) = _uiState.update { it.copy(address = value) }
     fun onCifChange(value: String) = _uiState.update { it.copy(cif = value) }
     fun onProfilePhotoChange(value: String) = _uiState.update { it.copy(profilePhotoUri = value) }
+    fun onAdoptionFormUrlChange(value: String) = _uiState.update { it.copy(adoptionFormUrl = value) }
     fun onCurrentPasswordChange(value: String) = _uiState.update { it.copy(currentPassword = value) }
     fun onNewPasswordChange(value: String) = _uiState.update { it.copy(newPassword = value) }
     fun onConfirmNewPasswordChange(value: String) = _uiState.update { it.copy(confirmNewPassword = value) }
@@ -128,8 +134,24 @@ class ShelterSettingsViewModel @Inject constructor(
         viewModelScope.launch {
             val current = _uiState.value
             settingsRepository.saveShelterSettings(current.toSettingsData())
+            syncShelterToFirebase(current)
             updateFirebaseProfile(current)
         }
+    }
+
+    private fun syncShelterToFirebase(current: ShelterSettingsUiState) {
+        val userId = auth.currentUser?.uid ?: return
+        val shelter = ShelterEntity(
+            userId,
+            current.shelterName,
+            current.cif,
+            current.profilePhotoUri,
+            current.email,
+            current.address,
+            current.phone,
+            current.adoptionFormUrl.trim(),
+        )
+        shelterRepository.saveShelter(shelter)
     }
 
     fun onChangePasswordClick() {
@@ -232,6 +254,7 @@ class ShelterSettingsViewModel @Inject constructor(
             address = address,
             cif = cif,
             profilePhotoUri = profilePhotoUri,
+            adoptionFormUrl = adoptionFormUrl,
             adoptionAlertsEnabled = adoptionAlertsEnabled,
             darkModeEnabled = darkModeEnabled
         )

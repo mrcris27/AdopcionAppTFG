@@ -51,6 +51,19 @@ fun AnimalEntity.ageInYears(): Int {
  */
 fun AnimalEntity.genderLabel(): String = if (isSex) "Hembra" else "Macho"
 
+/** Animales visibles en listados de usuarios (no adoptados ni dados de baja). */
+fun AnimalEntity.isPubliclyVisible(): Boolean {
+    val current = status ?: AnimalStatus.AVAILABLE
+    return current == AnimalStatus.AVAILABLE || current == AnimalStatus.RESERVED
+}
+
+fun AnimalEntity.statusLabel(): String = when (status ?: AnimalStatus.AVAILABLE) {
+    AnimalStatus.AVAILABLE -> "Disponible"
+    AnimalStatus.RESERVED -> "Reservado"
+    AnimalStatus.ADOPTED -> "Adoptado"
+    AnimalStatus.UNAVAILABLE -> "No disponible"
+}
+
 /**
  * Convierte la lista de [com.example.adopciontfg.model.Characteristic] en un único texto
  * separado por comas, con nombres legibles.

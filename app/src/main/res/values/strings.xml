@@ -60,4 +60,23 @@
     <string name="nav_bar_anadir">Añadir</string>
     <string name="nav_bar_ajustes">Ajustes</string>
 
+    <string name="mis_animales">Mis animales</string>
+    <string name="buscar_mis_animales">Buscar en mis animales…</string>
+    <string name="animales_registrados">Animales registrados</string>
+    <string name="disponibles">Disponibles</string>
+    <string name="reservados">Reservados</string>
+    <string name="adoptados">Adoptados</string>
+    <string name="cambiar_estado">Cambiar estado</string>
+    <string name="editar_animal">Editar animal</string>
+    <string name="guardar_cambios">Guardar cambios</string>
+    <string name="estado_publicacion">Estado de publicación</string>
+    <string name="estado_publicacion_hint">Los adoptados dejan de mostrarse a los usuarios. Usa reservado si hay una adopción en curso.</string>
+    <string name="shelter_sin_animales">Aún no has registrado animales. Pulsa + para añadir el primero.</string>
+    <string name="shelter_sin_sesion">Inicia sesión como protectora para gestionar tus animales.</string>
+    <string name="shelter_formulario_adopcion_titulo">Solicitudes de adopción</string>
+    <string name="shelter_formulario_adopcion_desc">Abre tu Google Form para revisar las solicitudes recibidas.</string>
+    <string name="shelter_formulario_adopcion_sin_url">Configura el enlace de tu formulario en Ajustes → Adopciones.</string>
+    <string name="shelter_abrir_formulario">Abrir formulario</string>
+    <string name="adopcion_formulario_no_configurado">Esta protectora aún no ha configurado el formulario de adopción.</string>
+
 </resources>

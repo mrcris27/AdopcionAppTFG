@@ -69,11 +69,7 @@ fun MainNavHost(
 
 
         petDetail(
-
             onBackClick = { navController.popBackStack() },
-
-            onAdoptClick = {},
-
         )
 
 

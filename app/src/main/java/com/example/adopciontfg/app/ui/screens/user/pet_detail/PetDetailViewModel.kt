@@ -5,6 +5,7 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import com.example.adopciontfg.data.local.entity.AnimalEntity
 import com.example.adopciontfg.data.repository.AnimalRepository
+import com.example.adopciontfg.data.repository.ShelterRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,12 +16,14 @@ import kotlinx.coroutines.launch
 
 data class PetDetailUiState(
     val animal: AnimalEntity? = null,
+    val adoptionFormUrl: String = "",
     val isLoading: Boolean = true,
 )
 
 @HiltViewModel
 class PetDetailViewModel @Inject constructor(
     private val animalRepository: AnimalRepository,
+    private val shelterRepository: ShelterRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(PetDetailUiState())
     val uiState: StateFlow<PetDetailUiState> = _uiState.asStateFlow()
@@ -33,6 +36,12 @@ class PetDetailViewModel @Inject constructor(
                         animal = animal,
                         isLoading = false,
                     )
+                }
+                val shelterId = animal?.shelterId ?: return@collect
+                shelterRepository.getShelterById(shelterId).asFlow().collect { shelter ->
+                    _uiState.update { state ->
+                        state.copy(adoptionFormUrl = shelter?.adoptionFormUrl.orEmpty())
+                    }
                 }
             }
         }

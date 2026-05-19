@@ -2,6 +2,7 @@ package com.example.adopciontfg.data.local.entity;
 
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "shelters")
@@ -17,11 +18,19 @@ public class ShelterEntity {
     private String email;
     private String address;
     private String phone;
+    /** Enlace al Google Form de solicitudes de adopción de esta protectora */
+    private String adoptionFormUrl;
 
-    // Constructor
+    @Ignore
     public ShelterEntity(@NonNull String id, String name, String cif,
                          String profilePicture, String email,
                          String address, String phone) {
+        this(id, name, cif, profilePicture, email, address, phone, "");
+    }
+
+    public ShelterEntity(@NonNull String id, String name, String cif,
+                         String profilePicture, String email,
+                         String address, String phone, String adoptionFormUrl) {
         this.id = id;
         this.name = name;
         this.cif = cif;
@@ -29,9 +38,9 @@ public class ShelterEntity {
         this.email = email;
         this.address = address;
         this.phone = phone;
+        this.adoptionFormUrl = adoptionFormUrl != null ? adoptionFormUrl : "";
     }
 
-    // Getters y Setters
     @NonNull
     public String getId() { return id; }
     public void setId(@NonNull String id) { this.id = id; }
@@ -53,4 +62,9 @@ public class ShelterEntity {
 
     public String getPhone() { return phone; }
     public void setPhone(String phone) { this.phone = phone; }
+
+    public String getAdoptionFormUrl() { return adoptionFormUrl; }
+    public void setAdoptionFormUrl(String adoptionFormUrl) {
+        this.adoptionFormUrl = adoptionFormUrl != null ? adoptionFormUrl : "";
+    }
 }

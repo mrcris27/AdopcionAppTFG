@@ -7,6 +7,7 @@ data class ShelterSettingsData(
     val address: String = "",
     val cif: String = "",
     val profilePhotoUri: String = "",
+    val adoptionFormUrl: String = "",
     val adoptionAlertsEnabled: Boolean = true,
     val darkModeEnabled: Boolean = false
 )

@@ -27,7 +27,7 @@ import com.example.adopciontfg.data.local.entity.UserEntity;
                 FavoriteEntity.class,
                 SponsorshipEntity.class
         },
-        version = 1,
+        version = 3,
         exportSchema = false
 )
 @TypeConverters(Converters.class)

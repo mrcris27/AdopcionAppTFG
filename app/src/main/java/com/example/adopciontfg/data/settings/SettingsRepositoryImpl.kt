@@ -66,6 +66,7 @@ class SettingsRepositoryImpl @Inject constructor(
                     address = prefs[SHELTER_ADDRESS] ?: "",
                     cif = prefs[SHELTER_CIF] ?: "",
                     profilePhotoUri = prefs[SHELTER_PROFILE_PHOTO_URI] ?: "",
+                    adoptionFormUrl = prefs[SHELTER_ADOPTION_FORM_URL] ?: "",
                     adoptionAlertsEnabled = prefs[SHELTER_ADOPTION_ALERTS] ?: true,
                     darkModeEnabled = prefs[SHELTER_DARK_MODE] ?: false
                 )
@@ -80,6 +81,7 @@ class SettingsRepositoryImpl @Inject constructor(
             prefs[SHELTER_ADDRESS] = data.address
             prefs[SHELTER_CIF] = data.cif
             prefs[SHELTER_PROFILE_PHOTO_URI] = data.profilePhotoUri
+            prefs[SHELTER_ADOPTION_FORM_URL] = data.adoptionFormUrl
             prefs[SHELTER_ADOPTION_ALERTS] = data.adoptionAlertsEnabled
             prefs[SHELTER_DARK_MODE] = data.darkModeEnabled
         }
@@ -102,6 +104,7 @@ class SettingsRepositoryImpl @Inject constructor(
         val SHELTER_ADDRESS = stringPreferencesKey("shelter_address")
         val SHELTER_CIF = stringPreferencesKey("shelter_cif")
         val SHELTER_PROFILE_PHOTO_URI = stringPreferencesKey("shelter_profile_photo_uri")
+        val SHELTER_ADOPTION_FORM_URL = stringPreferencesKey("shelter_adoption_form_url")
         val SHELTER_ADOPTION_ALERTS = booleanPreferencesKey("shelter_adoption_alerts")
         val SHELTER_DARK_MODE = booleanPreferencesKey("shelter_dark_mode")
     }
