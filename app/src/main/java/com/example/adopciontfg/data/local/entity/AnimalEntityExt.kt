@@ -1,5 +1,6 @@
 package com.example.adopciontfg.data.local.entity
 
+import com.example.adopciontfg.model.AnimalStatus
 import java.util.concurrent.TimeUnit
 import kotlin.math.max
 
@@ -11,8 +12,8 @@ import kotlin.math.max
  * para mostrar en Compose, sin duplicar lógica en cada pantalla.
  *
  * Se usan principalmente en:
- * - [com.example.adopciontfg.app.ui.screens.pet_detail_screen.PetDetailScreen] (detalle)
- * - [com.example.adopciontfg.app.ui.screens.pet_list.PetListScreen] y perfil de protectora (lista)
+ * - [com.example.adopciontfg.app.ui.screens.user.pet_detail.PetDetailScreen] (detalle)
+ * - [com.example.adopciontfg.app.ui.screens.user.pet_list.PetListScreen] y perfil de protectora (lista)
  */
 
 /**
@@ -71,6 +72,13 @@ fun AnimalEntity.formattedCharacteristics(): String =
  * - "3 años" (solo edad)
  * - "Ver detalles" (si faltan ambos datos)
  */
+fun AnimalEntity.statusLabel(): String = when (status ?: AnimalStatus.AVAILABLE) {
+    AnimalStatus.AVAILABLE -> "Disponible"
+    AnimalStatus.RESERVED -> "Reservado"
+    AnimalStatus.ADOPTED -> "Adoptado"
+    AnimalStatus.UNAVAILABLE -> "No disponible"
+}
+
 fun AnimalEntity.listSubtitle(): String {
     val speciesLabel = species?.name
         ?.replace("_", " ")

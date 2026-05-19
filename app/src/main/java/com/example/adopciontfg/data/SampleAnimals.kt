@@ -1,6 +1,7 @@
 package com.example.adopciontfg.data
 
 import com.example.adopciontfg.data.local.entity.AnimalEntity
+import com.example.adopciontfg.model.AnimalStatus
 import com.example.adopciontfg.model.Characteristic
 import com.example.adopciontfg.model.Species
 
@@ -41,6 +42,7 @@ val sampleAnimals: List<AnimalEntity> = listOf(
         Species.PERRO,
         listOf(Characteristic.ENERGETICO, Characteristic.SOCIABLE_CON_PERROS),
         "1",
+        AnimalStatus.ADOPTED,
     ),
     AnimalEntity(
         "a4",
