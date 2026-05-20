@@ -5,7 +5,6 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import com.example.adopciontfg.data.local.entity.AnimalEntity
 import com.example.adopciontfg.data.repository.AnimalRepository
-import com.example.adopciontfg.model.AnimalStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,7 +32,6 @@ class PetListViewModel @Inject constructor(
             animalRepository.getAllAnimals().asFlow().collect { loaded ->
                 _uiState.update { state ->
                     val animals = loaded.orEmpty()
-                        .filter { it.status == AnimalStatus.AVAILABLE }
                     state.copy(
                         isLoading = false,
                         animals = animals,

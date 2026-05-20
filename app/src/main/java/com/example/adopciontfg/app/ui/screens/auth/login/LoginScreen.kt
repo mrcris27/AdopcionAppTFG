@@ -32,7 +32,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.adopciontfg.R
 import com.example.adopciontfg.app.ui.screens.components.AppFilledTextField
 import com.example.adopciontfg.app.ui.screens.components.AppPrimaryButton
-import com.example.adopciontfg.app.ui.screens.components.AppSecondaryButton
 import com.example.adopciontfg.app.ui.screens.components.AppTopAppBar
 import com.example.adopciontfg.ui.theme.AdoptionTheme
 import com.example.adopciontfg.ui.theme.Dimens
@@ -41,8 +40,7 @@ import com.example.adopciontfg.ui.theme.Dimens
 @Composable
 fun LoginScreen(
     onBackClick: () -> Unit,
-    onContinueClick: () -> Unit,
-    onShelterLoginClick: () -> Unit,
+    onContinueClick: () -> Unit
 ) {
     var user by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
@@ -115,12 +113,6 @@ fun LoginScreen(
                 onClick = onContinueClick,
                 modifier = Modifier.padding(top = Dimens.spacingLg)
             )
-
-            AppSecondaryButton(
-                text = stringResource(R.string.login_como_protectora),
-                onClick = onShelterLoginClick,
-                modifier = Modifier.padding(top = Dimens.spacingMd)
-            )
         }
     }
 }
@@ -129,10 +121,6 @@ fun LoginScreen(
 @Composable
 fun LoginScreenPreview() {
     AdoptionTheme {
-        LoginScreen(
-            onBackClick = {},
-            onContinueClick = {},
-            onShelterLoginClick = {},
-        )
+        LoginScreen(onBackClick = {}, onContinueClick = {})
     }
 }

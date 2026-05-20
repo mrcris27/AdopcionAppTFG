@@ -1,6 +1,5 @@
 package com.example.adopciontfg.data.local.entity
 
-import com.example.adopciontfg.model.AnimalStatus
 import java.util.concurrent.TimeUnit
 import kotlin.math.max
 
@@ -72,13 +71,6 @@ fun AnimalEntity.formattedCharacteristics(): String =
  * - "3 años" (solo edad)
  * - "Ver detalles" (si faltan ambos datos)
  */
-fun AnimalEntity.statusLabel(): String = when (status ?: AnimalStatus.AVAILABLE) {
-    AnimalStatus.AVAILABLE -> "Disponible"
-    AnimalStatus.RESERVED -> "Reservado"
-    AnimalStatus.ADOPTED -> "Adoptado"
-    AnimalStatus.UNAVAILABLE -> "No disponible"
-}
-
 fun AnimalEntity.listSubtitle(): String {
     val speciesLabel = species?.name
         ?.replace("_", " ")

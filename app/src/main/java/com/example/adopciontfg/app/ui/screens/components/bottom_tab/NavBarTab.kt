@@ -2,11 +2,12 @@ package com.example.adopciontfg.app.ui.screens.components.bottom_tab
 
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.adopciontfg.R
-import com.example.adopciontfg.app.ui.screens.shelter.home.navigation.ShelterAnimalsRoute
+import com.example.adopciontfg.app.ui.screens.shelter.home.navigation.ShelterAddPetRoute
 import com.example.adopciontfg.app.ui.screens.shelter.home.navigation.ShelterSettingsTabRoute
 import com.example.adopciontfg.app.ui.screens.user.home.navigation.UserScreenRoute
 import com.example.adopciontfg.app.ui.screens.user.settings.navigation.SettingsHubRoute
@@ -26,10 +27,10 @@ enum class NavBarTab(
         icon = Icons.Filled.Settings,
         labelRes = R.string.nav_bar_ajustes,
     ),
-    ShelterAnimals(
-        route = ShelterAnimalsRoute,
-        icon = Icons.Filled.Home,
-        labelRes = R.string.nav_bar_mis_animales,
+    ShelterAddPet(
+        route = ShelterAddPetRoute,
+        icon = Icons.Filled.Add,
+        labelRes = R.string.nav_bar_anadir,
     ),
     ShelterSettings(
         route = ShelterSettingsTabRoute,
@@ -39,6 +40,6 @@ enum class NavBarTab(
 
     companion object {
         val userTabs: List<NavBarTab> = listOf(UserHome, UserSettings)
-        val shelterTabs: List<NavBarTab> = listOf(ShelterAnimals, ShelterSettings)
+        val shelterTabs: List<NavBarTab> = listOf(ShelterAddPet, ShelterSettings)
     }
 }

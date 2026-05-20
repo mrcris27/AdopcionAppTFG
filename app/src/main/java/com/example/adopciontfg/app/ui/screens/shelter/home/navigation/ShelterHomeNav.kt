@@ -6,9 +6,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.toRoute
-import com.example.adopciontfg.app.ui.screens.shelter.animals.ShelterAnimalsScreen
-import com.example.adopciontfg.app.ui.screens.shelter.pet_registration.ShelterPetFormScreen
+import com.example.adopciontfg.app.ui.screens.shelter.pet_registration.PetRegistration
 import com.example.adopciontfg.app.ui.screens.shelter.settings.ShelterSettingsScreen
 import kotlinx.serialization.Serializable
 
@@ -20,31 +18,11 @@ fun ShelterMainNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = ShelterAnimalsRoute,
+        startDestination = ShelterAddPetRoute,
         modifier = modifier,
     ) {
-        composable<ShelterAnimalsRoute> {
-            ShelterAnimalsScreen(
-                onAddAnimalClick = { navController.navigate(ShelterAddPetRoute) },
-                onEditAnimalClick = { animalId ->
-                    navController.navigate(ShelterEditPetRoute(animalId))
-                },
-            )
-        }
         composable<ShelterAddPetRoute> {
-            ShelterPetFormScreen(
-                animalId = null,
-                onBackClick = { navController.popBackStack() },
-                onSaved = { navController.popBackStack() },
-            )
-        }
-        composable<ShelterEditPetRoute> { backStackEntry ->
-            val route = backStackEntry.toRoute<ShelterEditPetRoute>()
-            ShelterPetFormScreen(
-                animalId = route.animalId,
-                onBackClick = { navController.popBackStack() },
-                onSaved = { navController.popBackStack() },
-            )
+            PetRegistration()
         }
         composable<ShelterSettingsTabRoute> {
             ShelterSettingsScreen(
@@ -55,13 +33,7 @@ fun ShelterMainNavHost(
 }
 
 @Serializable
-object ShelterAnimalsRoute
-
-@Serializable
 object ShelterAddPetRoute
-
-@Serializable
-data class ShelterEditPetRoute(val animalId: String)
 
 @Serializable
 object ShelterSettingsTabRoute

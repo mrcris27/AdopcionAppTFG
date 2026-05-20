@@ -4,7 +4,6 @@ import android.text.TextUtils;
 
 import androidx.room.TypeConverter;
 
-import com.example.adopciontfg.model.AnimalStatus;
 import com.example.adopciontfg.model.Characteristic;
 import com.example.adopciontfg.model.Species;
 
@@ -60,18 +59,5 @@ public class Converters {
             list.add(Characteristic.valueOf(s));
         }
         return list;
-    }
-
-    // ─── AnimalStatus (Enum) ────────────────────────────────────────────
-    @TypeConverter
-    public static String fromAnimalStatus(AnimalStatus status) {
-        if (status == null) return AnimalStatus.AVAILABLE.name();
-        return status.name();
-    }
-
-    @TypeConverter
-    public static AnimalStatus toAnimalStatus(String value) {
-        if (value == null || value.isEmpty()) return AnimalStatus.AVAILABLE;
-        return AnimalStatus.valueOf(value);
     }
 }

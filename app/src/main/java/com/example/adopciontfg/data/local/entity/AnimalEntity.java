@@ -2,10 +2,8 @@ package com.example.adopciontfg.data.local.entity;
 
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
-import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
-import com.example.adopciontfg.model.AnimalStatus;
 import com.example.adopciontfg.model.Characteristic;
 import com.example.adopciontfg.model.Species;
 
@@ -30,24 +28,12 @@ public class AnimalEntity {
     @NonNull
     private String shelterId;             // FK a ShelterEntity
 
-    private AnimalStatus status;          // Enum (TypeConverter)
-
-    /** Constructor sin estado explícito (por defecto: disponible). Solo para código de app, no Room. */
-    @Ignore
+    // Constructor
     public AnimalEntity(@NonNull String id, String name, boolean sex,
                         String mainPhoto, List<String> photos, long birthDate,
                         String description, Species species,
                         List<Characteristic> characteristics,
                         @NonNull String shelterId) {
-        this(id, name, sex, mainPhoto, photos, birthDate, description, species,
-                characteristics, shelterId, AnimalStatus.AVAILABLE);
-    }
-
-    public AnimalEntity(@NonNull String id, String name, boolean sex,
-                        String mainPhoto, List<String> photos, long birthDate,
-                        String description, Species species,
-                        List<Characteristic> characteristics,
-                        @NonNull String shelterId, AnimalStatus status) {
         this.id = id;
         this.name = name;
         this.sex = sex;
@@ -58,7 +44,6 @@ public class AnimalEntity {
         this.species = species;
         this.characteristics = characteristics;
         this.shelterId = shelterId;
-        this.status = status != null ? status : AnimalStatus.AVAILABLE;
     }
 
     // Getters y Setters
@@ -93,9 +78,4 @@ public class AnimalEntity {
     @NonNull
     public String getShelterId() { return shelterId; }
     public void setShelterId(@NonNull String shelterId) { this.shelterId = shelterId; }
-
-    public AnimalStatus getStatus() { return status; }
-    public void setStatus(AnimalStatus status) {
-        this.status = status != null ? status : AnimalStatus.AVAILABLE;
-    }
 }
