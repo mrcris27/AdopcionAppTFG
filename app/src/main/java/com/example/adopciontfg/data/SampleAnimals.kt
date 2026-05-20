@@ -1,6 +1,7 @@
 package com.example.adopciontfg.data
 
 import com.example.adopciontfg.data.local.entity.AnimalEntity
+import com.example.adopciontfg.model.AnimalStatus
 import com.example.adopciontfg.model.Characteristic
 import com.example.adopciontfg.model.Species
 
@@ -12,11 +13,12 @@ val sampleAnimals: List<AnimalEntity> = listOf(
         false,
         "",
         emptyList(),
-        1640995200000L, // 01/01/2022
+        1640995200000L,
         "Max es un perro muy cariñoso y juguetón. Le encanta pasear y jugar con la pelota.",
         Species.PERRO,
         listOf(Characteristic.JUGUETON, Characteristic.SOCIABLE_CON_KIDS),
         "1",
+        AnimalStatus.AVAILABLE,
     ),
     AnimalEntity(
         "a2",
@@ -24,11 +26,12 @@ val sampleAnimals: List<AnimalEntity> = listOf(
         true,
         "",
         emptyList(),
-        1672531200000L, // 01/01/2023
+        1672531200000L,
         "Luna es una gata tranquila, ideal para pisos pequeños. Se adapta bien a la vida en interior.",
         Species.GATO,
         listOf(Characteristic.TRANQUILO, Characteristic.SOCIABLE_CON_GATOS),
         "1",
+        AnimalStatus.AVAILABLE,
     ),
     AnimalEntity(
         "a3",
@@ -36,7 +39,7 @@ val sampleAnimals: List<AnimalEntity> = listOf(
         false,
         "",
         emptyList(),
-        1609459200000L, // 01/01/2021
+        1609459200000L,
         "Rocky tiene mucha energía y necesita una familia activa que le dedique tiempo al ejercicio.",
         Species.PERRO,
         listOf(Characteristic.ENERGETICO, Characteristic.SOCIABLE_CON_PERROS),
@@ -48,11 +51,12 @@ val sampleAnimals: List<AnimalEntity> = listOf(
         true,
         "",
         emptyList(),
-        1685577600000L, // 01/06/2023
+        1685577600000L,
         "Mimi es sociable y cariñosa. Lleva bien convivir con otros gatos.",
         Species.GATO,
         listOf(Characteristic.SOCIABLE_CON_GATOS, Characteristic.JUGUETON),
         "2",
+        AnimalStatus.AVAILABLE,
     ),
     AnimalEntity(
         "a5",
@@ -60,11 +64,12 @@ val sampleAnimals: List<AnimalEntity> = listOf(
         false,
         "",
         emptyList(),
-        1704067200000L, // 01/01/2024
+        1704067200000L,
         "Napoleón es un conejo tranquilo, perfecto para familias con niños mayores.",
         Species.CONEJO,
         listOf(Characteristic.TRANQUILO, Characteristic.SOCIABLE_CON_KIDS),
         "2",
+        AnimalStatus.RESERVED,
     ),
     AnimalEntity(
         "a6",
@@ -72,11 +77,12 @@ val sampleAnimals: List<AnimalEntity> = listOf(
         true,
         "",
         emptyList(),
-        1577836800000L, // 01/01/2020
+        1577836800000L,
         "Estrella es una yegua dócil con experiencia en equitación terapéutica.",
         Species.CABALLO,
         listOf(Characteristic.TRANQUILO, Characteristic.SOCIABLE_CON_KIDS),
         "3",
+        AnimalStatus.AVAILABLE,
     ),
     AnimalEntity(
         "a7",
@@ -84,10 +90,11 @@ val sampleAnimals: List<AnimalEntity> = listOf(
         false,
         "",
         emptyList(),
-        1619827200000L, // 01/05/2021
+        1619827200000L,
         "Thor necesita un adoptante con experiencia. Es leal y protector con su familia.",
         Species.PERRO,
         listOf(Characteristic.REACTIVO, Characteristic.SOCIABLE_CON_PERROS),
         "3",
+        AnimalStatus.AVAILABLE,
     ),
 )

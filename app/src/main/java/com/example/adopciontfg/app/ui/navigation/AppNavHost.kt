@@ -43,6 +43,11 @@ fun AppNavHost(navController: NavHostController) {
                     popUpTo(LoginScreenRoute) { inclusive = true }
                 }
             },
+            onShelterPreviewClick = {
+                navController.navigate(SHELTER_MAIN_ROUTE) {
+                    popUpTo(LoginScreenRoute) { inclusive = true }
+                }
+            },
 //            authViewModel = authViewModel
         )
 

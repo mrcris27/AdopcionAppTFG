@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import com.example.adopciontfg.data.local.entity.AnimalEntity
+import com.example.adopciontfg.data.local.entity.isPubliclyVisible
 import com.example.adopciontfg.data.repository.AnimalRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -31,7 +32,7 @@ class PetListViewModel @Inject constructor(
         viewModelScope.launch {
             animalRepository.getAllAnimals().asFlow().collect { loaded ->
                 _uiState.update { state ->
-                    val animals = loaded.orEmpty()
+                    val animals = loaded.orEmpty().filter { it.isPubliclyVisible() }
                     state.copy(
                         isLoading = false,
                         animals = animals,

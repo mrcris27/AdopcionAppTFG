@@ -8,12 +8,14 @@ import kotlinx.serialization.Serializable
 
 fun NavGraphBuilder.loginScreen(
     onBackClick: () -> Unit,
-    onContinueClick: () -> Unit
+    onContinueClick: () -> Unit,
+    onShelterPreviewClick: () -> Unit,
 ){
     composable<LoginScreenRoute> {
         LoginScreen(
             onBackClick = onBackClick,
             onContinueClick = onContinueClick,
+            onShelterPreviewClick = onShelterPreviewClick,
 //            authViewModel = authViewModel
             )
     }

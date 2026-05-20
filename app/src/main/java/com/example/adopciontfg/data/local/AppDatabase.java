@@ -1,20 +1,21 @@
 package com.example.adopciontfg.data.local;
 
 import android.content.Context;
+import android.database.Cursor;
 
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
+import androidx.room.migration.Migration;
+import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import com.example.adopciontfg.data.local.converters.Converters;
 import com.example.adopciontfg.data.local.dao.AnimalDao;
-import com.example.adopciontfg.data.local.dao.FavoriteDao;
 import com.example.adopciontfg.data.local.dao.ShelterDao;
 import com.example.adopciontfg.data.local.dao.SponsorshipDao;
 import com.example.adopciontfg.data.local.dao.UserDao;
 import com.example.adopciontfg.data.local.entity.AnimalEntity;
-import com.example.adopciontfg.data.local.entity.FavoriteEntity;
 import com.example.adopciontfg.data.local.entity.ShelterEntity;
 import com.example.adopciontfg.data.local.entity.SponsorshipEntity;
 import com.example.adopciontfg.data.local.entity.UserEntity;
@@ -24,10 +25,9 @@ import com.example.adopciontfg.data.local.entity.UserEntity;
                 UserEntity.class,
                 ShelterEntity.class,
                 AnimalEntity.class,
-                FavoriteEntity.class,
                 SponsorshipEntity.class
         },
-        version = 1,
+        version = 4,
         exportSchema = false
 )
 @TypeConverters(Converters.class)
@@ -39,8 +39,29 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract UserDao userDao();
     public abstract ShelterDao shelterDao();
     public abstract AnimalDao animalDao();
-    public abstract FavoriteDao favoriteDao();
     public abstract SponsorshipDao sponsorshipDao();
+
+    private static final Migration MIGRATION_3_4 = new Migration(3, 4) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+            if (!hasColumn(database, "animals", "status")) {
+                database.execSQL("ALTER TABLE animals ADD COLUMN status TEXT");
+            }
+            database.execSQL("UPDATE animals SET status = 'AVAILABLE' WHERE status IS NULL");
+            database.execSQL("DROP TABLE IF EXISTS favorites");
+        }
+    };
+
+    private static boolean hasColumn(SupportSQLiteDatabase database, String tableName, String columnName) {
+        try (Cursor cursor = database.query("PRAGMA table_info(`" + tableName + "`)")) {
+            while (cursor.moveToNext()) {
+                if (columnName.equals(cursor.getString(1))) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
 
     public static AppDatabase getInstance(Context context) {
 
@@ -61,7 +82,7 @@ public abstract class AppDatabase extends RoomDatabase {
                             context.getApplicationContext(),
                             AppDatabase.class,
                             "adopcion_tfg_db"
-                    ).build();
+                    ).addMigrations(MIGRATION_3_4).build();
                 }
             }
         }

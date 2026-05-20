@@ -76,6 +76,7 @@ fun ShelterSettingsScreen(
         onPhoneChange = viewModel::onPhoneChange,
         onAddressChange = viewModel::onAddressChange,
         onCifChange = viewModel::onCifChange,
+        onAdoptionFormUrlChange = viewModel::onAdoptionFormUrlChange,
         onAdoptionAlertsChange = viewModel::onAdoptionAlertsChange,
         onDarkModeChange = viewModel::onDarkModeChange,
         onCurrentPasswordChange = viewModel::onCurrentPasswordChange,
@@ -104,6 +105,7 @@ private fun ShelterSettingsContent(
     onPhoneChange: (String) -> Unit,
     onAddressChange: (String) -> Unit,
     onCifChange: (String) -> Unit,
+    onAdoptionFormUrlChange: (String) -> Unit,
     onAdoptionAlertsChange: (Boolean) -> Unit,
     onDarkModeChange: (Boolean) -> Unit,
     onCurrentPasswordChange: (String) -> Unit,
@@ -205,6 +207,33 @@ private fun ShelterSettingsContent(
                 }
             }
 
+            AppSectionTitle("Adopciones")
+            ElevatedCard(
+                shape = MaterialTheme.shapes.large,
+                colors = CardDefaults.elevatedCardColors(
+                    containerColor = MaterialTheme.colorScheme.elevatedSurface()
+                ),
+                elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Text(
+                        text = "Los usuarios rellenarán este formulario cuando soliciten adoptar un animal.",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    OutlinedTextField(
+                        value = uiState.adoptionFormUrl,
+                        onValueChange = onAdoptionFormUrlChange,
+                        label = { Text("Enlace Google Forms") },
+                        placeholder = { Text("https://forms.gle/...") },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true
+                    )
+                }
+            }
+
             AppSectionTitle("Preferencias")
             ElevatedCard(
                 shape = MaterialTheme.shapes.large,
@@ -277,6 +306,7 @@ private fun ShelterSettingsScreenPreview() {
             onPhoneChange = {},
             onAddressChange = {},
             onCifChange = {},
+            onAdoptionFormUrlChange = {},
             onAdoptionAlertsChange = {},
             onDarkModeChange = {},
             onCurrentPasswordChange = {},
