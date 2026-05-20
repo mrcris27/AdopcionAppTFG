@@ -1,6 +1,7 @@
 package com.example.adopciontfg.data
 
 import com.example.adopciontfg.data.local.entity.AnimalEntity
+import com.example.adopciontfg.model.AnimalStatus
 import com.example.adopciontfg.model.Characteristic
 import com.example.adopciontfg.model.Species
 

@@ -1,5 +1,6 @@
 package com.example.adopciontfg.data.local.entity
 
+import com.example.adopciontfg.model.AnimalStatus
 import java.util.concurrent.TimeUnit
 import kotlin.math.max
 

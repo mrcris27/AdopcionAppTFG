@@ -126,9 +126,7 @@ private fun BottomNavDestination(
             Icon(
                 imageVector = tab.icon,
                 contentDescription = label,
-                modifier = Modifier.size(
-                    if (tab == NavBarTab.ShelterAnimals) 26.dp else 22.dp
-                ),
+                modifier = Modifier.size(22.dp),
                 tint = contentColor,
             )
             Text(

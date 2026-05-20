@@ -22,6 +22,7 @@ enum class ShelterAnimalFilter {
     AVAILABLE,
     RESERVED,
     ADOPTED,
+    UNAVAILABLE,
 }
 
 data class ShelterAnimalsUiState(
@@ -116,6 +117,7 @@ class ShelterAnimalsViewModel @Inject constructor(
                     ShelterAnimalFilter.AVAILABLE -> animal.status == AnimalStatus.AVAILABLE
                     ShelterAnimalFilter.RESERVED -> animal.status == AnimalStatus.RESERVED
                     ShelterAnimalFilter.ADOPTED -> animal.status == AnimalStatus.ADOPTED
+                    ShelterAnimalFilter.UNAVAILABLE -> animal.status == AnimalStatus.UNAVAILABLE
                 }
             }
             .filter { animal ->
