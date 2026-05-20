@@ -1,5 +1,6 @@
 package com.example.adopciontfg.app.ui.screens.auth.login
 
+import android.util.Patterns
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -41,12 +42,15 @@ import com.example.adopciontfg.ui.theme.Dimens
 @Composable
 fun LoginScreen(
     onBackClick: () -> Unit,
-    onContinueClick: () -> Unit,
+    onContinueClick: (email: String, password: String) -> Unit,
     onShelterPreviewClick: () -> Unit,
 ) {
     var user by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
     var passwordHidden by rememberSaveable { mutableStateOf(true) }
+    var showEmptyFieldsError by rememberSaveable { mutableStateOf(false) }
+    val email = user.trim()
+    val isEmailInvalid = email.isNotEmpty() && !Patterns.EMAIL_ADDRESS.matcher(email).matches()
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -78,15 +82,41 @@ fun LoginScreen(
                     modifier = Modifier.padding(bottom = Dimens.spacingSm)
                 )
 
-                AppFilledTextField(
-                    value = user,
-                    onValueChange = { user = it },
-                    label = { Text(stringResource(R.string.correo)) }
-                )
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(Dimens.spacingXs)
+                ) {
+                    if (isEmailInvalid) {
+                        Text(
+                            text = stringResource(R.string.login_invalid_email_error),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+
+                    AppFilledTextField(
+                        value = user,
+                        onValueChange = {
+                            user = it
+                            if (it.isNotBlank() && password.isNotBlank()) {
+                                showEmptyFieldsError = false
+                            }
+                        },
+                        label = { Text(stringResource(R.string.correo)) },
+                        isError = isEmailInvalid,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+                    )
+                }
 
                 AppFilledTextField(
                     value = password,
-                    onValueChange = { password = it },
+                    onValueChange = {
+                        password = it
+                        if (user.isNotBlank() && it.isNotBlank()) {
+                            showEmptyFieldsError = false
+                        }
+                    },
                     label = { Text(stringResource(R.string.contraseña)) },
                     visualTransformation = if (passwordHidden) {
                         PasswordVisualTransformation()
@@ -108,11 +138,36 @@ fun LoginScreen(
                         }
                     }
                 )
+
+                if (showEmptyFieldsError) {
+                    Text(
+                        text = stringResource(R.string.login_empty_fields_error),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
             }
 
             AppPrimaryButton(
                 text = stringResource(R.string.continuar),
-                onClick = onContinueClick,
+                onClick = {
+                    when {
+                        email.isBlank() || password.isBlank() -> {
+                            showEmptyFieldsError = true
+                        }
+
+                        !Patterns.EMAIL_ADDRESS.matcher(email).matches() -> {
+                            showEmptyFieldsError = false
+                        }
+
+                        else -> {
+                            showEmptyFieldsError = false
+                            onContinueClick(email, password)
+                        }
+                    }
+                },
                 modifier = Modifier.padding(top = Dimens.spacingLg)
             )
             AppSecondaryButton(
@@ -128,6 +183,6 @@ fun LoginScreen(
 @Composable
 fun LoginScreenPreview() {
     AdoptionTheme {
-        LoginScreen(onBackClick = {}, onContinueClick = {}, onShelterPreviewClick = {})
+        LoginScreen(onBackClick = {}, onContinueClick = { _, _ -> }, onShelterPreviewClick = {})
     }
 }

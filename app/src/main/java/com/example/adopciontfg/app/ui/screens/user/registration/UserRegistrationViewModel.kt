@@ -1,6 +1,9 @@
 package com.example.adopciontfg.app.ui.screens.user.registration
 
 import androidx.lifecycle.ViewModel
+import com.example.adopciontfg.app.ui.validation.doPasswordsMatch
+import com.example.adopciontfg.app.ui.validation.isValidEmail
+import com.example.adopciontfg.app.ui.validation.isValidRegistrationPassword
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +22,16 @@ data class UserRegistrationUiState(
     val passwordHidden: Boolean = true,
     val confirmPasswordHidden: Boolean = true,
     val canRegister: Boolean = false
-)
+) {
+    val isEmailInvalid: Boolean
+        get() = email.isNotBlank() && !isValidEmail(email)
+
+    val isPasswordInvalid: Boolean
+        get() = password.isNotBlank() && !isValidRegistrationPassword(password)
+
+    val doPasswordsNotMatch: Boolean
+        get() = confirmPassword.isNotBlank() && !doPasswordsMatch(password, confirmPassword)
+}
 
 @HiltViewModel
 class UserRegistrationViewModel @Inject constructor() : ViewModel() {
@@ -42,10 +54,6 @@ class UserRegistrationViewModel @Inject constructor() : ViewModel() {
         _uiState.update { it.copy(confirmPasswordHidden = !it.confirmPasswordHidden) }
     }
 
-    fun onRegisterClick() {
-        // Placeholder for persistence / auth integration.
-    }
-
     private fun updateForm(transform: (UserRegistrationUiState) -> UserRegistrationUiState) {
         _uiState.update { current ->
             val updated = transform(current)
@@ -56,8 +64,8 @@ class UserRegistrationViewModel @Inject constructor() : ViewModel() {
     private fun validate(state: UserRegistrationUiState): Boolean {
         return state.name.isNotBlank() &&
             state.surname.isNotBlank() &&
-            state.email.contains("@") &&
-            state.password.length >= 6 &&
-            state.password == state.confirmPassword
+            isValidEmail(state.email) &&
+            isValidRegistrationPassword(state.password) &&
+            doPasswordsMatch(state.password, state.confirmPassword)
     }
 }

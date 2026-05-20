@@ -1,13 +1,16 @@
 package com.example.adopciontfg.app.ui.navigation
 
 import android.app.Application
+import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
+import com.example.adopciontfg.R
 import com.example.adopciontfg.data.local.entity.ShelterEntity
 import com.example.adopciontfg.data.local.entity.UserEntity
 import com.example.adopciontfg.data.remote.FirebaseService
 import com.example.adopciontfg.data.remote.RoleCallback
 import com.example.adopciontfg.data.repository.ShelterRepository
 import com.example.adopciontfg.data.repository.UserRepository
+import com.google.firebase.auth.FirebaseAuthException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -63,12 +66,12 @@ class AuthViewModel (application: Application) : AndroidViewModel(application) {
                 })
             }, {
                 exception ->
-                _authState.value = AuthState.Error(exception.message ?: "Unknown error")
+                _authState.value = AuthState.Error(getString(R.string.login_invalid_credentials_error))
             })
     }
 
     //Registro de usuarios
-    fun registerUser(name: String, surname : String, email: String, password: String){
+    fun registerUser(name: String, surname : String, email: String, bio: String, profilePic:String, password: String){
         _authState.value = AuthState.Loading
         firebase.register(email, password,
 
@@ -78,18 +81,19 @@ class AuthViewModel (application: Application) : AndroidViewModel(application) {
                     authResult ->
                 authResult.user?.uid?.let { uid ->
                     //Se crea el usuario completo en la base de datos
-                    userRepos.saveUser(UserEntity(uid, name, surname, "", email, ""))
+                    userRepos.saveUser(UserEntity(uid, name, surname, profilePic, email, bio))
                 }
                 _authState.value = AuthState.Success("user")
             },
             //Si falla se muestra el error
             { exception ->
-                _authState.value = AuthState.Error(exception.message ?: "Unknown error")
+                _authState.value = AuthState.Error(getRegisterErrorMessage(exception))
+                println("ERROR EN EL REGISTRO" + getRegisterErrorMessage(exception))
             })
     }
 
 
-    fun registerShelter(name: String, cif : String, phoneName : String, address: String , email: String, password: String){
+    fun registerShelter(name: String, cif : String, phoneName : String, address: String ,profilePic:String, email: String, password: String){
         _authState.value = AuthState.Loading
         firebase.register(email, password,
 
@@ -104,7 +108,7 @@ class AuthViewModel (application: Application) : AndroidViewModel(application) {
                             uid,
                             name,
                             cif,
-                            "",
+                            profilePic,
                             email,
                             address,
                             phoneName
@@ -116,8 +120,12 @@ class AuthViewModel (application: Application) : AndroidViewModel(application) {
             },
             //Si falla se muestra el error
             { exception ->
-                _authState.value = AuthState.Error(exception.message ?: "Unknown error")
+                _authState.value = AuthState.Error(getRegisterErrorMessage(exception))
             })
+    }
+
+    fun resetAuthState() {
+        _authState.value = AuthState.Idle
     }
 
     fun logout() {
@@ -125,5 +133,23 @@ class AuthViewModel (application: Application) : AndroidViewModel(application) {
     }
 
     fun isLogged(): Boolean = firebase.isLoggedIn
+
+    private fun getRegisterErrorMessage(exception: Exception): String {
+        val errorMessage = exception.localizedMessage.orEmpty()
+        return when ((exception as? FirebaseAuthException)?.errorCode) {
+            "ERROR_EMAIL_ALREADY_IN_USE" -> getString(R.string.registro_email_already_in_use_error)
+            "ERROR_INVALID_EMAIL" -> getString(R.string.login_invalid_email_error)
+            "ERROR_WEAK_PASSWORD" -> getString(R.string.registro_password_min_length_error)
+            else -> if (errorMessage.contains("CONFIGURATION_NOT_FOUND")) {
+                getString(R.string.firebase_auth_configuration_error)
+            } else {
+                exception.localizedMessage ?: getString(R.string.auth_generic_error)
+            }
+        }
+    }
+
+    private fun getString(@StringRes resId: Int): String {
+        return getApplication<Application>().getString(resId)
+    }
 
 }
