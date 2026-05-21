@@ -4,9 +4,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.adopciontfg.R
+import com.example.adopciontfg.model.AnimalStatus
+import com.example.adopciontfg.model.Characteristic
+import com.example.adopciontfg.model.Species
+import com.example.adopciontfg.ui.theme.AdoptionTheme
 
 @Composable
 fun ShelterPetFormScreen(
@@ -63,4 +68,41 @@ fun ShelterPetFormScreen(
         onBackClick = onBackClick,
         onSaveClick = viewModel::onSave,
     )
+}
+
+@Preview(showBackground = true, name = "Editar animal")
+@Composable
+private fun ShelterPetFormScreenPreview() {
+    AdoptionTheme {
+        PetRegistration(
+            title = stringResource(R.string.editar_animal),
+            saveButtonText = stringResource(R.string.guardar_cambios),
+            isLoading = false,
+            name = "Max",
+            onNameChange = {},
+            isFemale = false,
+            onSexChange = {},
+            mainPhotoUri = null,
+            onMainPhotoChange = {},
+            galleryUris = emptyList(),
+            onGalleryChange = {},
+            birthDateMillis = 1640995200000L,
+            onBirthDateChange = {},
+            description = "Perro cariñoso y activo que busca una familia responsable.",
+            onDescriptionChange = {},
+            species = Species.PERRO,
+            onSpeciesChange = {},
+            selectedCharacteristics = setOf(
+                Characteristic.JUGUETON,
+                Characteristic.SOCIABLE_CON_KIDS,
+            ),
+            onCharacteristicToggle = {},
+            status = AnimalStatus.AVAILABLE,
+            onStatusChange = {},
+            showStatusSection = true,
+            canSave = true,
+            onBackClick = {},
+            onSaveClick = {},
+        )
+    }
 }

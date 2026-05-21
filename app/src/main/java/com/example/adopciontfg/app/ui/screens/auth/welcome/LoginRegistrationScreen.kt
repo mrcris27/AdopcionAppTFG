@@ -48,7 +48,7 @@ fun LoginRegistrationScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Uni
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = Dimens.spacingXxl),
+                .padding(horizontal = Dimens.screenPadding),
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -94,7 +94,7 @@ fun LoginRegistrationScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Uni
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 48.dp),
+                    .padding(bottom = Dimens.spacingXxl),
                 verticalArrangement = Arrangement.spacedBy(Dimens.spacingMd),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {

@@ -119,7 +119,7 @@ private fun BottomNavDestination(
             modifier = Modifier
                 .clip(MaterialTheme.shapes.medium)
                 .background(pillColor)
-                .padding(horizontal = Dimens.spacingXl, vertical = Dimens.spacingSm),
+                .padding(horizontal = Dimens.spacingLg, vertical = Dimens.spacingSm),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {

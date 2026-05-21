@@ -14,13 +14,10 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.outlined.Campaign
 import androidx.compose.material.icons.outlined.Palette
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -30,19 +27,19 @@ import androidx.compose.material3.TextButton
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import com.example.adopciontfg.app.ui.screens.components.AppFilledTextField
+import com.example.adopciontfg.app.ui.screens.components.AppFormSection
 import com.example.adopciontfg.app.ui.screens.components.AppOutlinedButton
 import com.example.adopciontfg.app.ui.screens.components.AppPrimaryButton
-import com.example.adopciontfg.app.ui.screens.components.AppSectionTitle
 import com.example.adopciontfg.app.ui.screens.components.AppTopAppBar
 import com.example.adopciontfg.app.ui.screens.components.ProfilePhotoPicker
 import com.example.adopciontfg.ui.theme.Dimens
-import com.example.adopciontfg.ui.theme.elevatedSurface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.adopciontfg.ui.theme.AdoptionTheme
@@ -152,133 +149,80 @@ private fun ShelterSettingsContent(
                 .padding(Dimens.screenPadding),
             verticalArrangement = Arrangement.spacedBy(Dimens.spacingMd)
         ) {
-            AppSectionTitle("Datos de la protectora")
-            ElevatedCard(
-                shape = MaterialTheme.shapes.large,
-                colors = CardDefaults.elevatedCardColors(
-                    containerColor = MaterialTheme.colorScheme.elevatedSurface()
-                ),
-                elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    ProfilePhotoPicker(
-                        photoUri = uiState.profilePhotoUri,
-                        onPhotoChange = onProfilePhotoChange,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    OutlinedTextField(
-                        value = uiState.shelterName,
-                        onValueChange = onShelterNameChange,
-                        label = { Text("Nombre de protectora") },
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true
-                    )
-                    OutlinedTextField(
-                        value = uiState.email,
-                        onValueChange = onEmailChange,
-                        label = { Text("Correo") },
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true
-                    )
-                    OutlinedTextField(
-                        value = uiState.phone,
-                        onValueChange = onPhoneChange,
-                        label = { Text("Telefono") },
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true
-                    )
-                    OutlinedTextField(
-                        value = uiState.address,
-                        onValueChange = onAddressChange,
-                        label = { Text("Direccion") },
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true
-                    )
-                    OutlinedTextField(
-                        value = uiState.cif,
-                        onValueChange = onCifChange,
-                        label = { Text("CIF") },
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true
-                    )
-                }
+            AppFormSection(title = "Datos de la protectora") {
+                ProfilePhotoPicker(
+                    photoUri = uiState.profilePhotoUri,
+                    onPhotoChange = onProfilePhotoChange,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                AppFilledTextField(
+                    value = uiState.shelterName,
+                    onValueChange = onShelterNameChange,
+                    label = { Text("Nombre de protectora") }
+                )
+                AppFilledTextField(
+                    value = uiState.email,
+                    onValueChange = onEmailChange,
+                    label = { Text("Correo") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+                )
+                AppFilledTextField(
+                    value = uiState.phone,
+                    onValueChange = onPhoneChange,
+                    label = { Text("Telefono") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
+                )
+                AppFilledTextField(
+                    value = uiState.address,
+                    onValueChange = onAddressChange,
+                    label = { Text("Direccion") }
+                )
+                AppFilledTextField(
+                    value = uiState.cif,
+                    onValueChange = onCifChange,
+                    label = { Text("CIF") }
+                )
             }
 
-            AppSectionTitle("Adopciones")
-            ElevatedCard(
-                shape = MaterialTheme.shapes.large,
-                colors = CardDefaults.elevatedCardColors(
-                    containerColor = MaterialTheme.colorScheme.elevatedSurface()
-                ),
-                elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    Text(
-                        text = "Los usuarios rellenarán este formulario cuando soliciten adoptar un animal.",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    OutlinedTextField(
-                        value = uiState.adoptionFormUrl,
-                        onValueChange = onAdoptionFormUrlChange,
-                        label = { Text("Enlace Google Forms") },
-                        placeholder = { Text("https://forms.gle/...") },
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true
-                    )
-                }
+            AppFormSection(title = "Adopciones") {
+                Text(
+                    text = "Los usuarios rellenarán este formulario cuando soliciten adoptar un animal.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                AppFilledTextField(
+                    value = uiState.adoptionFormUrl,
+                    onValueChange = onAdoptionFormUrlChange,
+                    label = { Text("Enlace Google Forms") },
+                    placeholder = { Text("https://forms.gle/...") }
+                )
             }
 
-            AppSectionTitle("Preferencias")
-            ElevatedCard(
-                shape = MaterialTheme.shapes.large,
-                colors = CardDefaults.elevatedCardColors(
-                    containerColor = MaterialTheme.colorScheme.elevatedSurface()
-                ),
-                elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
-            ) {
-                Column(modifier = Modifier.padding(12.dp)) {
-                    SwitchRow(
-                        text = "Alertas de adopcion",
-                        icon = { Icon(Icons.Outlined.Campaign, contentDescription = null) },
-                        checked = uiState.adoptionAlertsEnabled,
-                        onCheckedChange = onAdoptionAlertsChange
-                    )
-                    SwitchRow(
-                        text = "Modo oscuro",
-                        icon = { Icon(Icons.Outlined.Palette, contentDescription = null) },
-                        checked = uiState.darkModeEnabled,
-                        onCheckedChange = onDarkModeChange
-                    )
-                }
+            AppFormSection(title = "Preferencias") {
+                SwitchRow(
+                    text = "Alertas de adopcion",
+                    icon = { Icon(Icons.Outlined.Campaign, contentDescription = null) },
+                    checked = uiState.adoptionAlertsEnabled,
+                    onCheckedChange = onAdoptionAlertsChange
+                )
+                SwitchRow(
+                    text = "Modo oscuro",
+                    icon = { Icon(Icons.Outlined.Palette, contentDescription = null) },
+                    checked = uiState.darkModeEnabled,
+                    onCheckedChange = onDarkModeChange
+                )
             }
 
-            AppSectionTitle("Seguridad")
-            ElevatedCard(
-                shape = MaterialTheme.shapes.large,
-                colors = CardDefaults.elevatedCardColors(
-                    containerColor = MaterialTheme.colorScheme.elevatedSurface()
-                ),
-                elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    Text(
-                        text = "Actualiza tu contraseña desde un formulario privado.",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    AppPrimaryButton(
-                        text = "Cambiar contraseña",
-                        onClick = onOpenPasswordDialog
-                    )
-                }
+            AppFormSection(title = "Seguridad") {
+                Text(
+                    text = "Actualiza tu contraseña desde un formulario privado.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                AppPrimaryButton(
+                    text = "Cambiar contraseña",
+                    onClick = onOpenPasswordDialog
+                )
             }
             AppPrimaryButton(
                 text = "Guardar",
@@ -332,9 +276,14 @@ private fun SwitchRow(
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(
+            modifier = Modifier.weight(1f),
+            horizontalArrangement = Arrangement.spacedBy(Dimens.spacingSm),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             icon()
             Text(text)
         }
@@ -358,7 +307,7 @@ private fun ChangePasswordDialog(
         onDismissRequest = onDismissRequest,
         title = { Text("Cambiar contraseña") },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(Dimens.spacingSm)) {
                 PasswordField(
                     value = uiState.currentPassword,
                     onValueChange = onCurrentPasswordChange,
@@ -409,11 +358,10 @@ private fun PasswordField(
     hidden: Boolean,
     onToggleVisibility: () -> Unit
 ) {
-    OutlinedTextField(
+    AppFilledTextField(
         value = value,
         onValueChange = onValueChange,
         label = { Text(label) },
-        modifier = Modifier.fillMaxWidth(),
         singleLine = true,
         visualTransformation = if (hidden) {
             PasswordVisualTransformation()

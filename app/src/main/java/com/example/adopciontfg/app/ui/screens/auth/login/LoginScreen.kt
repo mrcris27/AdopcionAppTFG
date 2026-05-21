@@ -32,6 +32,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.adopciontfg.R
 import com.example.adopciontfg.app.ui.screens.components.AppFilledTextField
+import com.example.adopciontfg.app.ui.screens.components.AppFormSection
 import com.example.adopciontfg.app.ui.screens.components.AppPrimaryButton
 import com.example.adopciontfg.app.ui.screens.components.AppSecondaryButton
 import com.example.adopciontfg.app.ui.screens.components.AppTopAppBar

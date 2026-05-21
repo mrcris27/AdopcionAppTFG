@@ -10,7 +10,7 @@ object Dimens {
     val spacingXl = 24.dp
     val spacingXxl = 32.dp
 
-    val screenPadding = 20.dp
+    val screenPadding = 16.dp
     val cardPadding = 16.dp
     val listItemSpacing = 10.dp
 

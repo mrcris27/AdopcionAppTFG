@@ -7,6 +7,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -67,6 +68,7 @@ fun UserHomeScreenBody(
     Column(
         modifier = modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding()
     ) {
         Column(
@@ -89,7 +91,8 @@ fun UserHomeScreenBody(
             if (uiState.selectedTab == 0) {
                 SearchBar(
                     query = uiState.query,
-                    onQueryChange = onQueryChange
+                    onQueryChange = onQueryChange,
+                    modifier = Modifier.padding(horizontal = Dimens.spacingSm, vertical = Dimens.spacingSm)
                 )
             }
 
