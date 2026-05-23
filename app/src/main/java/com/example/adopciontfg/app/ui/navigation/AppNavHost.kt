@@ -13,6 +13,8 @@ import com.example.adopciontfg.app.ui.screens.auth.register.navigation.registrat
 import com.example.adopciontfg.app.ui.screens.shelter.registration.navigation.ShelterRegistrationRoute
 import com.example.adopciontfg.app.ui.screens.shelter.registration.navigation.shelterRegistrationScreen
 import com.example.adopciontfg.app.ui.screens.shelter.home.ShelterHomeScreen
+import com.example.adopciontfg.app.ui.screens.splash.navigation.SplashRoute
+import com.example.adopciontfg.app.ui.screens.splash.navigation.splashScreen
 import com.example.adopciontfg.app.ui.screens.user.registration.navigation.UserRegistrationRoute
 import com.example.adopciontfg.app.ui.screens.user.registration.navigation.userRegistrationScreen
 
@@ -22,10 +24,19 @@ fun AppNavHost(navController: NavHostController) {
 
     NavHost(
         navController = navController,
-        startDestination = LoginResRoute
+        startDestination = SplashRoute
     ) {
 
         /* ---------------- AUTH ---------------- */
+
+        splashScreen(
+            onFinished = {
+                navController.navigate(LoginResRoute) {
+                    popUpTo(SplashRoute) { inclusive = true }
+                    launchSingleTop = true
+                }
+            }
+        )
 
         loginResScreen(
             onLoginClick = {
