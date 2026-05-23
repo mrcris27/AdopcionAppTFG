@@ -31,13 +31,12 @@ public class AnimalEntity {
     @NonNull
     private String shelterId;             // FK a ShelterEntity
 
-    private AnimalStatus status;          // Enum (TypeConverter)
+
 
     @Ignore
     public AnimalEntity() {
         this.id = "";
         this.shelterId = "";
-        this.status = AnimalStatus.AVAILABLE;
     }
 
     /** Constructor sin estado explícito (por defecto: disponible). Solo para código de app, no Room. */
@@ -46,16 +45,16 @@ public class AnimalEntity {
                         String mainPhoto, List<String> photos, long birthDate,
                         String description, Species species,
                         List<Characteristic> characteristics,
-                        @NonNull String shelterId) {
+                        @NonNull String shelterId, boolean forAdoption) {
         this(id, name, sex, mainPhoto, photos, birthDate, description, species,
-                characteristics, shelterId, AnimalStatus.AVAILABLE);
+                characteristics, forAdoption ,shelterId);
     }
 
     public AnimalEntity(@NonNull String id, String name, boolean sex,
                         String mainPhoto, List<String> photos, long birthDate,
                         String description, Species species,
-                        List<Characteristic> characteristics,
-                        @NonNull String shelterId, AnimalStatus status) {
+                        List<Characteristic> characteristics, Boolean forAdoption,
+                        @NonNull String shelterId) {
         this.id = id;
         this.name = name;
         this.sex = sex;
@@ -66,7 +65,7 @@ public class AnimalEntity {
         this.species = species;
         this.characteristics = characteristics;
         this.shelterId = shelterId;
-        this.status = status != null ? status : AnimalStatus.AVAILABLE;
+        this.forAdoption = forAdoption != null ? forAdoption : false;
     }
 
     // Getters y Setters
@@ -105,8 +104,5 @@ public class AnimalEntity {
     public String getShelterId() { return shelterId; }
     public void setShelterId(@NonNull String shelterId) { this.shelterId = shelterId; }
 
-    public AnimalStatus getStatus() { return status; }
-    public void setStatus(AnimalStatus status) {
-        this.status = status != null ? status : AnimalStatus.AVAILABLE;
-    }
+
 }
