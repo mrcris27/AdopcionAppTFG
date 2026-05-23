@@ -58,7 +58,6 @@ import com.example.adopciontfg.app.ui.screens.components.SearchSection
 import com.example.adopciontfg.data.local.entity.AnimalEntity
 import com.example.adopciontfg.data.local.entity.ShelterEntity
 import com.example.adopciontfg.data.local.entity.listSubtitle
-import com.example.adopciontfg.model.AnimalStatus
 import com.example.adopciontfg.model.Characteristic
 import com.example.adopciontfg.model.Species
 import com.example.adopciontfg.ui.theme.AdoptionTheme
@@ -440,7 +439,6 @@ private fun FilterSection(
 private fun enumLabel(name: String): String =
     name.replace("_", " ").lowercase().replaceFirstChar { it.uppercase() }
 
-/*
 @Preview(showBackground = true)
 @Composable
 fun ShelterProfileViewPreview() {
@@ -491,7 +489,7 @@ private fun previewAnimals(): List<AnimalEntity> = listOf(
         Species.PERRO,
         listOf(Characteristic.TRANQUILO),
         "preview-shelter",
-        AnimalStatus.AVAILABLE,
+        true,
     ),
     AnimalEntity(
         "preview-animal-2",
@@ -504,7 +502,6 @@ private fun previewAnimals(): List<AnimalEntity> = listOf(
         Species.GATO,
         listOf(Characteristic.JUGUETON),
         "preview-shelter",
-        AnimalStatus.AVAILABLE,
+        true,
     ),
 )
-*/

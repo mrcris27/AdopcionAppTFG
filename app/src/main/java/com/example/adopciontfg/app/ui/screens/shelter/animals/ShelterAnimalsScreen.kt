@@ -466,7 +466,7 @@ private fun EmptyMessage(text: String, modifier: Modifier = Modifier) {
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
 }
-/*
+
 @Preview(showBackground = true)
 @Composable
 private fun ShelterAnimalsScreenPreview() {
@@ -493,7 +493,7 @@ private fun ShelterAnimalsScreenPreview() {
         )
     }
 }
-/*
+
 private fun previewAnimals(): List<AnimalEntity> = listOf(
     AnimalEntity(
         "preview-animal-1",
@@ -506,7 +506,7 @@ private fun previewAnimals(): List<AnimalEntity> = listOf(
         Species.PERRO,
         listOf(Characteristic.TRANQUILO),
         "1",
-        AnimalStatus.AVAILABLE,
+        true,
     ),
     AnimalEntity(
         "preview-animal-2",
@@ -519,7 +519,7 @@ private fun previewAnimals(): List<AnimalEntity> = listOf(
         Species.GATO,
         listOf(Characteristic.JUGUETON),
         "1",
-        AnimalStatus.AVAILABLE,
+        true,
     ),
     AnimalEntity(
         "preview-animal-3",
@@ -532,7 +532,6 @@ private fun previewAnimals(): List<AnimalEntity> = listOf(
         Species.PERRO,
         listOf(Characteristic.SOCIABLE_CON_PERROS),
         "1",
-        AnimalStatus.ADOPTED,
+        false,
     ),
 )
-*/

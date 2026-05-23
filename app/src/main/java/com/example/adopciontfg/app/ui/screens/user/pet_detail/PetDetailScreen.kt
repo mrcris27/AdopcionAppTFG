@@ -47,7 +47,6 @@ import com.example.adopciontfg.data.local.entity.ageInYears
 import com.example.adopciontfg.data.local.entity.displayPhotos
 import com.example.adopciontfg.data.local.entity.formattedCharacteristics
 import com.example.adopciontfg.data.local.entity.genderLabel
-import com.example.adopciontfg.model.AnimalStatus
 import com.example.adopciontfg.model.Characteristic
 import com.example.adopciontfg.model.Species
 import com.example.adopciontfg.ui.theme.AdoptionTheme
@@ -263,8 +262,7 @@ fun PetDetailLoadingPreview() {
         )
     }
 }
-/*
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun PetDetailPreview() {
     AdoptionTheme {
@@ -287,6 +285,5 @@ private fun previewAnimal(): AnimalEntity = AnimalEntity(
     Species.PERRO,
     listOf(Characteristic.TRANQUILO),
     "preview-shelter",
-    AnimalStatus.AVAILABLE,
+    true,
 )
-*/

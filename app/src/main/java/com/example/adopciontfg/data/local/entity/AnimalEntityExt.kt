@@ -1,6 +1,5 @@
 package com.example.adopciontfg.data.local.entity
 
-import com.example.adopciontfg.model.AnimalStatus
 import java.util.concurrent.TimeUnit
 import kotlin.math.max
 
@@ -52,18 +51,10 @@ fun AnimalEntity.ageInYears(): Int {
  */
 fun AnimalEntity.genderLabel(): String = if (isSex) "Hembra" else "Macho"
 
-/** Animales visibles en listados de usuarios (no adoptados ni dados de baja). */
-fun AnimalEntity.isPubliclyVisible(): Boolean {
-    val current = status ?: AnimalStatus.AVAILABLE
-    return current == AnimalStatus.AVAILABLE || current == AnimalStatus.RESERVED
-}
+/** Animales visibles en listados de usuarios. */
+fun AnimalEntity.isPubliclyVisible(): Boolean = isForAdoption
 
-fun AnimalEntity.statusLabel(): String = when (status ?: AnimalStatus.AVAILABLE) {
-    AnimalStatus.AVAILABLE -> "Disponible"
-    AnimalStatus.RESERVED -> "Reservado"
-    AnimalStatus.ADOPTED -> "Adoptado"
-    AnimalStatus.UNAVAILABLE -> "No disponible"
-}
+fun AnimalEntity.statusLabel(): String = if (isForAdoption) "Disponible" else "No disponible"
 
 /**
  * Convierte la lista de [com.example.adopciontfg.model.Characteristic] en un único texto

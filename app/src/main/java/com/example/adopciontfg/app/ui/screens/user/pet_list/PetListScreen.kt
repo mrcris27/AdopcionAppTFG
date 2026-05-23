@@ -40,7 +40,6 @@ import com.example.adopciontfg.data.local.entity.AnimalEntity
 
 import com.example.adopciontfg.data.local.entity.listSubtitle
 
-import com.example.adopciontfg.model.AnimalStatus
 import com.example.adopciontfg.model.Characteristic
 import com.example.adopciontfg.model.Species
 
@@ -215,9 +214,7 @@ fun HomeTopBar(
 
 }
 
-/*
-
-@Preview
+@Preview(showBackground = true)
 
 @Composable
 
@@ -260,7 +257,7 @@ private fun previewAnimals(): List<AnimalEntity> = listOf(
         Species.PERRO,
         listOf(Characteristic.TRANQUILO),
         "preview-shelter",
-        AnimalStatus.AVAILABLE,
+        true,
     ),
     AnimalEntity(
         "preview-animal-2",
@@ -273,7 +270,7 @@ private fun previewAnimals(): List<AnimalEntity> = listOf(
         Species.GATO,
         listOf(Characteristic.JUGUETON),
         "preview-shelter",
-        AnimalStatus.AVAILABLE,
+        true,
     ),
 )
 
@@ -300,5 +297,3 @@ fun PetListScreenLoadingPreview() {
     }
 
 }
-
-*/
