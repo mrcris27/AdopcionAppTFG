@@ -24,6 +24,7 @@ public class AnimalEntity {
     private List<String> photos;           // URLs Firebase Storage (TypeConverter)
     private long birthDate;                // timestamp
     private String description;
+    private boolean forAdoption;
     private Species species;               // Enum (TypeConverter)
     private List<Characteristic> characteristics; // Enum (TypeConverter)
 
@@ -71,6 +72,9 @@ public class AnimalEntity {
 
     public boolean isSex() { return sex; }
     public void setSex(boolean sex) { this.sex = sex; }
+
+    public boolean isForAdoption() { return forAdoption; }
+    public void setForAdoption(boolean forAdoption) { this.forAdoption = forAdoption; }
 
     public String getMainPhoto() { return mainPhoto; }
     public void setMainPhoto(String mainPhoto) { this.mainPhoto = mainPhoto; }

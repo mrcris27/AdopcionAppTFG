@@ -31,6 +31,11 @@ public interface AnimalDao {
     @Query("SELECT * FROM animals WHERE species = :species")
     LiveData<List<AnimalEntity>> getAnimalsBySpecies(String species);
 
+    // Obtener animales por estado
+    @Query("SELECT * FROM animals WHERE forAdoption = :inAdpotion")
+    LiveData<List<AnimalEntity>> getAnimalsInAdoption(String inAdpotion);
+
+
     // Obtener animales por característica
     @Query("SELECT * FROM animals WHERE characteristics LIKE '%' || :characteristic || '%'")
     LiveData<List<AnimalEntity>> getAnimalsByCharacteristic(String characteristic);
