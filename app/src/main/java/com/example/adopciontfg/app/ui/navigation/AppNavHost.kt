@@ -24,6 +24,7 @@ import com.example.adopciontfg.app.ui.screens.user.registration.navigation.UserR
 import com.example.adopciontfg.app.ui.screens.user.registration.navigation.userRegistrationScreen
 import com.example.adopciontfg.app.ui.screens.user.settings.navigation.userSettingsScreen
 import com.example.adopciontfg.data.remote.FirebaseService
+import kotlinx.serialization.Serializable
 
 @Composable
 fun AppNavHost(navController: NavHostController) {
@@ -33,7 +34,7 @@ fun AppNavHost(navController: NavHostController) {
     val startDestination = if (firebaseService.isLoggedIn()) {
         val role = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
             .getString("role", "user")
-        if (role == "shelter") SHELTER_MAIN_ROUTE else USER_MAIN_ROUTE
+        if (role == "shelter") ShelterMainRoute else UserMainRoute
     } else {
         LoginResRoute
     }
@@ -45,9 +46,9 @@ fun AppNavHost(navController: NavHostController) {
         when (val state = authState) {
             is AuthViewModel.AuthState.Success -> {
                 val destination = if (state.role == "shelter") {
-                    SHELTER_MAIN_ROUTE
+                    ShelterMainRoute
                 } else {
-                    USER_MAIN_ROUTE
+                    UserMainRoute
                 }
 
                 navController.navigate(destination) {
@@ -94,7 +95,7 @@ fun AppNavHost(navController: NavHostController) {
                 authViewModel.login(email, password)
             },
             onShelterPreviewClick = {
-                navController.navigate(SHELTER_MAIN_ROUTE) {
+                navController.navigate(ShelterMainRoute) {
                     popUpTo(LoginScreenRoute) { inclusive = true }
                 }
             },
@@ -143,13 +144,13 @@ fun AppNavHost(navController: NavHostController) {
 
         /* ---------------- MAIN ---------------- */
 
-        composable(USER_MAIN_ROUTE) {
+        composable<UserMainRoute> {
             AppScaffold(
                 onLogout = { navigateToLogin(navController) },
             )
         }
 
-        composable(SHELTER_MAIN_ROUTE) {
+        composable<ShelterMainRoute> {
             ShelterHomeScreen(
                 onLogout = { navigateToLogin(navController, fromShelter = true) },
             )
@@ -157,14 +158,17 @@ fun AppNavHost(navController: NavHostController) {
     }
 }
 
-private const val USER_MAIN_ROUTE = "main"
-private const val SHELTER_MAIN_ROUTE = "main/shelter"
+@Serializable
+private object UserMainRoute
+
+@Serializable
+private object ShelterMainRoute
 
 private fun navigateToLogin(
     navController: NavHostController,
     fromShelter: Boolean = false,
 ) {
-    val mainRoute = if (fromShelter) SHELTER_MAIN_ROUTE else USER_MAIN_ROUTE
+    val mainRoute = if (fromShelter) ShelterMainRoute else UserMainRoute
     navController.navigate(LoginResRoute) {
         popUpTo(mainRoute) { inclusive = true }
         launchSingleTop = true

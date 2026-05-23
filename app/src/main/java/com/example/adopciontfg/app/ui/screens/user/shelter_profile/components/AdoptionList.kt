@@ -5,23 +5,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.adopciontfg.app.ui.screens.components.CardViewList
 import com.example.adopciontfg.app.ui.screens.components.ListCardView
 
-@Preview(showBackground = true)
 @Composable
-fun AdoptionList() {
-
-    val list = listOf(
-        "Animal1",
-        "Animal2",
-        "Animal3",
-        "Animal4",
-        "Animal5"
-    )
-
+fun AdoptionList(
+    animals: List<String> = emptyList(),
+    onAnimalClick: (String) -> Unit = {},
+) {
     ListCardView(
-        items = list,
-        onItemClick = { name ->
-            println(name)
-        },
+        items = animals,
+        onItemClick = onAnimalClick,
         itemContent = { name, onClick ->
             CardViewList(
                 name = name,
@@ -29,4 +20,10 @@ fun AdoptionList() {
             )
         }
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun AdoptionListPreview() {
+    AdoptionList()
 }

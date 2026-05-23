@@ -2,6 +2,7 @@ package com.example.adopciontfg.app.ui.screens.shelter.settings
 
 import android.net.Uri
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import com.example.adopciontfg.data.local.entity.ShelterEntity
 import com.example.adopciontfg.data.repository.ShelterRepository
@@ -67,6 +68,26 @@ class ShelterSettingsViewModel @Inject constructor(
                         adoptionAlertsEnabled = data.adoptionAlertsEnabled,
                         darkModeEnabled = data.darkModeEnabled
                     )
+                }
+            }
+        }
+        val shelterId = auth.currentUser?.uid
+        if (shelterId != null) {
+            viewModelScope.launch {
+                shelterRepository.getShelterById(shelterId).asFlow().collectLatest { shelter ->
+                    if (shelter != null) {
+                        _uiState.update { current ->
+                            current.copy(
+                                shelterName = shelter.name.orEmpty(),
+                                email = shelter.email.orEmpty(),
+                                phone = shelter.phone.orEmpty(),
+                                address = shelter.address.orEmpty(),
+                                cif = shelter.cif.orEmpty(),
+                                profilePhotoUri = shelter.profilePicture.orEmpty(),
+                                adoptionFormUrl = shelter.adoptionFormUrl.orEmpty(),
+                            )
+                        }
+                    }
                 }
             }
         }

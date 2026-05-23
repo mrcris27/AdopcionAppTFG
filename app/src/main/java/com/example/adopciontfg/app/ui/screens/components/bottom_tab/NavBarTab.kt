@@ -9,7 +9,7 @@ import com.example.adopciontfg.R
 import com.example.adopciontfg.app.ui.screens.shelter.home.navigation.ShelterAnimalsRoute
 import com.example.adopciontfg.app.ui.screens.shelter.home.navigation.ShelterSettingsTabRoute
 import com.example.adopciontfg.app.ui.screens.user.home.navigation.UserScreenRoute
-import com.example.adopciontfg.app.ui.screens.user.settings.navigation.SettingsHubRoute
+import com.example.adopciontfg.app.ui.screens.user.settings.navigation.UserSettingsRoute
 
 enum class NavBarTab(
     val route: Any,
@@ -22,7 +22,7 @@ enum class NavBarTab(
         labelRes = R.string.nav_bar_inicio,
     ),
     UserSettings(
-        route = SettingsHubRoute,
+        route = UserSettingsRoute,
         icon = Icons.Filled.Settings,
         labelRes = R.string.nav_bar_ajustes,
     ),

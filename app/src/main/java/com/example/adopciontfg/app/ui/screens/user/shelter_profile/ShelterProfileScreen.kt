@@ -58,8 +58,7 @@ import com.example.adopciontfg.app.ui.screens.components.SearchSection
 import com.example.adopciontfg.data.local.entity.AnimalEntity
 import com.example.adopciontfg.data.local.entity.ShelterEntity
 import com.example.adopciontfg.data.local.entity.listSubtitle
-import com.example.adopciontfg.data.sampleAnimals
-import com.example.adopciontfg.data.sampleShelters
+import com.example.adopciontfg.model.AnimalStatus
 import com.example.adopciontfg.model.Characteristic
 import com.example.adopciontfg.model.Species
 import com.example.adopciontfg.ui.theme.AdoptionTheme
@@ -446,8 +445,8 @@ private fun enumLabel(name: String): String =
 fun ShelterProfileViewPreview() {
     AdoptionTheme {
         ShelterProfileScreen(
-            shelter = sampleShelters.first(),
-            animals = sampleAnimals.filter { it.shelterId == "1" },
+            shelter = previewShelter(),
+            animals = previewAnimals(),
             onBackClick = {},
             onPetClick = {},
         )
@@ -459,7 +458,7 @@ fun ShelterProfileViewPreview() {
 fun ShelterProfilePetsLoadingPreview() {
     AdoptionTheme {
         ShelterProfileScreen(
-            shelter = sampleShelters.first(),
+            shelter = previewShelter(),
             animals = emptyList(),
             onBackClick = {},
             onPetClick = {},
@@ -467,3 +466,43 @@ fun ShelterProfilePetsLoadingPreview() {
         )
     }
 }
+
+private fun previewShelter(): ShelterEntity = ShelterEntity(
+    "preview-shelter",
+    "Protectora Norte",
+    "B00000001",
+    null,
+    "contacto@protectoranorte.org",
+    "Calle Mayor 1",
+    "600000001",
+    "https://forms.gle/preview",
+)
+
+private fun previewAnimals(): List<AnimalEntity> = listOf(
+    AnimalEntity(
+        "preview-animal-1",
+        "Luna",
+        true,
+        null,
+        emptyList(),
+        0L,
+        "Busca una familia tranquila.",
+        Species.PERRO,
+        listOf(Characteristic.TRANQUILO),
+        "preview-shelter",
+        AnimalStatus.AVAILABLE,
+    ),
+    AnimalEntity(
+        "preview-animal-2",
+        "Milo",
+        false,
+        null,
+        emptyList(),
+        0L,
+        "Muy jugueton y sociable.",
+        Species.GATO,
+        listOf(Characteristic.JUGUETON),
+        "preview-shelter",
+        AnimalStatus.AVAILABLE,
+    ),
+)

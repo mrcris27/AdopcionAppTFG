@@ -3,7 +3,10 @@ package com.example.adopciontfg.app.ui.screens.user.settings
 import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
+import com.example.adopciontfg.data.local.entity.UserEntity
+import com.example.adopciontfg.data.repository.UserRepository
 import com.example.adopciontfg.domain.settings.SettingsRepository
 import com.example.adopciontfg.domain.settings.UserSettingsData
 import com.google.firebase.auth.EmailAuthProvider
@@ -23,8 +26,6 @@ data class UserSettingsUiState(
     val name: String = "",
     val surname: String = "",
     val email: String = "",
-    val phone: String = "",
-    val city: String = "",
     val biography: String = "",
     val profilePhotoUri: String = "",
     val notificationsEnabled: Boolean = true,
@@ -44,6 +45,7 @@ data class UserSettingsUiState(
 @HiltViewModel
 class UserSettingsViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository,
+    private val userRepository: UserRepository,
     @ApplicationContext private val context: Context
 
 ) : ViewModel() {
@@ -62,8 +64,6 @@ class UserSettingsViewModel @Inject constructor(
                             firebaseUser?.displayName.orEmpty().substringAfter(" ", "")
                         },
                         email = data.email.ifBlank { firebaseUser?.email.orEmpty() },
-                        phone = data.phone,
-                        city = data.city,
                         biography = data.biography,
                         profilePhotoUri = data.profilePhotoUri.ifBlank {
                             firebaseUser?.photoUrl?.toString().orEmpty()
@@ -74,13 +74,29 @@ class UserSettingsViewModel @Inject constructor(
                 }
             }
         }
+        val userId = auth.currentUser?.uid
+        if (userId != null) {
+            viewModelScope.launch {
+                userRepository.getUserById(userId).asFlow().collectLatest { user ->
+                    if (user != null) {
+                        _uiState.update { current ->
+                            current.copy(
+                                name = user.name.orEmpty(),
+                                surname = user.surname.orEmpty(),
+                                email = user.email.orEmpty(),
+                                biography = user.biography.orEmpty(),
+                                profilePhotoUri = user.profilePicture.orEmpty(),
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
 
     fun onNameChange(value: String) = _uiState.update { it.copy(name = value) }
     fun onSurnameChange(value: String) = _uiState.update { it.copy(surname = value) }
     fun onEmailChange(value: String) = _uiState.update { it.copy(email = value) }
-    fun onPhoneChange(value: String) = _uiState.update { it.copy(phone = value) }
-    fun onCityChange(value: String) = _uiState.update { it.copy(city = value) }
     fun onBiographyChange(value: String) = _uiState.update { it.copy(biography = value) }
     fun onProfilePhotoChange(value: String) = _uiState.update { it.copy(profilePhotoUri = value) }
     fun onCurrentPasswordChange(value: String) = _uiState.update { it.copy(currentPassword = value) }
@@ -138,8 +154,22 @@ class UserSettingsViewModel @Inject constructor(
         viewModelScope.launch {
             val current = _uiState.value
             settingsRepository.saveUserSettings(current.toSettingsData())
+            syncUserToFirebase(current)
             updateFirebaseProfile(current)
         }
+    }
+
+    private fun syncUserToFirebase(current: UserSettingsUiState) {
+        val userId = auth.currentUser?.uid ?: return
+        val user = UserEntity(
+            userId,
+            current.name,
+            current.surname,
+            current.profilePhotoUri,
+            current.email,
+            current.biography,
+        )
+        userRepository.saveUser(user)
     }
 
     fun onChangePasswordClick() {
@@ -249,8 +279,6 @@ class UserSettingsViewModel @Inject constructor(
             name = name,
             surname = surname,
             email = email,
-            phone = phone,
-            city = city,
             biography = biography,
             profilePhotoUri = profilePhotoUri,
             notificationsEnabled = notificationsEnabled,

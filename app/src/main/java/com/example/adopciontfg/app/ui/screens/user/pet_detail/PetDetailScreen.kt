@@ -47,7 +47,9 @@ import com.example.adopciontfg.data.local.entity.ageInYears
 import com.example.adopciontfg.data.local.entity.displayPhotos
 import com.example.adopciontfg.data.local.entity.formattedCharacteristics
 import com.example.adopciontfg.data.local.entity.genderLabel
-import com.example.adopciontfg.data.sampleAnimals
+import com.example.adopciontfg.model.AnimalStatus
+import com.example.adopciontfg.model.Characteristic
+import com.example.adopciontfg.model.Species
 import com.example.adopciontfg.ui.theme.AdoptionTheme
 import com.example.adopciontfg.ui.theme.Dimens
 import com.example.adopciontfg.ui.theme.elevatedSurface
@@ -267,9 +269,23 @@ fun PetDetailLoadingPreview() {
 fun PetDetailPreview() {
     AdoptionTheme {
         PetDetailScreen(
-            animal = sampleAnimals.first(),
+            animal = previewAnimal(),
             onBackClick = {},
             onAdoptClick = {},
         )
     }
 }
+
+private fun previewAnimal(): AnimalEntity = AnimalEntity(
+    "preview-animal-1",
+    "Luna",
+    true,
+    null,
+    emptyList(),
+    0L,
+    "Busca una familia tranquila.",
+    Species.PERRO,
+    listOf(Characteristic.TRANQUILO),
+    "preview-shelter",
+    AnimalStatus.AVAILABLE,
+)

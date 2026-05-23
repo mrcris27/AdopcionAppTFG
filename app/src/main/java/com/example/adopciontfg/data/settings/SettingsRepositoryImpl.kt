@@ -29,8 +29,6 @@ class SettingsRepositoryImpl @Inject constructor(
                     name = prefs[USER_NAME] ?: "",
                     surname = prefs[USER_SURNAME] ?: "",
                     email = prefs[USER_EMAIL] ?: "",
-                    phone = prefs[USER_PHONE] ?: "",
-                    city = prefs[USER_CITY] ?: "",
                     biography = prefs[USER_BIOGRAPHY] ?: "",
                     profilePhotoUri = prefs[USER_PROFILE_PHOTO_URI] ?: "",
                     notificationsEnabled = prefs[USER_NOTIFICATIONS] ?: true,
@@ -44,8 +42,6 @@ class SettingsRepositoryImpl @Inject constructor(
             prefs[USER_NAME] = data.name
             prefs[USER_SURNAME] = data.surname
             prefs[USER_EMAIL] = data.email
-            prefs[USER_PHONE] = data.phone
-            prefs[USER_CITY] = data.city
             prefs[USER_BIOGRAPHY] = data.biography
             prefs[USER_PROFILE_PHOTO_URI] = data.profilePhotoUri
             prefs[USER_NOTIFICATIONS] = data.notificationsEnabled
@@ -91,8 +87,6 @@ class SettingsRepositoryImpl @Inject constructor(
         val USER_NAME = stringPreferencesKey("user_name")
         val USER_SURNAME = stringPreferencesKey("user_surname")
         val USER_EMAIL = stringPreferencesKey("user_email")
-        val USER_PHONE = stringPreferencesKey("user_phone")
-        val USER_CITY = stringPreferencesKey("user_city")
         val USER_BIOGRAPHY = stringPreferencesKey("user_biography")
         val USER_PROFILE_PHOTO_URI = stringPreferencesKey("user_profile_photo_uri")
         val USER_NOTIFICATIONS = booleanPreferencesKey("user_notifications")

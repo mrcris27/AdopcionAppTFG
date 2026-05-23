@@ -33,6 +33,13 @@ public class AnimalEntity {
 
     private AnimalStatus status;          // Enum (TypeConverter)
 
+    @Ignore
+    public AnimalEntity() {
+        this.id = "";
+        this.shelterId = "";
+        this.status = AnimalStatus.AVAILABLE;
+    }
+
     /** Constructor sin estado explícito (por defecto: disponible). Solo para código de app, no Room. */
     @Ignore
     public AnimalEntity(@NonNull String id, String name, boolean sex,

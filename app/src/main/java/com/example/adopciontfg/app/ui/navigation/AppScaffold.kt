@@ -23,7 +23,7 @@ fun AppScaffold(onLogout: () -> Unit) {
     val showBottomBar = destination.showsUserBottomBar()
 
     val currentTab = when {
-        destination.isUserSettingsHubRoute() -> NavBarTab.UserSettings
+        destination.isUserSettingsRoute() -> NavBarTab.UserSettings
         else -> NavBarTab.UserHome
     }
 

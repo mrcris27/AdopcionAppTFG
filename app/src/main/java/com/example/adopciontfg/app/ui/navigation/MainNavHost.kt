@@ -14,17 +14,9 @@ import com.example.adopciontfg.app.ui.screens.user.pet_detail.navigation.PetDeta
 
 import com.example.adopciontfg.app.ui.screens.user.pet_detail.navigation.petDetail
 
-import com.example.adopciontfg.app.ui.screens.shelter.settings.navigation.ShelterSettingsRoute
-
-import com.example.adopciontfg.app.ui.screens.shelter.settings.navigation.shelterSettingsScreen
-
 import com.example.adopciontfg.app.ui.screens.user.home.navigation.UserScreenRoute
 
 import com.example.adopciontfg.app.ui.screens.user.home.navigation.userScreen
-
-import com.example.adopciontfg.app.ui.screens.user.settings.navigation.UserSettingsRoute
-
-import com.example.adopciontfg.app.ui.screens.user.settings.navigation.settingsHubScreen
 
 import com.example.adopciontfg.app.ui.screens.user.settings.navigation.userSettingsScreen
 
@@ -88,16 +80,6 @@ fun MainNavHost(
 
 
 
-        settingsHubScreen(
-
-            onUserSettingsClick = { navController.navigate(UserSettingsRoute) },
-
-            onShelterSettingsClick = { navController.navigate(ShelterSettingsRoute) },
-
-        )
-
-
-
         userSettingsScreen(
 
             onBackClick = { navController.popBackStack() },
@@ -107,14 +89,6 @@ fun MainNavHost(
         )
 
 
-
-        shelterSettingsScreen(
-
-            onBackClick = { navController.popBackStack() },
-
-            onLogout = onLogout,
-
-        )
 
     }
 

@@ -9,6 +9,7 @@ import com.example.adopciontfg.data.local.dao.ShelterDao;
 import com.example.adopciontfg.data.local.entity.ShelterEntity;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -72,8 +73,15 @@ public class ShelterRepository {
                     List<ShelterEntity> shelters = querySnapshot.toObjects(ShelterEntity.class); // 4. Convierte a objetos Java
 
                     executor.execute(() -> {   // 5. En hilo secundario...
+                        List<String> shelterIds = new ArrayList<>();
                         for (ShelterEntity shelter : shelters) {
                             shelterDao.insertShelter(shelter); // 6. Guarda cada uno en Room
+                            shelterIds.add(shelter.getId());
+                        }
+                        if (shelterIds.isEmpty()) {
+                            shelterDao.deleteAllShelters();
+                        } else {
+                            shelterDao.deleteSheltersNotIn(shelterIds);
                         }
                     });
                 });

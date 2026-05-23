@@ -47,6 +47,18 @@ public interface AnimalDao {
     @Query("SELECT COUNT(*) FROM animals")
     int getAnimalCount();
 
+    @Query("DELETE FROM animals")
+    void deleteAllAnimals();
+
+    @Query("DELETE FROM animals WHERE shelterId = :shelterId")
+    void deleteAnimalsByShelter(String shelterId);
+
+    @Query("DELETE FROM animals WHERE id NOT IN (:ids)")
+    void deleteAnimalsNotIn(List<String> ids);
+
+    @Query("DELETE FROM animals WHERE shelterId = :shelterId AND id NOT IN (:ids)")
+    void deleteAnimalsByShelterNotIn(String shelterId, List<String> ids);
+
     // Eliminar animal
     @Delete
     void deleteAnimal(AnimalEntity animal);

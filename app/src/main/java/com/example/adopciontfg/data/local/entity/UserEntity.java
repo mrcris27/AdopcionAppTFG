@@ -2,6 +2,7 @@ package com.example.adopciontfg.data.local.entity;
 
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "users")
@@ -17,9 +18,10 @@ public class UserEntity {
     private String email;
     private String biography;
 
-    // Constructor
-
-
+    @Ignore
+    public UserEntity() {
+        this.id = "";
+    }
 
     public UserEntity(@NonNull String id, String name, String surname,
                       String profilePicture, String email, String biography) {
