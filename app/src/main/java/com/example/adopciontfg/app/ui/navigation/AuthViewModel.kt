@@ -1,6 +1,7 @@
 package com.example.adopciontfg.app.ui.navigation
 
 import android.app.Application
+import android.content.Context
 import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
 import com.example.adopciontfg.R
@@ -57,6 +58,12 @@ class AuthViewModel (application: Application) : AndroidViewModel(application) {
                 }
                 firebase.getUserRole(uid, object : RoleCallback {
                     override fun onRole(role: String) {
+                        //Shared preferences es como un mini diccionario persistente
+                        getApplication<Application>()
+                            .getSharedPreferences("auth", Context.MODE_PRIVATE)
+                            .edit()
+                            .putString("role", role)
+                            .apply()
                         _authState.value = AuthState.Success(role)
                     }
 

@@ -1,5 +1,6 @@
 package com.example.adopciontfg.app.ui.screens.user.settings
 
+import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,6 +10,7 @@ import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -36,11 +38,14 @@ data class UserSettingsUiState(
     val isPasswordChangeDialogOpen: Boolean = false,
     val isPasswordChangeLoading: Boolean = false,
     val saveMessage: String? = null
+
 )
 
 @HiltViewModel
 class UserSettingsViewModel @Inject constructor(
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    @ApplicationContext private val context: Context
+
 ) : ViewModel() {
     private val auth = FirebaseAuth.getInstance()
     private val _uiState = MutableStateFlow(UserSettingsUiState())
@@ -199,6 +204,13 @@ class UserSettingsViewModel @Inject constructor(
 
     fun logout() {
         auth.signOut()
+        _uiState.update { it.copy(saveMessage = "Sesión cerrada") }
+        auth.signOut()
+        context.getSharedPreferences("auth", Context.MODE_PRIVATE)
+            .edit()
+            .remove("role")
+            .apply()
+        _uiState.update { it.copy(saveMessage = "Sesión cerrada") }
     }
 
     fun onMessageShown() {

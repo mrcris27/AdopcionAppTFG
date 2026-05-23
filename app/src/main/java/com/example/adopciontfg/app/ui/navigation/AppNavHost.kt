@@ -1,5 +1,6 @@
 package com.example.adopciontfg.app.ui.navigation
 
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Composable
@@ -21,10 +22,22 @@ import com.example.adopciontfg.app.ui.screens.shelter.registration.navigation.sh
 import com.example.adopciontfg.app.ui.screens.shelter.home.ShelterHomeScreen
 import com.example.adopciontfg.app.ui.screens.user.registration.navigation.UserRegistrationRoute
 import com.example.adopciontfg.app.ui.screens.user.registration.navigation.userRegistrationScreen
+import com.example.adopciontfg.app.ui.screens.user.settings.navigation.userSettingsScreen
+import com.example.adopciontfg.data.remote.FirebaseService
 
 @Composable
 fun AppNavHost(navController: NavHostController) {
     val context = LocalContext.current
+    val firebaseService = FirebaseService.getInstance()
+
+    val startDestination = if (firebaseService.isLoggedIn()) {
+        val role = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
+            .getString("role", "user")
+        if (role == "shelter") SHELTER_MAIN_ROUTE else USER_MAIN_ROUTE
+    } else {
+        LoginResRoute
+    }
+
     val authViewModel: AuthViewModel = viewModel()
     val authState by authViewModel.authState.collectAsStateWithLifecycle()
 
@@ -59,7 +72,7 @@ fun AppNavHost(navController: NavHostController) {
 
     NavHost(
         navController = navController,
-        startDestination = LoginResRoute
+        startDestination = startDestination
     ) {
 
         /* ---------------- AUTH ---------------- */
