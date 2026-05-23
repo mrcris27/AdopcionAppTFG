@@ -263,7 +263,7 @@ fun PetDetailLoadingPreview() {
         )
     }
 }
-
+/*
 @Preview
 @Composable
 fun PetDetailPreview() {
@@ -289,3 +289,4 @@ private fun previewAnimal(): AnimalEntity = AnimalEntity(
     "preview-shelter",
     AnimalStatus.AVAILABLE,
 )
+*/

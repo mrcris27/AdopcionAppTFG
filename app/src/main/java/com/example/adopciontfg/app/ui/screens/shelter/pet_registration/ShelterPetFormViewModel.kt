@@ -74,7 +74,7 @@ class ShelterPetFormViewModel @Inject constructor(
                         description = entity.description.orEmpty(),
                         species = entity.species,
                         selectedCharacteristics = entity.characteristics.orEmpty().toSet(),
-                        status = entity.status ?: AnimalStatus.AVAILABLE,
+                       // status = entity.status ?: AnimalStatus.AVAILABLE,
                     )
                 }
             }
@@ -126,7 +126,9 @@ class ShelterPetFormViewModel @Inject constructor(
             state.species,
             state.selectedCharacteristics.toList(),
             shelterId,
-            state.status,
+
+            //Aqui poner el valor de que se recoge en pantalla
+            true,
         )
 
         animalRepository.updateAnimal(animal)

@@ -466,7 +466,7 @@ private fun EmptyMessage(text: String, modifier: Modifier = Modifier) {
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
 }
-
+/*
 @Preview(showBackground = true)
 @Composable
 private fun ShelterAnimalsScreenPreview() {
@@ -493,7 +493,7 @@ private fun ShelterAnimalsScreenPreview() {
         )
     }
 }
-
+/*
 private fun previewAnimals(): List<AnimalEntity> = listOf(
     AnimalEntity(
         "preview-animal-1",
@@ -535,3 +535,4 @@ private fun previewAnimals(): List<AnimalEntity> = listOf(
         AnimalStatus.ADOPTED,
     ),
 )
+*/

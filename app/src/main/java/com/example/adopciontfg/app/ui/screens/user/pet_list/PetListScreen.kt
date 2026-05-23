@@ -215,7 +215,7 @@ fun HomeTopBar(
 
 }
 
-
+/*
 
 @Preview
 
@@ -301,3 +301,4 @@ fun PetListScreenLoadingPreview() {
 
 }
 
+*/

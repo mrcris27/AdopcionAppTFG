@@ -69,9 +69,9 @@ class ShelterAnimalsViewModel @Inject constructor(
                             isLoading = false,
                             animals = animals,
                             filteredAnimals = filtered,
-                            availableCount = animals.count { it.status == AnimalStatus.AVAILABLE },
-                            reservedCount = animals.count { it.status == AnimalStatus.RESERVED },
-                            adoptedCount = animals.count { it.status == AnimalStatus.ADOPTED },
+                            //  availableCount = animals.count { it.status == AnimalStatus.AVAILABLE },
+                            //reservedCount = animals.count { it.status == AnimalStatus.RESERVED },
+                            //adoptedCount = animals.count { it.status == AnimalStatus.ADOPTED },
                         )
                     }
                 }
@@ -101,7 +101,7 @@ class ShelterAnimalsViewModel @Inject constructor(
 
     fun updateAnimalStatus(animalId: String, status: AnimalStatus) {
         val animal = _uiState.value.animals.find { it.id == animalId } ?: return
-        animal.status = status
+      //  animal.status = status
         animalRepository.updateAnimal(animal)
     }
 
@@ -111,7 +111,7 @@ class ShelterAnimalsViewModel @Inject constructor(
         filter: ShelterAnimalFilter,
     ): List<AnimalEntity> {
         return animals
-            .filter { animal ->
+          /*  .filter { animal ->
                 when (filter) {
                     ShelterAnimalFilter.ALL -> true
                     ShelterAnimalFilter.AVAILABLE -> animal.status == AnimalStatus.AVAILABLE
@@ -119,13 +119,13 @@ class ShelterAnimalsViewModel @Inject constructor(
                     ShelterAnimalFilter.ADOPTED -> animal.status == AnimalStatus.ADOPTED
                     ShelterAnimalFilter.UNAVAILABLE -> animal.status == AnimalStatus.UNAVAILABLE
                 }
-            }
+            }*/
             .filter { animal ->
                 query.isBlank() || animal.name.orEmpty().contains(query, ignoreCase = true)
             }
-            .sortedWith(
+          /*  .sortedWith(
                 compareBy<AnimalEntity> { it.status == AnimalStatus.ADOPTED }
                     .thenBy { it.name.orEmpty() },
-            )
+            )*/
     }
 }

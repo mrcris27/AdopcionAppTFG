@@ -440,6 +440,7 @@ private fun FilterSection(
 private fun enumLabel(name: String): String =
     name.replace("_", " ").lowercase().replaceFirstChar { it.uppercase() }
 
+/*
 @Preview(showBackground = true)
 @Composable
 fun ShelterProfileViewPreview() {
@@ -506,3 +507,4 @@ private fun previewAnimals(): List<AnimalEntity> = listOf(
         AnimalStatus.AVAILABLE,
     ),
 )
+*/
