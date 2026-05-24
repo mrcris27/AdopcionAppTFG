@@ -78,58 +78,95 @@ class AuthViewModel (application: Application) : AndroidViewModel(application) {
     }
 
     //Registro de usuarios
-    fun registerUser(name: String, surname : String, email: String, bio: String, profilePic:String, password: String){
-        _authState.value = AuthState.Loading
-        firebase.register(email, password,
 
-            //Si se registra correctamente se crea el usuario en la base de datos
-            {
-                //Así se le da nombre al parámetro que viene
-                    authResult ->
-                authResult.user?.uid?.let { uid ->
-                    //Se crea el usuario completo en la base de datos
-                    userRepos.saveUser(UserEntity(uid, name, surname, profilePic, email, bio))
+    /*
+            Flujo de la función
+            1. Registro en Firebase Auth → obtenemos el UID
+            2. Subimos la foto a Storage → obtenemos la URL
+            3. Creamos UserEntity con UID + URL + resto de datos
+            4. Guardamos UserEntity en Firestore y Room
+     */
+    fun registerUser(name: String, surname: String, email: String, bio: String, profilePic: String, password: String) {
+        _authState.value = AuthState.Loading
+
+        //Se registra el usuario en Firebase Auth
+        firebase.register(email, password,
+            { authResult ->
+                //Se obtiene el UID del usuario registrado
+                //Si devuelve null muestra error y sale del método
+                val uid = authResult.user?.uid ?: run {
+                    _authState.value = AuthState.Error(getString(R.string.auth_generic_error))
+                    return@register
                 }
-                _authState.value = AuthState.Success("user")
+                // Si tenemos foto se sube la foto a Firebase Storage
+                if (profilePic.isNotBlank()) {
+                    firebase.uploadProfilePhoto(
+                        getApplication(), uid, android.net.Uri.parse(profilePic),
+                        { photoUrl ->
+                            //Si se sube correctamente se crea el usuario en la base de datos con la foto vinculada
+                            userRepos.saveUser(UserEntity(uid, name, surname, photoUrl, email, bio))
+                            _authState.value = AuthState.Success("user")
+                        },
+                        //Si falla al subir la foto se crea el usuario sin la foto
+                        {
+                            userRepos.saveUser(UserEntity(uid, name, surname, "", email, bio))
+                            _authState.value = AuthState.Success("user")
+                        }
+                    )
+                } else {
+                    //Si no hay foto se crea el usuario sin la foto
+                    userRepos.saveUser(UserEntity(uid, name, surname, "", email, bio))
+                    _authState.value = AuthState.Success("user")
+                }
             },
-            //Si falla se muestra el error
             { exception ->
                 _authState.value = AuthState.Error(getRegisterErrorMessage(exception))
-                println("ERROR EN EL REGISTRO" + getRegisterErrorMessage(exception))
-            })
+            }
+        )
     }
 
 
     fun registerShelter(name: String, cif : String, phoneName : String, address: String ,profilePic:String, email: String, password: String){
         _authState.value = AuthState.Loading
+
+        //Se registra el usuario en Firebase Auth
         firebase.register(email, password,
-
-            //Si se registra correctamente se crea el usuario en la base de datos
-            {
-                //Así se le da nombre al parámetro que viene
-                    authResult ->
-                authResult.user?.uid?.let { uid ->
-                    //Se crea el usuario completo en la base de datos
-                    shelterRepos.saveShelter(
-                        ShelterEntity(
-                            uid,
-                            name,
-                            cif,
-                            profilePic,
-                            email,
-                            address,
-                            phoneName
-                        )
-                    )
-
+            { authResult ->
+                //Se obtiene el UID de la protectora registrada
+                //Si devuelve null muestra error y sale del método
+                val uid = authResult.user?.uid ?: run {
+                    _authState.value = AuthState.Error(getString(R.string.auth_generic_error))
+                    return@register
                 }
-                _authState.value = AuthState.Success("shelter")
+                // Si tenemos foto se sube la foto a Firebase Storage
+                if (profilePic.isNotBlank()) {
+                    firebase.uploadProfilePhoto(
+                        getApplication(), uid, android.net.Uri.parse(profilePic),
+                        { photoUrl ->
+                            //Si se sube correctamente se crea el usuario en la base de datos con la foto vinculada
+                            shelterRepos.saveShelter(ShelterEntity(uid, name, cif, photoUrl, email,address, phoneName))
+                            _authState.value = AuthState.Success("shelter")
+                        },
+                        //Si falla al subir la foto se crea el usuario sin la foto
+                        {
+                            shelterRepos.saveShelter(ShelterEntity(uid, name, cif, "", email,address, phoneName))
+                            _authState.value = AuthState.Success("shelter")
+                        }
+                    )
+                } else {
+                    //Si no hay foto se crea el usuario sin la foto
+                    shelterRepos.saveShelter(ShelterEntity(uid, name, cif, "", email,address, phoneName ))
+                    _authState.value = AuthState.Success("shelter")
+                }
             },
-            //Si falla se muestra el error
             { exception ->
                 _authState.value = AuthState.Error(getRegisterErrorMessage(exception))
-            })
+            }
+        )
     }
+
+
+
 
     fun resetAuthState() {
         _authState.value = AuthState.Idle

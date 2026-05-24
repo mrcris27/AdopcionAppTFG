@@ -1,5 +1,8 @@
 package com.example.adopciontfg.data.remote;
 
+import android.content.Context;
+import android.net.Uri;
+
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.AuthResult;
@@ -7,6 +10,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 public class FirebaseService {
 
@@ -107,7 +112,21 @@ public class FirebaseService {
     }
 
 
+    // ─── Subir foto de perfil a Firebase Storage ─────────────────────────
+    public void uploadProfilePhoto(Context context, String uid, Uri photoUri,
+                                   OnSuccessListener<String> onSuccess, OnFailureListener onFailure) {
 
+        StorageReference ref = FirebaseStorage.getInstance()
+                .getReference("profile_photos/" + uid + ".jpg");
+
+        ref.putFile(photoUri)
+                .continueWithTask(task -> {
+                    if (!task.isSuccessful()) throw task.getException();
+                    return ref.getDownloadUrl();
+                })
+                .addOnSuccessListener(uri -> onSuccess.onSuccess(uri.toString()))
+                .addOnFailureListener(onFailure);
+    }
 
 
 }
