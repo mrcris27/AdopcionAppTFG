@@ -18,6 +18,8 @@ public class FirebaseService {
     private final FirebaseAuth auth;
     private final FirebaseFirestore firestore;
 
+    private FirebaseStorage storage = FirebaseStorage.getInstance();
+
     //volatile garantiza que se lea la variable siempre desde el disco para evitar posibles conflictos
     //derivados de que se modifique desde diferentes hilos
     private static volatile FirebaseService instance;
@@ -116,8 +118,23 @@ public class FirebaseService {
     public void uploadProfilePhoto(Context context, String uid, Uri photoUri,
                                    OnSuccessListener<String> onSuccess, OnFailureListener onFailure) {
 
-        StorageReference ref = FirebaseStorage.getInstance()
+        StorageReference ref = storage
                 .getReference("profile_photos/" + uid + ".jpg");
+
+        ref.putFile(photoUri)
+                .continueWithTask(task -> {
+                    if (!task.isSuccessful()) throw task.getException();
+                    return ref.getDownloadUrl();
+                })
+                .addOnSuccessListener(uri -> onSuccess.onSuccess(uri.toString()))
+                .addOnFailureListener(onFailure);
+    }
+
+    public void uploadAnimalPhoto(Context context, String animalId, String photoIndex,
+                                  Uri photoUri, OnSuccessListener<String> onSuccess, OnFailureListener onFailure) {
+
+        StorageReference ref = storage
+                .getReference("animal_photos/" + animalId + "/" + photoIndex + ".jpg");
 
         ref.putFile(photoUri)
                 .continueWithTask(task -> {

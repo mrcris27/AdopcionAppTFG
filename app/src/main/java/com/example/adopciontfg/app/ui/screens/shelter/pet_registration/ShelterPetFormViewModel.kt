@@ -1,10 +1,12 @@
 package com.example.adopciontfg.app.ui.screens.shelter.pet_registration
 
+import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import com.example.adopciontfg.data.local.entity.AnimalEntity
+import com.example.adopciontfg.data.remote.FirebaseService
 import com.example.adopciontfg.data.repository.AnimalRepository
 import com.example.adopciontfg.model.AnimalStatus
 import com.example.adopciontfg.model.Characteristic
@@ -42,6 +44,7 @@ data class PetFormUiState(
 @HiltViewModel
 class ShelterPetFormViewModel @Inject constructor(
     private val animalRepository: AnimalRepository,
+    private val firebaseService: FirebaseService
 ) : ViewModel() {
     private val auth = FirebaseAuth.getInstance()
 
@@ -101,38 +104,73 @@ class ShelterPetFormViewModel @Inject constructor(
 
     fun onStatusChange(status: AnimalStatus) = _uiState.update { it.copy(status = status) }
 
-    fun onSave() {
-        val shelterId = auth.currentUser?.uid
-        if (shelterId == null) {
-            _uiState.update { it.copy(saveMessage = "Inicia sesión como protectora para guardar.") }
-            return
-        }
 
-        val state = _uiState.value
-        if (!state.canSave) return
 
-        val id = state.animalId ?: UUID.randomUUID().toString()
-        val mainPhoto = state.mainPhotoUri?.toString().orEmpty()
-        val gallery = state.galleryUris.map { it.toString() }
+    fun onSave(context: Context) {
+            val shelterId = auth.currentUser?.uid
+            if (shelterId == null) {
+                _uiState.update { it.copy(saveMessage = "Inicia sesión como protectora para guardar.") }
+                return
+            }
 
+            val state = _uiState.value
+            if (!state.canSave) return
+
+            _uiState.update { it.copy(isLoading = true) }
+
+            val id = state.animalId ?: UUID.randomUUID().toString()
+
+            // Subir foto principal
+            firebaseService.uploadAnimalPhoto(
+                context, id, "main", state.mainPhotoUri,
+                { mainPhotoUrl ->
+                    // Subir fotos de galería
+                    val galleryUrls = mutableListOf<String>()
+                    val galleryUris = state.galleryUris
+
+                    if (galleryUris.isEmpty()) {
+                        saveAnimal(id, shelterId, mainPhotoUrl, emptyList(), state)
+                    } else {
+                        var uploaded = 0
+                        galleryUris.forEachIndexed { index, uri ->
+                            firebaseService.uploadAnimalPhoto(
+                                context, id, "gallery_$index", uri,
+                                { url ->
+                                    galleryUrls.add(url)
+                                    uploaded++
+                                    if (uploaded == galleryUris.size) {
+                                        saveAnimal(id, shelterId, mainPhotoUrl, galleryUrls, state)
+                                    }
+                                },
+                                {
+                                    uploaded++
+                                    if (uploaded == galleryUris.size) {
+                                        saveAnimal(id, shelterId, mainPhotoUrl, galleryUrls, state)
+                                    }
+                                }
+                            )
+                        }
+                    }
+                },
+                {
+                    _uiState.update { it.copy(isLoading = false, saveMessage = "Error al subir la foto principal") }
+                }
+            )
+    }
+
+    private fun saveAnimal(
+        id: String, shelterId: String, mainPhotoUrl: String,
+        galleryUrls: List<String>, state: PetFormUiState
+    ) {
         val animal = AnimalEntity(
-            id,
-            state.name.trim(),
-            state.isFemale,
-            mainPhoto,
-            gallery,
-            state.birthDateMillis,
-            state.description.trim(),
-            state.species,
-            state.selectedCharacteristics.toList(),
-            shelterId,
-
-            //Aqui poner el valor de que se recoge en pantalla
-            true,
+            id, state.name.trim(), state.isFemale,
+            mainPhotoUrl, galleryUrls,
+            state.birthDateMillis, state.description.trim(),
+            state.species, state.selectedCharacteristics.toList(),
+            shelterId, true
         )
-
         animalRepository.updateAnimal(animal)
-        _uiState.update { it.copy(saveSucceeded = true, saveMessage = "Animal guardado correctamente") }
+        _uiState.update { it.copy(isLoading = false, saveSucceeded = true, saveMessage = "Animal guardado correctamente") }
     }
 
     fun onSaveHandled() {

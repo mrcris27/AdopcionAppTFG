@@ -2,6 +2,7 @@ package com.example.adopciontfg.app.di
 
 import android.app.Application
 import android.content.Context
+import com.example.adopciontfg.data.remote.FirebaseService
 import com.example.adopciontfg.data.repository.AnimalRepository
 import com.example.adopciontfg.data.repository.ShelterRepository
 import com.example.adopciontfg.data.repository.UserRepository
@@ -32,4 +33,8 @@ object DataModule {
     fun provideUserRepository(
         @ApplicationContext context: Context
     ): UserRepository = UserRepository(context.applicationContext as Application)
+
+    @Provides
+    @Singleton
+    fun provideFirebaseService(): FirebaseService = FirebaseService.getInstance()
 }

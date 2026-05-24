@@ -1,5 +1,6 @@
 package com.example.adopciontfg.app.ui.screens.shelter.pet_registration
 
+import android.content.Context
 import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -37,6 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.tooling.preview.Preview
@@ -74,9 +76,9 @@ fun PetRegistration(
     var selectedCharacteristics by remember { mutableStateOf(setOf<Characteristic>()) }
 
     val canRegister = name.isNotBlank() &&
-        species != null &&
-        birthDateMillis > 0L &&
-        mainPhotoUri != null
+            species != null &&
+            birthDateMillis > 0L &&
+            mainPhotoUri != null
 
     PetRegistration(
         title = stringResource(R.string.registro_animal),
@@ -109,7 +111,7 @@ fun PetRegistration(
         showStatusSection = false,
         canSave = canRegister,
         onBackClick = onBackClick,
-        onSaveClick = onRegisterClick,
+        onSaveClick = { onRegisterClick() },  // ← adaptado para ignorar el Context
     )
 }
 
@@ -140,12 +142,13 @@ fun PetRegistration(
     showStatusSection: Boolean,
     canSave: Boolean,
     onBackClick: (() -> Unit)? = null,
-    onSaveClick: () -> Unit,
+    onSaveClick: (Context) -> Unit,  // ← cambiado
 ) {
     var speciesExpanded by remember { mutableStateOf(false) }
     var statusExpanded by remember { mutableStateOf(false) }
     var showDatePicker by remember { mutableStateOf(false) }
 
+    val context = LocalContext.current  // ← añadido
     val dateFormatter = remember { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) }
 
     Scaffold(
@@ -368,7 +371,7 @@ fun PetRegistration(
 
             AppSecondaryButton(
                 text = saveButtonText,
-                onClick = onSaveClick,
+                onClick = { onSaveClick(context) },  // ← cambiado
                 enabled = canSave && !isLoading
             )
 
