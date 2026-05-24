@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -58,16 +58,16 @@ fun LoginRegistrationScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Uni
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Surface(
-                    modifier = Modifier.size(120.dp),
-                    shape = CircleShape,
+                    modifier = Modifier.size(132.dp),
+                    shape = RoundedCornerShape(32.dp),
                     color = MaterialTheme.colorScheme.elevatedSurface(),
                     shadowElevation = 6.dp,
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Image(
-                            painter = painterResource(R.drawable.logo),
+                            painter = painterResource(R.drawable.adopta_splash_logo),
                             contentDescription = null,
-                            modifier = Modifier.size(88.dp)
+                            modifier = Modifier.size(116.dp)
                         )
                     }
                 }

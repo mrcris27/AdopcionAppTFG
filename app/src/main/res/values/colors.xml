@@ -7,4 +7,8 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="adopta_splash_background">#EAFBF6</color>
+    <color name="adopta_icon_background">#DDF8EF</color>
+    <color name="adopta_coral">#F2614D</color>
+    <color name="adopta_teal">#39B3AE</color>
 </resources>
