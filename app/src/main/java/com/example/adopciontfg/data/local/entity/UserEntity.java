@@ -18,9 +18,17 @@ public class UserEntity {
     private String email;
     private String biography;
 
+    // Constructor
+
+
     @Ignore
     public UserEntity() {
         this.id = "";
+        this.name = "";
+        this.surname = "";
+        this.profilePicture = "";
+        this.email = "";
+        this.biography = "";
     }
 
     public UserEntity(@NonNull String id, String name, String surname,

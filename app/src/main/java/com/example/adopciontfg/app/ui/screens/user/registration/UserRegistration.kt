@@ -63,7 +63,7 @@ fun UserRegistration(
             verticalArrangement = Arrangement.spacedBy(Dimens.spacingMd),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            AppFormSection(title = "Datos personales") {
+            AppFormSection(title = stringResource(R.string.datos_personales)) {
                 RegistrationTextField(
                     value = uiState.value.name,
                     onValueChange = viewModel::onNameChange,
@@ -93,7 +93,7 @@ fun UserRegistration(
                 )
             }
 
-            AppFormSection(title = "Foto de perfil") {
+            AppFormSection(title = stringResource(R.string.foto_perfil_section)) {
                 ProfilePhotoPicker(
                     photoUri = uiState.value.profilePhotoUri,
                     onPhotoChange = viewModel::onProfilePhotoChange,
@@ -101,7 +101,7 @@ fun UserRegistration(
                 )
             }
 
-            AppFormSection(title = "Acceso") {
+            AppFormSection(title = stringResource(R.string.acceso)) {
                 RegistrationPasswordField(
                     value = uiState.value.password,
                     onValueChange = viewModel::onPasswordChange,

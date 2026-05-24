@@ -1,11 +1,16 @@
 package com.example.adopciontfg.app.ui.screens.shelter.settings
 
 import android.net.Uri
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
+import com.example.adopciontfg.R
 import com.example.adopciontfg.data.local.entity.ShelterEntity
 import com.example.adopciontfg.data.repository.ShelterRepository
+import com.example.adopciontfg.data.util.ShelterAddressParts
+import com.example.adopciontfg.data.util.buildShelterAddress
+import com.example.adopciontfg.data.util.parseShelterAddress
 import com.example.adopciontfg.domain.settings.SettingsRepository
 import com.example.adopciontfg.domain.settings.ShelterSettingsData
 import com.google.firebase.auth.EmailAuthProvider
@@ -25,6 +30,11 @@ data class ShelterSettingsUiState(
     val email: String = "",
     val phone: String = "",
     val address: String = "",
+    val street: String = "",
+    val streetNumber: String = "",
+    val postalCode: String = "",
+    val city: String = "",
+    val province: String = "",
     val cif: String = "",
     val profilePhotoUri: String = "",
     val adoptionFormUrl: String = "",
@@ -38,6 +48,7 @@ data class ShelterSettingsUiState(
     val confirmNewPasswordHidden: Boolean = true,
     val isPasswordChangeDialogOpen: Boolean = false,
     val isPasswordChangeLoading: Boolean = false,
+    val saveMessageRes: Int? = null,
     val saveMessage: String? = null
 )
 
@@ -54,12 +65,18 @@ class ShelterSettingsViewModel @Inject constructor(
         viewModelScope.launch {
             settingsRepository.shelterSettings().collectLatest { data ->
                 val firebaseUser = auth.currentUser
+                val addressParts = parseShelterAddress(data.address)
                 _uiState.update { current ->
                     current.copy(
                         shelterName = data.shelterName.ifBlank { firebaseUser?.displayName.orEmpty() },
                         email = data.email.ifBlank { firebaseUser?.email.orEmpty() },
                         phone = data.phone,
                         address = data.address,
+                        street = addressParts.street,
+                        streetNumber = addressParts.streetNumber,
+                        postalCode = addressParts.postalCode,
+                        city = addressParts.city,
+                        province = addressParts.province,
                         cif = data.cif,
                         profilePhotoUri = data.profilePhotoUri.ifBlank {
                             firebaseUser?.photoUrl?.toString().orEmpty()
@@ -96,7 +113,12 @@ class ShelterSettingsViewModel @Inject constructor(
     fun onShelterNameChange(value: String) = _uiState.update { it.copy(shelterName = value) }
     fun onEmailChange(value: String) = _uiState.update { it.copy(email = value) }
     fun onPhoneChange(value: String) = _uiState.update { it.copy(phone = value) }
-    fun onAddressChange(value: String) = _uiState.update { it.copy(address = value) }
+    fun onStreetChange(value: String) = updateAddress { it.copy(street = value) }
+    fun onStreetNumberChange(value: String) = updateAddress { it.copy(streetNumber = value) }
+    fun onPostalCodeChange(value: String) =
+        updateAddress { it.copy(postalCode = value.filter { char -> char.isDigit() }.take(5)) }
+    fun onCityChange(value: String) = updateAddress { it.copy(city = value) }
+    fun onProvinceChange(value: String) = updateAddress { it.copy(province = value) }
     fun onCifChange(value: String) = _uiState.update { it.copy(cif = value) }
     fun onProfilePhotoChange(value: String) = _uiState.update { it.copy(profilePhotoUri = value) }
     fun onAdoptionFormUrlChange(value: String) = _uiState.update { it.copy(adoptionFormUrl = value) }
@@ -151,6 +173,25 @@ class ShelterSettingsViewModel @Inject constructor(
         }
     }
 
+    private fun updateAddress(transform: (ShelterSettingsUiState) -> ShelterSettingsUiState) {
+        _uiState.update { current ->
+            val updated = transform(current)
+            updated.copy(address = buildFullAddress(updated))
+        }
+    }
+
+    private fun buildFullAddress(state: ShelterSettingsUiState): String {
+        return buildShelterAddress(
+            ShelterAddressParts(
+                street = state.street,
+                streetNumber = state.streetNumber,
+                postalCode = state.postalCode,
+                city = state.city,
+                province = state.province,
+            )
+        )
+    }
+
     fun onSaveClick() {
         viewModelScope.launch {
             val current = _uiState.value
@@ -179,15 +220,15 @@ class ShelterSettingsViewModel @Inject constructor(
         val current = _uiState.value
         when {
             current.currentPassword.isBlank() -> {
-                _uiState.update { it.copy(saveMessage = "Introduce tu contraseña actual") }
+                _uiState.update { it.withMessage(R.string.settings_error_current_password_required) }
                 return
             }
             current.newPassword.length < 6 -> {
-                _uiState.update { it.copy(saveMessage = "La nueva contraseña debe tener al menos 6 caracteres") }
+                _uiState.update { it.withMessage(R.string.settings_error_password_too_short) }
                 return
             }
             current.newPassword != current.confirmNewPassword -> {
-                _uiState.update { it.copy(saveMessage = "Las contraseñas nuevas no coinciden") }
+                _uiState.update { it.withMessage(R.string.settings_error_password_mismatch) }
                 return
             }
         }
@@ -195,7 +236,7 @@ class ShelterSettingsViewModel @Inject constructor(
         val user = auth.currentUser
         val email = user?.email
         if (user == null || email.isNullOrBlank()) {
-            _uiState.update { it.copy(saveMessage = "No hay una sesión activa") }
+            _uiState.update { it.withMessage(R.string.settings_error_no_active_session) }
             return
         }
 
@@ -212,7 +253,8 @@ class ShelterSettingsViewModel @Inject constructor(
                                 confirmNewPassword = "",
                                 isPasswordChangeDialogOpen = false,
                                 isPasswordChangeLoading = false,
-                                saveMessage = "Contraseña actualizada"
+                                saveMessageRes = R.string.settings_password_updated,
+                                saveMessage = null
                             )
                         }
                     }
@@ -220,7 +262,12 @@ class ShelterSettingsViewModel @Inject constructor(
                         _uiState.update {
                             it.copy(
                                 isPasswordChangeLoading = false,
-                                saveMessage = exception.message ?: "No se pudo actualizar la contraseña"
+                                saveMessageRes = if (exception.message == null) {
+                                    R.string.settings_password_update_failed
+                                } else {
+                                    null
+                                },
+                                saveMessage = exception.message
                             )
                         }
                     }
@@ -229,7 +276,8 @@ class ShelterSettingsViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         isPasswordChangeLoading = false,
-                        saveMessage = "La contraseña actual no es correcta"
+                        saveMessageRes = R.string.settings_current_password_incorrect,
+                        saveMessage = null
                     )
                 }
             }
@@ -240,13 +288,13 @@ class ShelterSettingsViewModel @Inject constructor(
     }
 
     fun onMessageShown() {
-        _uiState.update { it.copy(saveMessage = null) }
+        _uiState.update { it.copy(saveMessageRes = null, saveMessage = null) }
     }
 
     private fun updateFirebaseProfile(current: ShelterSettingsUiState) {
         val user = auth.currentUser
         if (user == null) {
-            _uiState.update { it.copy(saveMessage = "Cambios guardados") }
+            _uiState.update { it.withMessage(R.string.settings_changes_saved) }
             return
         }
 
@@ -258,11 +306,18 @@ class ShelterSettingsViewModel @Inject constructor(
 
         user.updateProfile(profileUpdates)
             .addOnSuccessListener {
-                _uiState.update { it.copy(saveMessage = "Cambios guardados") }
+                _uiState.update { it.withMessage(R.string.settings_changes_saved) }
             }
             .addOnFailureListener { exception ->
                 _uiState.update {
-                    it.copy(saveMessage = exception.message ?: "Cambios guardados solo en el dispositivo")
+                    it.copy(
+                        saveMessageRes = if (exception.message == null) {
+                            R.string.settings_changes_saved_device_only
+                        } else {
+                            null
+                        },
+                        saveMessage = exception.message
+                    )
                 }
             }
     }
@@ -280,4 +335,7 @@ class ShelterSettingsViewModel @Inject constructor(
             darkModeEnabled = darkModeEnabled
         )
     }
+
+    private fun ShelterSettingsUiState.withMessage(@StringRes messageRes: Int): ShelterSettingsUiState =
+        copy(saveMessageRes = messageRes, saveMessage = null)
 }

@@ -4,9 +4,9 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
+import com.example.adopciontfg.R
 import com.example.adopciontfg.data.local.entity.AnimalEntity
 import com.example.adopciontfg.data.repository.AnimalRepository
-import com.example.adopciontfg.model.AnimalStatus
 import com.example.adopciontfg.model.Characteristic
 import com.example.adopciontfg.model.Species
 import com.google.firebase.auth.FirebaseAuth
@@ -31,7 +31,7 @@ data class PetFormUiState(
     val description: String = "",
     val species: Species? = null,
     val selectedCharacteristics: Set<Characteristic> = emptySet(),
-    val status: AnimalStatus = AnimalStatus.AVAILABLE,
+    val saveMessageRes: Int? = null,
     val saveMessage: String? = null,
     val saveSucceeded: Boolean = false,
 ) {
@@ -74,7 +74,6 @@ class ShelterPetFormViewModel @Inject constructor(
                         description = entity.description.orEmpty(),
                         species = entity.species,
                         selectedCharacteristics = entity.characteristics.orEmpty().toSet(),
-                       // status = entity.status ?: AnimalStatus.AVAILABLE,
                     )
                 }
             }
@@ -99,12 +98,12 @@ class ShelterPetFormViewModel @Inject constructor(
         }
     }
 
-    fun onStatusChange(status: AnimalStatus) = _uiState.update { it.copy(status = status) }
-
     fun onSave() {
         val shelterId = auth.currentUser?.uid
         if (shelterId == null) {
-            _uiState.update { it.copy(saveMessage = "Inicia sesión como protectora para guardar.") }
+            _uiState.update {
+                it.copy(saveMessageRes = R.string.pet_form_login_required, saveMessage = null)
+            }
             return
         }
 
@@ -132,10 +131,16 @@ class ShelterPetFormViewModel @Inject constructor(
         )
 
         animalRepository.updateAnimal(animal)
-        _uiState.update { it.copy(saveSucceeded = true, saveMessage = "Animal guardado correctamente") }
+        _uiState.update {
+            it.copy(
+                saveSucceeded = true,
+                saveMessageRes = R.string.animal_saved_successfully,
+                saveMessage = null
+            )
+        }
     }
 
     fun onSaveHandled() {
-        _uiState.update { it.copy(saveSucceeded = false, saveMessage = null) }
+        _uiState.update { it.copy(saveSucceeded = false, saveMessageRes = null, saveMessage = null) }
     }
 }

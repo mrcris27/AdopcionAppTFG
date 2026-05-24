@@ -24,6 +24,7 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -36,6 +37,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -47,7 +49,8 @@ import com.example.adopciontfg.app.ui.screens.components.AppSecondaryButton
 import com.example.adopciontfg.app.ui.screens.components.AppTopAppBar
 import com.example.adopciontfg.app.ui.screens.components.RegistrationTextField
 import com.example.adopciontfg.app.ui.screens.components.SavePhotos
-import com.example.adopciontfg.model.AnimalStatus
+import com.example.adopciontfg.app.ui.screens.components.characteristicLabel
+import com.example.adopciontfg.app.ui.screens.components.speciesLabel
 import com.example.adopciontfg.model.Characteristic
 import com.example.adopciontfg.model.Species
 import com.example.adopciontfg.ui.theme.AdoptionTheme
@@ -104,9 +107,6 @@ fun PetRegistration(
                 selectedCharacteristics + characteristic
             }
         },
-        status = AnimalStatus.AVAILABLE,
-        onStatusChange = {},
-        showStatusSection = false,
         canSave = canRegister,
         onBackClick = onBackClick,
         onSaveClick = onRegisterClick,
@@ -135,15 +135,11 @@ fun PetRegistration(
     onSpeciesChange: (Species) -> Unit,
     selectedCharacteristics: Set<Characteristic>,
     onCharacteristicToggle: (Characteristic) -> Unit,
-    status: AnimalStatus,
-    onStatusChange: (AnimalStatus) -> Unit,
-    showStatusSection: Boolean,
     canSave: Boolean,
     onBackClick: (() -> Unit)? = null,
     onSaveClick: () -> Unit,
 ) {
     var speciesExpanded by remember { mutableStateOf(false) }
-    var statusExpanded by remember { mutableStateOf(false) }
     var showDatePicker by remember { mutableStateOf(false) }
 
     val dateFormatter = remember { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) }
@@ -179,7 +175,11 @@ fun PetRegistration(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     TextField(
-                        value = species?.let { enumLabel(it.name) }.orEmpty(),
+                        value = if (species != null) {
+                            speciesLabel(species)
+                        } else {
+                            ""
+                        },
                         onValueChange = {},
                         readOnly = true,
                         label = { Text(stringResource(R.string.especie)) },
@@ -203,7 +203,7 @@ fun PetRegistration(
                     ) {
                         Species.entries.forEach { option ->
                             DropdownMenuItem(
-                                text = { Text(enumLabel(option.name)) },
+                                text = { Text(speciesLabel(option)) },
                                 onClick = {
                                     onSpeciesChange(option)
                                     speciesExpanded = false
@@ -235,6 +235,8 @@ fun PetRegistration(
                         modifier = Modifier.weight(1f)
                     )
                 }
+
+                AdoptionAvailabilitySwitchRow()
 
                 Text(
                     text = stringResource(R.string.fecha_nacimiento),
@@ -311,57 +313,8 @@ fun PetRegistration(
                         FilterChip(
                             selected = characteristic in selectedCharacteristics,
                             onClick = { onCharacteristicToggle(characteristic) },
-                            label = { Text(enumLabel(characteristic.name)) }
+                            label = { Text(characteristicLabel(characteristic)) }
                         )
-                    }
-                }
-            }
-
-            if (showStatusSection) {
-                AppFormSection(title = stringResource(R.string.estado_publicacion)) {
-                    Text(
-                        text = stringResource(R.string.estado_publicacion_hint),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    ExposedDropdownMenuBox(
-                        expanded = statusExpanded,
-                        onExpandedChange = { statusExpanded = !statusExpanded },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        TextField(
-                            value = enumLabel(status.name),
-                            onValueChange = {},
-                            readOnly = true,
-                            label = { Text(stringResource(R.string.estado_publicacion)) },
-                            trailingIcon = {
-                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = statusExpanded)
-                            },
-                            modifier = Modifier
-                                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
-                                .fillMaxWidth(),
-                            shape = MaterialTheme.shapes.medium,
-                            colors = TextFieldDefaults.colors(
-                                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                focusedIndicatorColor = MaterialTheme.colorScheme.primary,
-                                unfocusedIndicatorColor = MaterialTheme.colorScheme.inputOutlineUnfocused(),
-                            )
-                        )
-                        ExposedDropdownMenu(
-                            expanded = statusExpanded,
-                            onDismissRequest = { statusExpanded = false }
-                        ) {
-                            AnimalStatus.entries.forEach { option ->
-                                DropdownMenuItem(
-                                    text = { Text(enumLabel(option.name)) },
-                                    onClick = {
-                                        onStatusChange(option)
-                                        statusExpanded = false
-                                    }
-                                )
-                            }
-                        }
                     }
                 }
             }
@@ -403,8 +356,27 @@ fun PetRegistration(
     }
 }
 
-private fun enumLabel(name: String): String =
-    name.replace("_", " ").lowercase().replaceFirstChar { it.uppercase() }
+@Composable
+private fun AdoptionAvailabilitySwitchRow() {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = stringResource(R.string.no_adoptar),
+            style = MaterialTheme.typography.bodyLarge
+        )
+        Switch(
+            checked = true,
+            onCheckedChange = null
+        )
+        Text(
+            text = stringResource(R.string.adoptar),
+            style = MaterialTheme.typography.bodyLarge
+        )
+    }
+}
 
 @Preview(showBackground = true)
 @Composable

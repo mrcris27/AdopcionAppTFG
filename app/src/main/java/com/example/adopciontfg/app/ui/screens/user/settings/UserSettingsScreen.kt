@@ -39,9 +39,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.adopciontfg.R
 import com.example.adopciontfg.ui.theme.AdoptionTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,9 +55,11 @@ fun UserSettingsScreen(
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val saveMessage = uiState.value.saveMessageRes?.let { stringResource(it) }
+        ?: uiState.value.saveMessage
 
-    LaunchedEffect(uiState.value.saveMessage) {
-        val message = uiState.value.saveMessage ?: return@LaunchedEffect
+    LaunchedEffect(saveMessage) {
+        val message = saveMessage ?: return@LaunchedEffect
         snackbarHostState.showSnackbar(message)
         viewModel.onMessageShown()
     }
@@ -131,7 +135,7 @@ private fun UserSettingsContent(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             AppTopAppBar(
-                title = "Ajustes de usuario",
+                title = stringResource(R.string.ajustes_usuario),
                 onBackClick = onBackClick
             )
         },
@@ -145,7 +149,7 @@ private fun UserSettingsContent(
                 .padding(Dimens.screenPadding),
             verticalArrangement = Arrangement.spacedBy(Dimens.spacingMd)
         ) {
-            AppFormSection(title = "Perfil") {
+            AppFormSection(title = stringResource(R.string.perfil)) {
                 ProfilePhotoPicker(
                     photoUri = uiState.profilePhotoUri,
                     onPhotoChange = onProfilePhotoChange,
@@ -154,72 +158,72 @@ private fun UserSettingsContent(
                 AppFilledTextField(
                     value = uiState.name,
                     onValueChange = onNameChange,
-                    label = { Text("Nombre") }
+                    label = { Text(stringResource(R.string.nombre)) }
                 )
                 AppFilledTextField(
                     value = uiState.surname,
                     onValueChange = onSurnameChange,
-                    label = { Text("Apellidos") }
+                    label = { Text(stringResource(R.string.apellidos)) }
                 )
                 AppFilledTextField(
                     value = uiState.email,
                     onValueChange = onEmailChange,
-                    label = { Text("Correo") },
+                    label = { Text(stringResource(R.string.correo)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
                 )
                 AppFilledTextField(
                     value = uiState.phone,
                     onValueChange = onPhoneChange,
-                    label = { Text("Telefono") },
+                    label = { Text(stringResource(R.string.telefono)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
                 )
                 AppFilledTextField(
                     value = uiState.city,
                     onValueChange = onCityChange,
-                    label = { Text("Ciudad") }
+                    label = { Text(stringResource(R.string.ciudad)) }
                 )
                 AppFilledTextField(
                     value = uiState.biography,
                     onValueChange = onBiographyChange,
-                    label = { Text("Biografia") },
+                    label = { Text(stringResource(R.string.biografia)) },
                     singleLine = false,
                     minLines = 3
                 )
             }
 
-            AppFormSection(title = "Preferencias") {
+            AppFormSection(title = stringResource(R.string.preferencias)) {
                 SettingsSwitchRow(
-                    text = "Notificaciones",
+                    text = stringResource(R.string.notificaciones),
                     icon = { Icon(Icons.Outlined.Notifications, contentDescription = null) },
                     checked = uiState.notificationsEnabled,
                     onCheckedChange = onNotificationsChange
                 )
                 SettingsSwitchRow(
-                    text = "Modo oscuro",
+                    text = stringResource(R.string.modo_oscuro),
                     icon = { Icon(Icons.Outlined.Palette, contentDescription = null) },
                     checked = uiState.darkModeEnabled,
                     onCheckedChange = onDarkModeChange
                 )
             }
 
-            AppFormSection(title = "Seguridad") {
+            AppFormSection(title = stringResource(R.string.seguridad)) {
                 Text(
-                    text = "Actualiza tu contraseña desde un formulario privado.",
+                    text = stringResource(R.string.actualizar_contrasena_desde_formulario),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 AppPrimaryButton(
-                    text = "Cambiar contraseña",
+                    text = stringResource(R.string.cambiar_contrasena),
                     onClick = onOpenPasswordDialog
                 )
             }
 
             AppPrimaryButton(
-                text = "Guardar",
+                text = stringResource(R.string.guardar),
                 onClick = onSaveClick
             )
             AppOutlinedButton(
-                text = "Cerrar sesión",
+                text = stringResource(R.string.cerrar_sesion),
                 onClick = onLogoutClick
             )
         }
@@ -296,27 +300,27 @@ private fun ChangePasswordDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismissRequest,
-        title = { Text("Cambiar contraseña") },
+        title = { Text(stringResource(R.string.cambiar_contrasena)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(Dimens.spacingSm)) {
                 PasswordField(
                     value = uiState.currentPassword,
                     onValueChange = onCurrentPasswordChange,
-                    label = "Contraseña actual",
+                    label = stringResource(R.string.contrasena_actual),
                     hidden = uiState.currentPasswordHidden,
                     onToggleVisibility = onToggleCurrentPasswordVisibility
                 )
                 PasswordField(
                     value = uiState.newPassword,
                     onValueChange = onNewPasswordChange,
-                    label = "Nueva contraseña",
+                    label = stringResource(R.string.nueva_contrasena),
                     hidden = uiState.newPasswordHidden,
                     onToggleVisibility = onToggleNewPasswordVisibility
                 )
                 PasswordField(
                     value = uiState.confirmNewPassword,
                     onValueChange = onConfirmNewPasswordChange,
-                    label = "Repetir nueva contraseña",
+                    label = stringResource(R.string.repetir_nueva_contrasena),
                     hidden = uiState.confirmNewPasswordHidden,
                     onToggleVisibility = onToggleConfirmNewPasswordVisibility
                 )
@@ -327,7 +331,13 @@ private fun ChangePasswordDialog(
                 onClick = onConfirmClick,
                 enabled = !uiState.isPasswordChangeLoading
             ) {
-                Text(if (uiState.isPasswordChangeLoading) "Actualizando..." else "Actualizar")
+                Text(
+                    if (uiState.isPasswordChangeLoading) {
+                        stringResource(R.string.actualizando)
+                    } else {
+                        stringResource(R.string.actualizar)
+                    }
+                )
             }
         },
         dismissButton = {
@@ -335,7 +345,7 @@ private fun ChangePasswordDialog(
                 onClick = onDismissRequest,
                 enabled = !uiState.isPasswordChangeLoading
             ) {
-                Text("Cancelar")
+                Text(stringResource(R.string.cancelar))
             }
         }
     )

@@ -3,6 +3,7 @@ package com.example.adopciontfg.app.ui.screens.user.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
+import com.example.adopciontfg.R
 import com.example.adopciontfg.data.local.entity.ShelterEntity
 import com.example.adopciontfg.data.repository.ShelterRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,7 +17,7 @@ import kotlinx.coroutines.launch
 data class UserHomeUiState(
     val query: String = "",
     val selectedTab: Int = 0,
-    val tabs: List<String> = listOf("Lista", "Mapa"),
+    val tabs: List<Int> = listOf(R.string.lista, R.string.mapa),
     val isLoadingShelters: Boolean = true,
     val shelters: List<ShelterEntity> = emptyList(),
     val filteredShelters: List<ShelterEntity> = emptyList()

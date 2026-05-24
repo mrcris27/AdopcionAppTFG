@@ -24,7 +24,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.adopciontfg.R
 import com.example.adopciontfg.ui.theme.Dimens
 import com.example.adopciontfg.ui.theme.elevatedSurface
 
@@ -32,7 +34,7 @@ import com.example.adopciontfg.ui.theme.elevatedSurface
 fun CardViewList(
     name: String,
     onClick: () -> Unit,
-    subtitle: String = "Toca para ver más información",
+    subtitle: String = stringResource(R.string.toca_ver_mas_informacion),
 ) {
     ElevatedCard(
         onClick = onClick,

@@ -23,10 +23,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 
 import androidx.compose.ui.text.font.FontWeight
 
 import androidx.compose.ui.tooling.preview.Preview
+
+import com.example.adopciontfg.R
 
 import com.example.adopciontfg.app.ui.components.skeleton.ShelterCardListSkeleton
 
@@ -36,9 +39,9 @@ import com.example.adopciontfg.app.ui.screens.components.ListCardView
 
 import com.example.adopciontfg.app.ui.screens.components.SearchSection
 
-import com.example.adopciontfg.data.local.entity.AnimalEntity
+import com.example.adopciontfg.app.ui.screens.components.animalListSubtitle
 
-import com.example.adopciontfg.data.local.entity.listSubtitle
+import com.example.adopciontfg.data.local.entity.AnimalEntity
 
 import com.example.adopciontfg.model.Characteristic
 import com.example.adopciontfg.model.Species
@@ -124,7 +127,7 @@ fun PetContent(
 
             animals.isEmpty() -> Text(
 
-                text = "No hay animales disponibles.",
+                text = stringResource(R.string.sin_animales_disponibles),
 
                 modifier = Modifier.padding(Dimens.screenPadding),
 
@@ -146,7 +149,7 @@ fun PetContent(
 
                         name = animal.name.orEmpty(),
 
-                        subtitle = animal.listSubtitle(),
+                        subtitle = animalListSubtitle(animal),
 
                         onClick = onClick,
 
@@ -180,7 +183,7 @@ fun HomeTopBar(
 
         Text(
 
-            text = "Animales",
+            text = stringResource(R.string.animales),
 
             style = MaterialTheme.typography.titleLarge,
 

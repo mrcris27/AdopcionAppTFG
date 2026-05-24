@@ -24,11 +24,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.adopciontfg.R
 import com.example.adopciontfg.app.ui.components.skeleton.MapAreaSkeleton
 import com.example.adopciontfg.app.ui.components.skeleton.ShelterCardListSkeleton
 import com.example.adopciontfg.app.ui.screens.components.CardViewList
@@ -77,7 +79,7 @@ fun UserHomeScreenBody(
                 .padding(horizontal = Dimens.spacingSm)
         ) {
             Text(
-                text = "Protectoras",
+                text = stringResource(R.string.protectoras),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground,
@@ -124,7 +126,7 @@ fun UserHomeScreenBody(
 
 @Composable
 fun TabsSection(
-    tabs: List<String>,
+    tabs: List<Int>,
     selectedTab: Int,
     onTabSelected: (Int) -> Unit
 ) {
@@ -134,13 +136,13 @@ fun TabsSection(
         contentColor = MaterialTheme.colorScheme.primary,
         divider = {}
     ) {
-        tabs.forEachIndexed { index, title ->
+        tabs.forEachIndexed { index, titleRes ->
             Tab(
                 selected = selectedTab == index,
                 onClick = { onTabSelected(index) },
                 text = {
                     Text(
-                        text = title,
+                        text = stringResource(titleRes),
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = if (selectedTab == index) FontWeight.SemiBold else FontWeight.Normal
                     )

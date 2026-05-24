@@ -5,7 +5,6 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
-import com.example.adopciontfg.model.AnimalStatus;
 import com.example.adopciontfg.model.Characteristic;
 import com.example.adopciontfg.model.Species;
 
@@ -41,6 +40,19 @@ public class AnimalEntity {
 
     /** Constructor sin estado explícito (por defecto: disponible). Solo para código de app, no Room. */
     @Ignore
+    public AnimalEntity() {
+        this.id = "";
+        this.name = "";
+        this.sex = false;
+        this.mainPhoto = "";
+        this.photos = null;
+        this.birthDate = 0L;
+        this.description = "";
+        this.species = null;
+        this.characteristics = null;
+        this.shelterId = "";
+    }
+
     public AnimalEntity(@NonNull String id, String name, boolean sex,
                         String mainPhoto, List<String> photos, long birthDate,
                         String description, Species species,

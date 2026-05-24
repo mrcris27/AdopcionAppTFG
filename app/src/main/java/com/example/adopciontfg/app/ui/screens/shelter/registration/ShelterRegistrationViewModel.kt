@@ -1,6 +1,8 @@
 package com.example.adopciontfg.app.ui.screens.shelter.registration
 
 import androidx.lifecycle.ViewModel
+import com.example.adopciontfg.data.util.ShelterAddressParts
+import com.example.adopciontfg.data.util.buildShelterAddress
 import com.example.adopciontfg.app.ui.validation.doPasswordsMatch
 import com.example.adopciontfg.app.ui.validation.isValidEmail
 import com.example.adopciontfg.app.ui.validation.isValidRegistrationPassword
@@ -16,6 +18,11 @@ data class ShelterRegistrationUiState(
     val cif: String = "",
     val phone: String = "",
     val address: String = "",
+    val street: String = "",
+    val streetNumber: String = "",
+    val postalCode: String = "",
+    val city: String = "",
+    val province: String = "",
     val email: String = "",
     val profilePhotoUri: String = "",
     val password: String = "",
@@ -42,7 +49,12 @@ class ShelterRegistrationViewModel @Inject constructor() : ViewModel() {
     fun onNameChange(name: String) = updateForm { it.copy(name = name) }
     fun onCifChange(cif: String) = updateForm { it.copy(cif = cif) }
     fun onPhoneChange(phone: String) = updateForm { it.copy(phone = phone) }
-    fun onAddressChange(address: String) = updateForm { it.copy(address = address) }
+    fun onStreetChange(street: String) = updateAddress { it.copy(street = street) }
+    fun onStreetNumberChange(streetNumber: String) = updateAddress { it.copy(streetNumber = streetNumber) }
+    fun onPostalCodeChange(postalCode: String) =
+        updateAddress { it.copy(postalCode = postalCode.filter { char -> char.isDigit() }.take(5)) }
+    fun onCityChange(city: String) = updateAddress { it.copy(city = city) }
+    fun onProvinceChange(province: String) = updateAddress { it.copy(province = province) }
     fun onEmailChange(email: String) = updateForm { it.copy(email = email) }
     fun onProfilePhotoChange(value: String) = _uiState.update { it.copy(profilePhotoUri = value) }
     fun onPasswordChange(password: String) = updateForm { it.copy(password = password) }
@@ -64,11 +76,35 @@ class ShelterRegistrationViewModel @Inject constructor() : ViewModel() {
         }
     }
 
+    private fun updateAddress(transform: (ShelterRegistrationUiState) -> ShelterRegistrationUiState) {
+        updateForm { current ->
+            val updated = transform(current)
+            updated.copy(address = buildFullAddress(updated))
+        }
+    }
+
+    private fun buildFullAddress(state: ShelterRegistrationUiState): String {
+        return buildShelterAddress(
+            ShelterAddressParts(
+                street = state.street,
+                streetNumber = state.streetNumber,
+                postalCode = state.postalCode,
+                city = state.city,
+                province = state.province,
+            )
+        )
+    }
+
     private fun validate(state: ShelterRegistrationUiState): Boolean {
         return state.name.isNotBlank() &&
             state.cif.isNotBlank() &&
             state.phone.isNotBlank() &&
-            state.address.isNotBlank() &&
+            state.street.isNotBlank() &&
+            state.streetNumber.isNotBlank() &&
+            state.postalCode.length == 5 &&
+            state.postalCode.all { it.isDigit() } &&
+            state.city.isNotBlank() &&
+            state.province.isNotBlank() &&
             isValidEmail(state.email) &&
             isValidRegistrationPassword(state.password) &&
             doPasswordsMatch(state.password, state.confirmPassword)

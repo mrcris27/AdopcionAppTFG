@@ -26,8 +26,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.adopciontfg.R
 import com.example.adopciontfg.ui.theme.Dimens
 
 @Composable
@@ -103,7 +105,7 @@ fun SavePhotos(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Photo,
-                        contentDescription = "Galería"
+                        contentDescription = stringResource(R.string.galeria)
                     )
                 }
                 FilledIconButton(
@@ -116,15 +118,15 @@ fun SavePhotos(
                 ) {
                     Icon(
                         imageVector = Icons.Default.CameraAlt,
-                        contentDescription = "Cámara"
+                        contentDescription = stringResource(R.string.camara)
                     )
                 }
             }
             if (currentUris.isNotEmpty()) {
                 val label = if (currentUris.size == 1) {
-                    "1 foto añadida"
+                    stringResource(R.string.foto_anadida)
                 } else {
-                    "${currentUris.size} fotos añadidas"
+                    stringResource(R.string.fotos_anadidas, currentUris.size)
                 }
                 Text(
                     text = label,
@@ -133,7 +135,7 @@ fun SavePhotos(
                 )
             } else {
                 Text(
-                    text = "Toca un icono para añadir fotos",
+                    text = stringResource(R.string.toca_icono_anadir_fotos),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

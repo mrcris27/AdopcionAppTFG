@@ -5,7 +5,6 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import com.example.adopciontfg.data.local.entity.AnimalEntity
 import com.example.adopciontfg.data.local.entity.ShelterEntity
-import com.example.adopciontfg.data.local.entity.isPubliclyVisible
 import com.example.adopciontfg.data.repository.AnimalRepository
 import com.example.adopciontfg.data.repository.ShelterRepository
 import com.example.adopciontfg.model.Characteristic
@@ -58,7 +57,7 @@ class ShelterProfileViewModel @Inject constructor(
         viewModelScope.launch {
             animalRepository.getAnimalsByShelter(shelterId).asFlow().collect { animals ->
                 _uiState.update { state ->
-                    val loadedAnimals = animals.orEmpty().filter { it.isPubliclyVisible() }
+                    val loadedAnimals = animals.orEmpty()
                     state.copy(
                         animals = loadedAnimals,
                         filteredAnimals = filterAnimals(

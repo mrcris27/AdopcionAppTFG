@@ -24,6 +24,12 @@ public class ShelterEntity {
     @Ignore
     public ShelterEntity() {
         this.id = "";
+        this.name = "";
+        this.cif = "";
+        this.profilePicture = "";
+        this.email = "";
+        this.address = "";
+        this.phone = "";
         this.adoptionFormUrl = "";
     }
 

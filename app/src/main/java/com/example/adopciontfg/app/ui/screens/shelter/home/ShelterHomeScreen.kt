@@ -14,10 +14,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.adopciontfg.R
 import com.example.adopciontfg.app.ui.screens.components.BottomNavBar
 import com.example.adopciontfg.app.ui.screens.components.bottom_tab.NavBarTab
 import com.example.adopciontfg.app.ui.screens.shelter.home.navigation.ShelterAnimalsRoute
@@ -93,7 +95,7 @@ private fun ShelterHomeScreenPreview() {
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
-                    text = "Vista principal de protectora",
+                    text = stringResource(R.string.vista_principal_protectora),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

@@ -38,10 +38,12 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import com.example.adopciontfg.R
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -98,7 +100,7 @@ fun ProfilePhotoPicker(
                 if (imageBitmap != null) {
                     Image(
                         bitmap = imageBitmap!!,
-                        contentDescription = "Foto de perfil",
+                        contentDescription = stringResource(R.string.foto_perfil_content_description),
                         modifier = Modifier
                             .size(112.dp)
                             .clip(CircleShape),
@@ -123,7 +125,7 @@ fun ProfilePhotoPicker(
             ) {
                 Icon(
                     imageVector = Icons.Default.CameraAlt,
-                    contentDescription = "Cambiar foto de perfil"
+                    contentDescription = stringResource(R.string.cambiar_foto_perfil)
                 )
             }
             DropdownMenu(
@@ -131,7 +133,7 @@ fun ProfilePhotoPicker(
                 onDismissRequest = { menuExpanded = false }
             ) {
                 DropdownMenuItem(
-                    text = { Text("Galería") },
+                    text = { Text(stringResource(R.string.galeria)) },
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Photo,
@@ -144,7 +146,7 @@ fun ProfilePhotoPicker(
                     }
                 )
                 DropdownMenuItem(
-                    text = { Text("Hacer una foto") },
+                    text = { Text(stringResource(R.string.hacer_una_foto)) },
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.CameraAlt,

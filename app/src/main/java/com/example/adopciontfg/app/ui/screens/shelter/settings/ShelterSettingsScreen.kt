@@ -14,7 +14,11 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.outlined.Campaign
 import androidx.compose.material.icons.outlined.Palette
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -24,6 +28,9 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -36,13 +43,20 @@ import com.example.adopciontfg.app.ui.screens.components.ProfilePhotoPicker
 import com.example.adopciontfg.ui.theme.Dimens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.adopciontfg.R
 import com.example.adopciontfg.ui.theme.AdoptionTheme
+import com.example.adopciontfg.ui.theme.inputOutlineUnfocused
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,9 +67,11 @@ fun ShelterSettingsScreen(
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val saveMessage = uiState.value.saveMessageRes?.let { stringResource(it) }
+        ?: uiState.value.saveMessage
 
-    LaunchedEffect(uiState.value.saveMessage) {
-        val message = uiState.value.saveMessage ?: return@LaunchedEffect
+    LaunchedEffect(saveMessage) {
+        val message = saveMessage ?: return@LaunchedEffect
         snackbarHostState.showSnackbar(message)
         viewModel.onMessageShown()
     }
@@ -71,7 +87,11 @@ fun ShelterSettingsScreen(
         onProfilePhotoChange = viewModel::onProfilePhotoChange,
         onEmailChange = viewModel::onEmailChange,
         onPhoneChange = viewModel::onPhoneChange,
-        onAddressChange = viewModel::onAddressChange,
+        onStreetChange = viewModel::onStreetChange,
+        onStreetNumberChange = viewModel::onStreetNumberChange,
+        onPostalCodeChange = viewModel::onPostalCodeChange,
+        onCityChange = viewModel::onCityChange,
+        onProvinceChange = viewModel::onProvinceChange,
         onCifChange = viewModel::onCifChange,
         onAdoptionFormUrlChange = viewModel::onAdoptionFormUrlChange,
         onAdoptionAlertsChange = viewModel::onAdoptionAlertsChange,
@@ -100,7 +120,11 @@ private fun ShelterSettingsContent(
     onProfilePhotoChange: (String) -> Unit,
     onEmailChange: (String) -> Unit,
     onPhoneChange: (String) -> Unit,
-    onAddressChange: (String) -> Unit,
+    onStreetChange: (String) -> Unit,
+    onStreetNumberChange: (String) -> Unit,
+    onPostalCodeChange: (String) -> Unit,
+    onCityChange: (String) -> Unit,
+    onProvinceChange: (String) -> Unit,
     onCifChange: (String) -> Unit,
     onAdoptionFormUrlChange: (String) -> Unit,
     onAdoptionAlertsChange: (Boolean) -> Unit,
@@ -135,7 +159,7 @@ private fun ShelterSettingsContent(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             AppTopAppBar(
-                title = "Ajustes de protectora",
+                title = stringResource(R.string.ajustes_protectora),
                 onBackClick = onBackClick
             )
         },
@@ -149,7 +173,7 @@ private fun ShelterSettingsContent(
                 .padding(Dimens.screenPadding),
             verticalArrangement = Arrangement.spacedBy(Dimens.spacingMd)
         ) {
-            AppFormSection(title = "Datos de la protectora") {
+            AppFormSection(title = stringResource(R.string.datos_protectora)) {
                 ProfilePhotoPicker(
                     photoUri = uiState.profilePhotoUri,
                     onPhotoChange = onProfilePhotoChange,
@@ -158,80 +182,156 @@ private fun ShelterSettingsContent(
                 AppFilledTextField(
                     value = uiState.shelterName,
                     onValueChange = onShelterNameChange,
-                    label = { Text("Nombre de protectora") }
+                    label = { Text(stringResource(R.string.nombre_protectora)) }
                 )
                 AppFilledTextField(
                     value = uiState.email,
                     onValueChange = onEmailChange,
-                    label = { Text("Correo") },
+                    label = { Text(stringResource(R.string.correo)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
                 )
                 AppFilledTextField(
                     value = uiState.phone,
                     onValueChange = onPhoneChange,
-                    label = { Text("Telefono") },
+                    label = { Text(stringResource(R.string.telefono)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
-                )
-                AppFilledTextField(
-                    value = uiState.address,
-                    onValueChange = onAddressChange,
-                    label = { Text("Direccion") }
                 )
                 AppFilledTextField(
                     value = uiState.cif,
                     onValueChange = onCifChange,
-                    label = { Text("CIF") }
+                    label = { Text(stringResource(R.string.cif)) }
                 )
             }
 
-            AppFormSection(title = "Adopciones") {
+            AppFormSection(title = stringResource(R.string.direccion)) {
+                AppFilledTextField(
+                    value = uiState.street,
+                    onValueChange = onStreetChange,
+                    label = { Text(stringResource(R.string.calle)) },
+                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words)
+                )
+                AppFilledTextField(
+                    value = uiState.streetNumber,
+                    onValueChange = onStreetNumberChange,
+                    label = { Text(stringResource(R.string.numero)) },
+                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Characters)
+                )
+                AppFilledTextField(
+                    value = uiState.postalCode,
+                    onValueChange = onPostalCodeChange,
+                    label = { Text(stringResource(R.string.codigo_postal)) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
+                AppFilledTextField(
+                    value = uiState.city,
+                    onValueChange = onCityChange,
+                    label = { Text(stringResource(R.string.localidad_ciudad)) },
+                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words)
+                )
+                ShelterSettingsProvinceDropdown(
+                    selectedProvince = uiState.province,
+                    provinces = stringArrayResource(R.array.provincias_espana).toList(),
+                    onProvinceSelected = onProvinceChange
+                )
+            }
+
+            AppFormSection(title = stringResource(R.string.adopciones)) {
                 Text(
-                    text = "Los usuarios rellenarán este formulario cuando soliciten adoptar un animal.",
+                    text = stringResource(R.string.adopciones_formulario_desc),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 AppFilledTextField(
                     value = uiState.adoptionFormUrl,
                     onValueChange = onAdoptionFormUrlChange,
-                    label = { Text("Enlace Google Forms") },
-                    placeholder = { Text("https://forms.gle/...") }
+                    label = { Text(stringResource(R.string.enlace_google_forms)) },
+                    placeholder = { Text(stringResource(R.string.google_forms_placeholder)) }
                 )
             }
 
-            AppFormSection(title = "Preferencias") {
+            AppFormSection(title = stringResource(R.string.preferencias)) {
                 SwitchRow(
-                    text = "Alertas de adopcion",
+                    text = stringResource(R.string.alertas_adopcion),
                     icon = { Icon(Icons.Outlined.Campaign, contentDescription = null) },
                     checked = uiState.adoptionAlertsEnabled,
                     onCheckedChange = onAdoptionAlertsChange
                 )
                 SwitchRow(
-                    text = "Modo oscuro",
+                    text = stringResource(R.string.modo_oscuro),
                     icon = { Icon(Icons.Outlined.Palette, contentDescription = null) },
                     checked = uiState.darkModeEnabled,
                     onCheckedChange = onDarkModeChange
                 )
             }
 
-            AppFormSection(title = "Seguridad") {
+            AppFormSection(title = stringResource(R.string.seguridad)) {
                 Text(
-                    text = "Actualiza tu contraseña desde un formulario privado.",
+                    text = stringResource(R.string.actualizar_contrasena_desde_formulario),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 AppPrimaryButton(
-                    text = "Cambiar contraseña",
+                    text = stringResource(R.string.cambiar_contrasena),
                     onClick = onOpenPasswordDialog
                 )
             }
             AppPrimaryButton(
-                text = "Guardar",
+                text = stringResource(R.string.guardar),
                 onClick = onSaveClick
             )
             AppOutlinedButton(
-                text = "Cerrar sesión",
+                text = stringResource(R.string.cerrar_sesion),
                 onClick = onLogoutClick
             )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ShelterSettingsProvinceDropdown(
+    selectedProvince: String,
+    provinces: List<String>,
+    onProvinceSelected: (String) -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded },
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        TextField(
+            value = selectedProvince,
+            onValueChange = {},
+            readOnly = true,
+            label = { Text(stringResource(R.string.provincia)) },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            modifier = Modifier
+                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true)
+                .fillMaxWidth(),
+            shape = MaterialTheme.shapes.medium,
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+                unfocusedIndicatorColor = MaterialTheme.colorScheme.inputOutlineUnfocused(),
+            ),
+        )
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            provinces.forEach { province ->
+                DropdownMenuItem(
+                    text = { Text(province) },
+                    onClick = {
+                        onProvinceSelected(province)
+                        expanded = false
+                    }
+                )
+            }
         }
     }
 }
@@ -248,7 +348,11 @@ private fun ShelterSettingsScreenPreview() {
             onProfilePhotoChange = {},
             onEmailChange = {},
             onPhoneChange = {},
-            onAddressChange = {},
+            onStreetChange = {},
+            onStreetNumberChange = {},
+            onPostalCodeChange = {},
+            onCityChange = {},
+            onProvinceChange = {},
             onCifChange = {},
             onAdoptionFormUrlChange = {},
             onAdoptionAlertsChange = {},
@@ -305,27 +409,27 @@ private fun ChangePasswordDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismissRequest,
-        title = { Text("Cambiar contraseña") },
+        title = { Text(stringResource(R.string.cambiar_contrasena)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(Dimens.spacingSm)) {
                 PasswordField(
                     value = uiState.currentPassword,
                     onValueChange = onCurrentPasswordChange,
-                    label = "Contraseña actual",
+                    label = stringResource(R.string.contrasena_actual),
                     hidden = uiState.currentPasswordHidden,
                     onToggleVisibility = onToggleCurrentPasswordVisibility
                 )
                 PasswordField(
                     value = uiState.newPassword,
                     onValueChange = onNewPasswordChange,
-                    label = "Nueva contraseña",
+                    label = stringResource(R.string.nueva_contrasena),
                     hidden = uiState.newPasswordHidden,
                     onToggleVisibility = onToggleNewPasswordVisibility
                 )
                 PasswordField(
                     value = uiState.confirmNewPassword,
                     onValueChange = onConfirmNewPasswordChange,
-                    label = "Repetir nueva contraseña",
+                    label = stringResource(R.string.repetir_nueva_contrasena),
                     hidden = uiState.confirmNewPasswordHidden,
                     onToggleVisibility = onToggleConfirmNewPasswordVisibility
                 )
@@ -336,7 +440,13 @@ private fun ChangePasswordDialog(
                 onClick = onConfirmClick,
                 enabled = !uiState.isPasswordChangeLoading
             ) {
-                Text(if (uiState.isPasswordChangeLoading) "Actualizando..." else "Actualizar")
+                Text(
+                    if (uiState.isPasswordChangeLoading) {
+                        stringResource(R.string.actualizando)
+                    } else {
+                        stringResource(R.string.actualizar)
+                    }
+                )
             }
         },
         dismissButton = {
@@ -344,7 +454,7 @@ private fun ChangePasswordDialog(
                 onClick = onDismissRequest,
                 enabled = !uiState.isPasswordChangeLoading
             ) {
-                Text("Cancelar")
+                Text(stringResource(R.string.cancelar))
             }
         }
     )

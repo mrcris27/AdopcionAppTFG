@@ -1,7 +1,6 @@
 package com.example.adopciontfg.data.local;
 
 import android.content.Context;
-import android.database.Cursor;
 
 import androidx.room.Database;
 import androidx.room.Room;
@@ -27,7 +26,7 @@ import com.example.adopciontfg.data.local.entity.UserEntity;
                 AnimalEntity.class,
                 SponsorshipEntity.class
         },
-        version = 4,
+        version = 5,
         exportSchema = false
 )
 @TypeConverters(Converters.class)
@@ -44,24 +43,19 @@ public abstract class AppDatabase extends RoomDatabase {
     private static final Migration MIGRATION_3_4 = new Migration(3, 4) {
         @Override
         public void migrate(SupportSQLiteDatabase database) {
-            if (!hasColumn(database, "animals", "status")) {
-                database.execSQL("ALTER TABLE animals ADD COLUMN status TEXT");
-            }
-            database.execSQL("UPDATE animals SET status = 'AVAILABLE' WHERE status IS NULL");
             database.execSQL("DROP TABLE IF EXISTS favorites");
         }
     };
 
-    private static boolean hasColumn(SupportSQLiteDatabase database, String tableName, String columnName) {
-        try (Cursor cursor = database.query("PRAGMA table_info(`" + tableName + "`)")) {
-            while (cursor.moveToNext()) {
-                if (columnName.equals(cursor.getString(1))) {
-                    return true;
-                }
-            }
-            return false;
+    private static final Migration MIGRATION_4_5 = new Migration(4, 5) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `animals_new` (`id` TEXT NOT NULL, `name` TEXT, `sex` INTEGER NOT NULL, `mainPhoto` TEXT, `photos` TEXT, `birthDate` INTEGER NOT NULL, `description` TEXT, `species` TEXT, `characteristics` TEXT, `shelterId` TEXT NOT NULL, PRIMARY KEY(`id`))");
+            database.execSQL("INSERT INTO `animals_new` (`id`, `name`, `sex`, `mainPhoto`, `photos`, `birthDate`, `description`, `species`, `characteristics`, `shelterId`) SELECT `id`, `name`, `sex`, `mainPhoto`, `photos`, `birthDate`, `description`, `species`, `characteristics`, `shelterId` FROM `animals`");
+            database.execSQL("DROP TABLE `animals`");
+            database.execSQL("ALTER TABLE `animals_new` RENAME TO `animals`");
         }
-    }
+    };
 
     public static AppDatabase getInstance(Context context) {
 
@@ -82,7 +76,7 @@ public abstract class AppDatabase extends RoomDatabase {
                             context.getApplicationContext(),
                             AppDatabase.class,
                             "adopcion_tfg_db"
-                    ).addMigrations(MIGRATION_3_4).build();
+                    ).addMigrations(MIGRATION_3_4, MIGRATION_4_5).build();
                 }
             }
         }

@@ -20,7 +20,7 @@
     <string name="volver_inicio">Volver al inicio</string>
     <string name="registro">Registro</string>
     <string name="registro_subtitle">Elige cómo quieres usar la aplicación</string>
-    <string name="login">Login</string>
+    <string name="login">Login</string>6
     <string name="login_subtitle">Accede con tu correo y contraseña</string>
     <string name="login_empty_fields_error">Rellena el correo y la contraseña para continuar.</string>
     <string name="login_invalid_email_error">Introduce un correo electrónico válido.</string>
@@ -39,6 +39,11 @@
     <string name="correo"> Correo electrónico </string>
     <string name="cif"> CIF </string>
     <string name="direccion"> Dirección </string>
+    <string name="calle">Calle</string>
+    <string name="numero">Número</string>
+    <string name="codigo_postal">Código postal</string>
+    <string name="localidad_ciudad">Localidad / ciudad</string>
+    <string name="provincia">Provincia</string>
     <string name="biografia"> Biografía </string>
     <string name="foto_perfil"> Seleccione foto de perfil </string>
     <string name="registrar"> Registrar </string>
@@ -52,6 +57,9 @@
     <string name="sexo">Sexo</string>
     <string name="macho">Macho</string>
     <string name="hembra">Hembra</string>
+    <string name="adoptado">Adoptado</string>
+    <string name="adoptar">Adoptar</string>
+    <string name="no_adoptar">No adoptar</string>
     <string name="fecha_nacimiento">Fecha de nacimiento</string>
     <string name="seleccionar_fecha">Seleccionar fecha</string>
     <string name="descripcion">Descripción</string>
@@ -73,15 +81,8 @@
     <string name="buscar_mis_animales">Buscar en mis animales…</string>
     <string name="animales_registrados">Animales registrados</string>
     <string name="shelter_total_animales">Total registrados: %1$d</string>
-    <string name="disponibles">Disponibles</string>
-    <string name="reservados">Reservados</string>
-    <string name="adoptados">Adoptados</string>
-    <string name="no_disponibles">No disponibles</string>
-    <string name="cambiar_estado">Cambiar estado</string>
     <string name="editar_animal">Editar animal</string>
     <string name="guardar_cambios">Guardar cambios</string>
-    <string name="estado_publicacion">Estado de publicación</string>
-    <string name="estado_publicacion_hint">Los adoptados dejan de mostrarse a los usuarios. Usa reservado si hay una adopción en curso.</string>
     <string name="shelter_sin_animales">Aún no has registrado animales. Pulsa + para añadir el primero.</string>
     <string name="shelter_sin_sesion">Inicia sesión como protectora para gestionar tus animales.</string>
     <string name="shelter_formulario_adopcion_titulo">Solicitudes de adopción</string>
@@ -89,5 +90,169 @@
     <string name="shelter_formulario_adopcion_sin_url">Configura el enlace de tu formulario en Ajustes → Adopciones.</string>
     <string name="shelter_abrir_formulario">Abrir formulario</string>
     <string name="adopcion_formulario_no_configurado">Esta protectora aún no ha configurado el formulario de adopción.</string>
+
+    <string name="iniciar_sesion">Iniciar sesión</string>
+    <string name="registrarse">Registrarse</string>
+    <string name="datos_personales">Datos personales</string>
+    <string name="acceso">Acceso</string>
+    <string name="foto_perfil_section">Foto de perfil</string>
+    <string name="imagen_publica">Imagen pública</string>
+    <string name="ajustes">Ajustes</string>
+    <string name="ajustes_usuario">Ajustes de usuario</string>
+    <string name="ajustes_protectora">Ajustes de protectora</string>
+    <string name="perfil">Perfil</string>
+    <string name="preferencias">Preferencias</string>
+    <string name="seguridad">Seguridad</string>
+    <string name="ciudad">Ciudad</string>
+    <string name="notificaciones">Notificaciones</string>
+    <string name="modo_oscuro">Modo oscuro</string>
+    <string name="actualizar_contrasena_desde_formulario">Actualiza tu contraseña desde un formulario privado.</string>
+    <string name="cambiar_contrasena">Cambiar contraseña</string>
+    <string name="guardar">Guardar</string>
+    <string name="cerrar_sesion">Cerrar sesión</string>
+    <string name="contrasena_actual">Contraseña actual</string>
+    <string name="nueva_contrasena">Nueva contraseña</string>
+    <string name="repetir_nueva_contrasena">Repetir nueva contraseña</string>
+    <string name="actualizando">Actualizando...</string>
+    <string name="actualizar">Actualizar</string>
+    <string name="cancelar">Cancelar</string>
+    <string name="datos_protectora">Datos de la protectora</string>
+    <string name="nombre_protectora">Nombre de protectora</string>
+    <string name="adopciones">Adopciones</string>
+    <string name="adopciones_formulario_desc">Los usuarios rellenarán este formulario cuando soliciten adoptar un animal.</string>
+    <string name="enlace_google_forms">Enlace Google Forms</string>
+    <string name="google_forms_placeholder">https://forms.gle/...</string>
+    <string name="alertas_adopcion">Alertas de adopción</string>
+    <string name="settings_hub_desc">Selecciona el tipo de perfil para editar sus preferencias.</string>
+    <string name="settings_user_subtitle">Perfil, contacto y preferencias de la app</string>
+    <string name="settings_shelter_subtitle">Datos de la entidad y alertas de adopción</string>
+    <string name="protectoras">Protectoras</string>
+    <string name="lista">Lista</string>
+    <string name="mapa">Mapa</string>
+    <string name="vista_principal_protectora">Vista principal de protectora</string>
+    <string name="buscar">Buscar</string>
+    <string name="buscar_protectora">Buscar protectora</string>
+    <string name="plegar_buscador">Plegar buscador</string>
+    <string name="mapa_centrar_espana_abreviado">ES</string>
+    <string name="ver_mas_informacion">Ver más información</string>
+    <string name="toca_ver_mas_informacion">Toca para ver más información</string>
+    <string name="foto_perfil_content_description">Foto de perfil</string>
+    <string name="cambiar_foto_perfil">Cambiar foto de perfil</string>
+    <string name="galeria">Galería</string>
+    <string name="hacer_una_foto">Hacer una foto</string>
+    <string name="camara">Cámara</string>
+    <string name="foto_anadida">1 foto añadida</string>
+    <string name="fotos_anadidas">%1$d fotos añadidas</string>
+    <string name="toca_icono_anadir_fotos">Toca un icono para añadir fotos</string>
+    <string name="adoptar_ahora">Adoptar ahora</string>
+    <string name="donar">Donar</string>
+    <string name="donation_dialog_title">Simular donativo</string>
+    <string name="donation_dialog_pet_name">Donativo para %1$s</string>
+    <string name="donation_dialog_description">Elige una cantidad para ver cómo sería la donación. Esta acción es solo una muestra y no realiza ningún pago real.</string>
+    <string name="donation_amount_selected">Importe seleccionado: %1$d €</string>
+    <string name="confirmar_donativo">Confirmar donativo</string>
+    <string name="donation_confirmation_message">Donativo simulado confirmado para %1$s. Gracias por apoyar su cuidado.</string>
+    <string name="cerrar">Cerrar</string>
+    <string name="volver">Volver</string>
+    <string name="edad">Edad</string>
+    <string name="genero">Género</string>
+    <string name="sobre_esta_mascota">Sobre esta mascota</string>
+    <string name="mascota_descripcion_default">Esta mascota busca un hogar lleno de amor. Está esperando a alguien especial que le dé una segunda oportunidad 🐾</string>
+    <string name="sin_fotos_disponibles">Sin fotos disponibles</string>
+    <string name="animal_age_years">%1$d años</string>
+    <string name="animal_list_subtitle_species_age">%1$s · %2$d años</string>
+    <string name="animal_list_subtitle_age">%1$d años</string>
+    <string name="stat_pill_label"> %1$s</string>
+    <string name="species_perro">Perro</string>
+    <string name="species_gato">Gato</string>
+    <string name="species_conejo">Conejo</string>
+    <string name="species_rata">Rata</string>
+    <string name="species_caballo">Caballo</string>
+    <string name="species_other">Otro</string>
+    <string name="characteristic_sociable_con_gatos">Sociable con gatos</string>
+    <string name="characteristic_sociable_con_perros">Sociable con perros</string>
+    <string name="characteristic_sociable_con_gato_y_perro">Sociable con gatos y perros</string>
+    <string name="characteristic_sociable_con_kids">Sociable con niños</string>
+    <string name="characteristic_tranquilo">Tranquilo</string>
+    <string name="characteristic_jugueton">Juguetón</string>
+    <string name="characteristic_energetico">Energético</string>
+    <string name="characteristic_reactivo">Reactivo</string>
+    <string name="protectora">Protectora</string>
+    <string name="ocultar_info_protectora">Ocultar información de la protectora</string>
+    <string name="mostrar_info_protectora">Mostrar información de la protectora</string>
+    <string name="shelter_info_empty">Aquí se mostrará la información de la protectora cuando esté disponible.</string>
+    <string name="cif_format">CIF: %1$s</string>
+    <string name="animales_disponibles">Animales disponibles</string>
+    <string name="sin_animales_disponibles">No hay animales disponibles.</string>
+    <string name="shelter_sin_animales_disponibles">No hay animales disponibles en esta protectora.</string>
+    <string name="animales">Animales</string>
+    <string name="settings_error_current_password_required">Introduce tu contraseña actual</string>
+    <string name="settings_error_password_too_short">La nueva contraseña debe tener al menos 6 caracteres</string>
+    <string name="settings_error_password_mismatch">Las contraseñas nuevas no coinciden</string>
+    <string name="settings_error_no_active_session">No hay una sesión activa</string>
+    <string name="settings_password_updated">Contraseña actualizada</string>
+    <string name="settings_password_update_failed">No se pudo actualizar la contraseña</string>
+    <string name="settings_current_password_incorrect">La contraseña actual no es correcta</string>
+    <string name="settings_changes_saved">Cambios guardados</string>
+    <string name="settings_changes_saved_device_only">Cambios guardados solo en el dispositivo</string>
+    <string name="error_obteniendo_usuario">Error obteniendo usuario</string>
+    <string name="error_desconocido">Error desconocido</string>
+    <string name="pet_form_login_required">Inicia sesión como protectora para guardar.</string>
+    <string name="animal_saved_successfully">Animal guardado correctamente</string>
+
+    <string-array name="provincias_espana">
+        <item>A Coruña</item>
+        <item>Álava</item>
+        <item>Albacete</item>
+        <item>Alicante</item>
+        <item>Almería</item>
+        <item>Asturias</item>
+        <item>Ávila</item>
+        <item>Badajoz</item>
+        <item>Barcelona</item>
+        <item>Burgos</item>
+        <item>Cáceres</item>
+        <item>Cádiz</item>
+        <item>Cantabria</item>
+        <item>Castellón</item>
+        <item>Ciudad Real</item>
+        <item>Córdoba</item>
+        <item>Cuenca</item>
+        <item>Girona</item>
+        <item>Granada</item>
+        <item>Guadalajara</item>
+        <item>Gipuzkoa</item>
+        <item>Huelva</item>
+        <item>Huesca</item>
+        <item>Illes Balears</item>
+        <item>Jaén</item>
+        <item>La Rioja</item>
+        <item>Las Palmas</item>
+        <item>León</item>
+        <item>Lleida</item>
+        <item>Lugo</item>
+        <item>Madrid</item>
+        <item>Málaga</item>
+        <item>Murcia</item>
+        <item>Navarra</item>
+        <item>Ourense</item>
+        <item>Palencia</item>
+        <item>Pontevedra</item>
+        <item>Salamanca</item>
+        <item>Santa Cruz de Tenerife</item>
+        <item>Segovia</item>
+        <item>Sevilla</item>
+        <item>Soria</item>
+        <item>Tarragona</item>
+        <item>Teruel</item>
+        <item>Toledo</item>
+        <item>Valencia</item>
+        <item>Valladolid</item>
+        <item>Bizkaia</item>
+        <item>Zamora</item>
+        <item>Zaragoza</item>
+        <item>Ceuta</item>
+        <item>Melilla</item>
+    </string-array>
 
 </resources>

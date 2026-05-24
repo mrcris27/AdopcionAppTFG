@@ -8,7 +8,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.adopciontfg.R
-import com.example.adopciontfg.model.AnimalStatus
 import com.example.adopciontfg.model.Characteristic
 import com.example.adopciontfg.model.Species
 import com.example.adopciontfg.ui.theme.AdoptionTheme
@@ -61,9 +60,6 @@ fun ShelterPetFormScreen(
         onSpeciesChange = viewModel::onSpeciesChange,
         selectedCharacteristics = uiState.selectedCharacteristics,
         onCharacteristicToggle = viewModel::onCharacteristicToggle,
-        status = uiState.status,
-        onStatusChange = viewModel::onStatusChange,
-        showStatusSection = true,
         canSave = uiState.canSave,
         onBackClick = onBackClick,
         onSaveClick = viewModel::onSave,
@@ -97,9 +93,6 @@ private fun ShelterPetFormScreenPreview() {
                 Characteristic.SOCIABLE_CON_KIDS,
             ),
             onCharacteristicToggle = {},
-            status = AnimalStatus.AVAILABLE,
-            onStatusChange = {},
-            showStatusSection = true,
             canSave = true,
             onBackClick = {},
             onSaveClick = {},

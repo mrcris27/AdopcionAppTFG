@@ -25,9 +25,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import com.example.adopciontfg.R
 import com.example.adopciontfg.data.local.entity.ShelterEntity
 import com.example.adopciontfg.data.util.geocodeAddress
 import kotlin.math.abs
@@ -259,7 +261,7 @@ private fun MapSearchPanel(
             IconButton(onClick = onExpand) {
                 Icon(
                     imageVector = Icons.Default.Search,
-                    contentDescription = "Buscar protectora"
+                    contentDescription = stringResource(R.string.buscar_protectora)
                 )
             }
         }
@@ -283,7 +285,7 @@ private fun MapSearchPanel(
                     onValueChange = onQueryChange,
                     modifier = Modifier.weight(1f),
                     singleLine = true,
-                    label = { Text("Buscar") },
+                    label = { Text(stringResource(R.string.buscar)) },
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Search,
@@ -295,7 +297,7 @@ private fun MapSearchPanel(
                             IconButton(onClick = onClear) {
                                 Icon(
                                     imageVector = Icons.Default.Close,
-                                    contentDescription = "Borrar busqueda"
+                                    contentDescription = stringResource(R.string.limpiar_busqueda)
                                 )
                             }
                         }
@@ -305,7 +307,7 @@ private fun MapSearchPanel(
                 IconButton(onClick = onCollapse) {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = "Plegar buscador"
+                        contentDescription = stringResource(R.string.plegar_buscador)
                     )
                 }
             }
@@ -355,7 +357,7 @@ private fun MapControls(
             }
             HorizontalDivider(modifier = Modifier.width(44.dp))
             TextButton(onClick = onCenterSpain) {
-                Text("ES", style = MaterialTheme.typography.labelLarge)
+                Text(stringResource(R.string.mapa_centrar_espana_abreviado), style = MaterialTheme.typography.labelLarge)
             }
         }
     }

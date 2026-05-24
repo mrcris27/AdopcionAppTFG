@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.adopciontfg.data.local.entity.AnimalEntity
 import com.example.adopciontfg.data.repository.AnimalRepository
 import com.example.adopciontfg.domain.settings.SettingsRepository
-import com.example.adopciontfg.model.AnimalStatus
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -17,26 +16,14 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-enum class ShelterAnimalFilter {
-    ALL,
-    AVAILABLE,
-    RESERVED,
-    ADOPTED,
-    UNAVAILABLE,
-}
-
 data class ShelterAnimalsUiState(
     val shelterId: String? = null,
     val shelterName: String = "",
     val adoptionFormUrl: String = "",
     val isLoading: Boolean = true,
     val query: String = "",
-    val statusFilter: ShelterAnimalFilter = ShelterAnimalFilter.ALL,
     val animals: List<AnimalEntity> = emptyList(),
     val filteredAnimals: List<AnimalEntity> = emptyList(),
-    val availableCount: Int = 0,
-    val reservedCount: Int = 0,
-    val adoptedCount: Int = 0,
 )
 
 @HiltViewModel
@@ -64,14 +51,11 @@ class ShelterAnimalsViewModel @Inject constructor(
                 animalRepository.getAnimalsByShelter(shelterId).asFlow().collect { loaded ->
                     val animals = loaded.orEmpty()
                     _uiState.update { state ->
-                        val filtered = applyFilters(animals, state.query, state.statusFilter)
+                        val filtered = applyFilters(animals, state.query)
                         state.copy(
                             isLoading = false,
                             animals = animals,
                             filteredAnimals = filtered,
-                            //  availableCount = animals.count { it.status == AnimalStatus.AVAILABLE },
-                            //reservedCount = animals.count { it.status == AnimalStatus.RESERVED },
-                            //adoptedCount = animals.count { it.status == AnimalStatus.ADOPTED },
                         )
                     }
                 }
@@ -85,47 +69,19 @@ class ShelterAnimalsViewModel @Inject constructor(
         _uiState.update { state ->
             state.copy(
                 query = query,
-                filteredAnimals = applyFilters(state.animals, query, state.statusFilter),
+                filteredAnimals = applyFilters(state.animals, query),
             )
         }
-    }
-
-    fun onStatusFilterChange(filter: ShelterAnimalFilter) {
-        _uiState.update { state ->
-            state.copy(
-                statusFilter = filter,
-                filteredAnimals = applyFilters(state.animals, state.query, filter),
-            )
-        }
-    }
-
-    fun updateAnimalStatus(animalId: String, status: AnimalStatus) {
-        val animal = _uiState.value.animals.find { it.id == animalId } ?: return
-      //  animal.status = status
-        animalRepository.updateAnimal(animal)
     }
 
     private fun applyFilters(
         animals: List<AnimalEntity>,
         query: String,
-        filter: ShelterAnimalFilter,
     ): List<AnimalEntity> {
         return animals
-          /*  .filter { animal ->
-                when (filter) {
-                    ShelterAnimalFilter.ALL -> true
-                    ShelterAnimalFilter.AVAILABLE -> animal.status == AnimalStatus.AVAILABLE
-                    ShelterAnimalFilter.RESERVED -> animal.status == AnimalStatus.RESERVED
-                    ShelterAnimalFilter.ADOPTED -> animal.status == AnimalStatus.ADOPTED
-                    ShelterAnimalFilter.UNAVAILABLE -> animal.status == AnimalStatus.UNAVAILABLE
-                }
-            }*/
             .filter { animal ->
                 query.isBlank() || animal.name.orEmpty().contains(query, ignoreCase = true)
             }
-          /*  .sortedWith(
-                compareBy<AnimalEntity> { it.status == AnimalStatus.ADOPTED }
-                    .thenBy { it.name.orEmpty() },
-            )*/
+            .sortedBy { it.name.orEmpty() }
     }
 }

@@ -3,8 +3,6 @@ package com.example.adopciontfg.app.ui.screens.shelter.animals
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,32 +13,19 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Badge
-import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SheetState
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -55,9 +40,9 @@ import com.example.adopciontfg.app.ui.components.skeleton.ShelterCardListSkeleto
 import com.example.adopciontfg.app.ui.screens.components.AppTopAppBar
 import com.example.adopciontfg.app.ui.screens.shelter.animals.components.ShelterAnimalCard
 import com.example.adopciontfg.data.local.entity.AnimalEntity
-import com.example.adopciontfg.model.AnimalStatus
 import com.example.adopciontfg.model.Characteristic
 import com.example.adopciontfg.model.Species
+import com.example.adopciontfg.data.sampleAnimals
 import com.example.adopciontfg.ui.theme.AdoptionTheme
 import com.example.adopciontfg.ui.theme.Dimens
 import com.example.adopciontfg.ui.theme.elevatedSurface
@@ -73,27 +58,19 @@ fun ShelterAnimalsScreen(
     ShelterAnimalsContent(
         uiState = uiState,
         onQueryChange = viewModel::onQueryChange,
-        onStatusFilterChange = viewModel::onStatusFilterChange,
         onAddAnimalClick = onAddAnimalClick,
         onEditAnimalClick = onEditAnimalClick,
-        onQuickStatusChange = viewModel::updateAnimalStatus,
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 private fun ShelterAnimalsContent(
     uiState: ShelterAnimalsUiState,
     onQueryChange: (String) -> Unit,
-    onStatusFilterChange: (ShelterAnimalFilter) -> Unit,
     onAddAnimalClick: () -> Unit,
     onEditAnimalClick: (String) -> Unit,
-    onQuickStatusChange: (String, AnimalStatus) -> Unit,
 ) {
     val title = uiState.shelterName.ifBlank { stringResource(R.string.mis_animales) }
-    var showFilters by remember { mutableStateOf(false) }
-    val filterSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val hasActiveFilters = uiState.statusFilter != ShelterAnimalFilter.ALL
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -117,13 +94,8 @@ private fun ShelterAnimalsContent(
         ) {
             ShelterAnimalsOverview(
                 total = uiState.animals.size,
-                available = uiState.availableCount,
-                reserved = uiState.reservedCount,
-                adopted = uiState.adoptedCount,
                 query = uiState.query,
                 onQueryChange = onQueryChange,
-                hasActiveFilters = hasActiveFilters,
-                onOpenFilters = { showFilters = true },
                 modifier = Modifier.padding(
                     horizontal = Dimens.screenPadding,
                     vertical = Dimens.spacingSm,
@@ -159,9 +131,6 @@ private fun ShelterAnimalsContent(
                                 ShelterAnimalCard(
                                     animal = animal,
                                     onClick = { onEditAnimalClick(animal.id) },
-                                    onStatusChange = { status ->
-                                        onQuickStatusChange(animal.id, status)
-                                    },
                                 )
                             }
                         }
@@ -170,29 +139,13 @@ private fun ShelterAnimalsContent(
             }
         }
     }
-
-    if (showFilters) {
-        ShelterAnimalFiltersBottomSheet(
-            selected = uiState.statusFilter,
-            onSelect = onStatusFilterChange,
-            onClearFilters = { onStatusFilterChange(ShelterAnimalFilter.ALL) },
-            onDismiss = { showFilters = false },
-            sheetState = filterSheetState,
-        )
-    }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ShelterAnimalsOverview(
     total: Int,
-    available: Int,
-    reserved: Int,
-    adopted: Int,
     query: String,
     onQueryChange: (String) -> Unit,
-    hasActiveFilters: Boolean,
-    onOpenFilters: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     ElevatedCard(
@@ -207,27 +160,16 @@ private fun ShelterAnimalsOverview(
             modifier = Modifier.padding(Dimens.cardPadding),
             verticalArrangement = Arrangement.spacedBy(Dimens.spacingMd),
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = stringResource(R.string.animales_registrados),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                    Text(
-                        text = stringResource(R.string.shelter_total_animales, total),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-                FilterIconButton(
-                    hasActiveFilters = hasActiveFilters,
-                    onOpenFilters = onOpenFilters,
-                )
-            }
+            Text(
+                text = stringResource(R.string.animales_registrados),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+            )
+            Text(
+                text = stringResource(R.string.shelter_total_animales, total),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -239,38 +181,6 @@ private fun ShelterAnimalsOverview(
                     modifier = Modifier.weight(1f),
                 )
             }
-
-            ShelterStatsRow(
-                available = available,
-                reserved = reserved,
-                adopted = adopted,
-            )
-        }
-    }
-}
-
-@Composable
-private fun FilterIconButton(
-    hasActiveFilters: Boolean,
-    onOpenFilters: () -> Unit,
-) {
-    IconButton(onClick = onOpenFilters) {
-        BadgedBox(
-            badge = {
-                if (hasActiveFilters) {
-                    Badge()
-                }
-            },
-        ) {
-            Icon(
-                imageVector = Icons.Default.FilterList,
-                contentDescription = stringResource(R.string.abrir_filtros_animales),
-                tint = if (hasActiveFilters) {
-                    MaterialTheme.colorScheme.primary
-                } else {
-                    MaterialTheme.colorScheme.onSurfaceVariant
-                },
-            )
         }
     }
 }
@@ -330,134 +240,6 @@ private fun ShelterSearchField(
 }
 
 @Composable
-private fun ShelterStatsRow(
-    available: Int,
-    reserved: Int,
-    adopted: Int,
-    modifier: Modifier = Modifier,
-) {
-    FlowRow(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(Dimens.spacingSm),
-        verticalArrangement = Arrangement.spacedBy(Dimens.spacingXs),
-    ) {
-        StatPill(label = stringResource(R.string.disponibles), count = available)
-        StatPill(label = stringResource(R.string.reservados), count = reserved)
-        StatPill(label = stringResource(R.string.adoptados), count = adopted)
-    }
-}
-
-@Composable
-private fun StatPill(label: String, count: Int) {
-    Surface(
-        shape = MaterialTheme.shapes.medium,
-        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.45f),
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = Dimens.spacingSm, vertical = Dimens.spacingXs),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = count.toString(),
-                style = MaterialTheme.typography.labelLarge,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.primary,
-            )
-            Text(
-                text = " $label",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun ShelterAnimalFiltersBottomSheet(
-    selected: ShelterAnimalFilter,
-    onSelect: (ShelterAnimalFilter) -> Unit,
-    onClearFilters: () -> Unit,
-    onDismiss: () -> Unit,
-    sheetState: SheetState,
-) {
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        sheetState = sheetState,
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = Dimens.spacingLg)
-                .padding(bottom = Dimens.spacingXl),
-            verticalArrangement = Arrangement.spacedBy(Dimens.spacingMd),
-        ) {
-            Text(
-                text = stringResource(R.string.filtros),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.SemiBold,
-            )
-
-            FilterSection(title = stringResource(R.string.estado_publicacion)) {
-                ShelterAnimalFilter.entries.forEach { filter ->
-                    FilterChip(
-                        selected = selected == filter,
-                        onClick = { onSelect(filter) },
-                        label = { Text(statusFilterLabel(filter)) },
-                    )
-                }
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                TextButton(onClick = onClearFilters) {
-                    Text(stringResource(R.string.limpiar_filtros))
-                }
-                TextButton(onClick = onDismiss) {
-                    Text(stringResource(R.string.aplicar_filtros))
-                }
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-private fun FilterSection(
-    title: String,
-    content: @Composable () -> Unit,
-) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(Dimens.spacingSm),
-    ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        FlowRow(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(Dimens.spacingSm),
-            verticalArrangement = Arrangement.spacedBy(Dimens.spacingSm),
-        ) {
-            content()
-        }
-    }
-}
-
-@Composable
-private fun statusFilterLabel(filter: ShelterAnimalFilter): String = when (filter) {
-    ShelterAnimalFilter.ALL -> stringResource(R.string.todos)
-    ShelterAnimalFilter.AVAILABLE -> stringResource(R.string.disponibles)
-    ShelterAnimalFilter.RESERVED -> stringResource(R.string.reservados)
-    ShelterAnimalFilter.ADOPTED -> stringResource(R.string.adoptados)
-    ShelterAnimalFilter.UNAVAILABLE -> stringResource(R.string.no_disponibles)
-}
-
-@Composable
 private fun EmptyMessage(text: String, modifier: Modifier = Modifier) {
     Text(
         text = text,
@@ -481,15 +263,10 @@ private fun ShelterAnimalsScreenPreview() {
                 isLoading = false,
                 animals = animals,
                 filteredAnimals = animals,
-                availableCount = 2,
-                reservedCount = 0,
-                adoptedCount = 1,
             ),
             onQueryChange = {},
-            onStatusFilterChange = {},
             onAddAnimalClick = {},
             onEditAnimalClick = {},
-            onQuickStatusChange = { _, _ -> },
         )
     }
 }

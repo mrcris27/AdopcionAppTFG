@@ -8,13 +8,27 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -28,6 +42,7 @@ import com.example.adopciontfg.app.ui.screens.components.RegistrationPasswordFie
 import com.example.adopciontfg.app.ui.screens.components.RegistrationTextField
 import com.example.adopciontfg.ui.theme.AdoptionTheme
 import com.example.adopciontfg.ui.theme.Dimens
+import com.example.adopciontfg.ui.theme.inputOutlineUnfocused
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -64,7 +79,7 @@ fun ShelterRegistration(
             verticalArrangement = Arrangement.spacedBy(Dimens.spacingMd),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            AppFormSection(title = "Datos de la protectora") {
+            AppFormSection(title = stringResource(R.string.datos_protectora)) {
                 RegistrationTextField(
                     value = uiState.value.name,
                     onValueChange = viewModel::onNameChange,
@@ -82,11 +97,6 @@ fun ShelterRegistration(
                     keyboardType = KeyboardType.Phone
                 )
                 RegistrationTextField(
-                    value = uiState.value.address,
-                    onValueChange = viewModel::onAddressChange,
-                    label = stringResource(R.string.direccion)
-                )
-                RegistrationTextField(
                     value = uiState.value.email,
                     onValueChange = viewModel::onEmailChange,
                     label = stringResource(R.string.correo),
@@ -98,7 +108,39 @@ fun ShelterRegistration(
                 })
             }
 
-            AppFormSection(title = "Acceso") {
+            AppFormSection(title = stringResource(R.string.direccion)) {
+                RegistrationTextField(
+                    value = uiState.value.street,
+                    onValueChange = viewModel::onStreetChange,
+                    label = stringResource(R.string.calle),
+                    capitalization = KeyboardCapitalization.Words
+                )
+                RegistrationTextField(
+                    value = uiState.value.streetNumber,
+                    onValueChange = viewModel::onStreetNumberChange,
+                    label = stringResource(R.string.numero),
+                    capitalization = KeyboardCapitalization.Characters
+                )
+                RegistrationTextField(
+                    value = uiState.value.postalCode,
+                    onValueChange = viewModel::onPostalCodeChange,
+                    label = stringResource(R.string.codigo_postal),
+                    keyboardType = KeyboardType.Number
+                )
+                RegistrationTextField(
+                    value = uiState.value.city,
+                    onValueChange = viewModel::onCityChange,
+                    label = stringResource(R.string.localidad_ciudad),
+                    capitalization = KeyboardCapitalization.Words
+                )
+                ShelterProvinceDropdown(
+                    selectedProvince = uiState.value.province,
+                    provinces = stringArrayResource(R.array.provincias_espana).toList(),
+                    onProvinceSelected = viewModel::onProvinceChange
+                )
+            }
+
+            AppFormSection(title = stringResource(R.string.acceso)) {
                 RegistrationPasswordField(
                     value = uiState.value.password,
                     onValueChange = viewModel::onPasswordChange,
@@ -123,7 +165,7 @@ fun ShelterRegistration(
                 })
             }
 
-            AppFormSection(title = "Imagen pública") {
+            AppFormSection(title = stringResource(R.string.imagen_publica)) {
                 ProfilePhotoPicker(
                     photoUri = uiState.value.profilePhotoUri,
                     onPhotoChange = viewModel::onProfilePhotoChange,
@@ -149,6 +191,56 @@ fun ShelterRegistration(
                 enabled = uiState.value.canRegister,
                 modifier = Modifier.fillMaxWidth()
             )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ShelterProvinceDropdown(
+    selectedProvince: String,
+    provinces: List<String>,
+    onProvinceSelected: (String) -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded },
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        TextField(
+            value = selectedProvince,
+            onValueChange = {},
+            readOnly = true,
+            label = { Text(stringResource(R.string.provincia)) },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            modifier = Modifier
+                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true)
+                .fillMaxWidth(),
+            shape = MaterialTheme.shapes.medium,
+            keyboardOptions = KeyboardOptions.Default,
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+                unfocusedIndicatorColor = MaterialTheme.colorScheme.inputOutlineUnfocused(),
+            ),
+        )
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            provinces.forEach { province ->
+                DropdownMenuItem(
+                    text = { Text(province) },
+                    onClick = {
+                        onProvinceSelected(province)
+                        expanded = false
+                    }
+                )
+            }
         }
     }
 }

@@ -55,8 +55,13 @@ import com.example.adopciontfg.app.ui.screens.components.AppTopAppBar
 import com.example.adopciontfg.app.ui.screens.components.CardViewList
 import com.example.adopciontfg.app.ui.screens.components.ListCardView
 import com.example.adopciontfg.app.ui.screens.components.SearchSection
+import com.example.adopciontfg.app.ui.screens.components.animalListSubtitle
+import com.example.adopciontfg.app.ui.screens.components.characteristicLabel
+import com.example.adopciontfg.app.ui.screens.components.speciesLabel
 import com.example.adopciontfg.data.local.entity.AnimalEntity
 import com.example.adopciontfg.data.local.entity.ShelterEntity
+import com.example.adopciontfg.data.sampleAnimals
+import com.example.adopciontfg.data.sampleShelters
 import com.example.adopciontfg.data.local.entity.listSubtitle
 import com.example.adopciontfg.model.Characteristic
 import com.example.adopciontfg.model.Species
@@ -98,7 +103,7 @@ fun ShelterProfileScreen(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             AppTopAppBar(
-                title = "Protectora",
+                title = stringResource(R.string.protectora),
                 onBackClick = onBackClick
             )
         }
@@ -159,9 +164,9 @@ fun ShelterProfileScreen(
                         Icon(
                             imageVector = Icons.Default.ExpandMore,
                             contentDescription = if (shelterCardExpanded) {
-                                "Ocultar información de la protectora"
+                                stringResource(R.string.ocultar_info_protectora)
                             } else {
-                                "Mostrar información de la protectora"
+                                stringResource(R.string.mostrar_info_protectora)
                             },
                             modifier = Modifier.rotate(chevronRotation),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
@@ -182,7 +187,7 @@ fun ShelterProfileScreen(
 
                         if (!hasContactDetails) {
                             Text(
-                                text = "Aquí se mostrará la información de la protectora cuando esté disponible.",
+                                text = stringResource(R.string.shelter_info_empty),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -197,7 +202,7 @@ fun ShelterProfileScreen(
                             if (shelter.cif.orEmpty().isNotBlank()) {
                                 Spacer(modifier = Modifier.height(Dimens.spacingSm))
                                 Text(
-                                    text = "CIF: ${shelter.cif.orEmpty()}",
+                                    text = stringResource(R.string.cif_format, shelter.cif.orEmpty()),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -235,7 +240,7 @@ fun ShelterProfileScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 AppSectionTitle(
-                    text = "Animales disponibles",
+                    text = stringResource(R.string.animales_disponibles),
                     modifier = Modifier.weight(1f)
                 )
                 IconButton(
@@ -279,7 +284,7 @@ fun ShelterProfileScreen(
                     ShelterCardListSkeleton(modifier = Modifier.fillMaxSize())
                 } else if (!hasAnimals) {
                     Text(
-                        text = "No hay animales disponibles en esta protectora.",
+                        text = stringResource(R.string.shelter_sin_animales_disponibles),
                         modifier = Modifier.padding(horizontal = Dimens.spacingLg),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -298,7 +303,7 @@ fun ShelterProfileScreen(
                         itemContent = { animal, onClick ->
                             CardViewList(
                                 name = animal.name.orEmpty(),
-                                subtitle = animal.listSubtitle(),
+                                subtitle = animalListSubtitle(animal),
                                 onClick = onClick,
                             )
                         },
@@ -363,7 +368,7 @@ private fun AnimalFiltersBottomSheet(
                     FilterChip(
                         selected = selectedSpecies == species,
                         onClick = { onSpeciesFilterChange(species) },
-                        label = { Text(enumLabel(species.name)) }
+                        label = { Text(speciesLabel(species)) }
                     )
                 }
             }
@@ -391,7 +396,7 @@ private fun AnimalFiltersBottomSheet(
                     FilterChip(
                         selected = characteristic in selectedCharacteristics,
                         onClick = { onCharacteristicToggle(characteristic) },
-                        label = { Text(enumLabel(characteristic.name)) }
+                        label = { Text(characteristicLabel(characteristic)) }
                     )
                 }
             }
@@ -435,9 +440,6 @@ private fun FilterSection(
         }
     }
 }
-
-private fun enumLabel(name: String): String =
-    name.replace("_", " ").lowercase().replaceFirstChar { it.uppercase() }
 
 @Preview(showBackground = true)
 @Composable
