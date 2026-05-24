@@ -22,6 +22,6 @@ fun SearchSection(
         placeholder = placeholder,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = Dimens.screenPadding, vertical = Dimens.spacingSm)
+            .padding(horizontal = Dimens.spacingSm, vertical = Dimens.spacingSm)
     )
 }

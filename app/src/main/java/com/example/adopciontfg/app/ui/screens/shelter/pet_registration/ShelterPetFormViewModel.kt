@@ -31,6 +31,7 @@ data class PetFormUiState(
     val galleryUris: List<Uri> = emptyList(),
     val birthDateMillis: Long = 0L,
     val description: String = "",
+    val isForAdoption: Boolean = true,
     val species: Species? = null,
     val selectedCharacteristics: Set<Characteristic> = emptySet(),
     val saveMessageRes: Int? = null,
@@ -80,6 +81,7 @@ class ShelterPetFormViewModel @Inject constructor(
                     .map(Uri::parse),
                 birthDateMillis = entity.birthDate,
                 description = entity.description.orEmpty(),
+                isForAdoption = entity.isForAdoption,
                 species = entity.species,
                 selectedCharacteristics = entity.characteristics.orEmpty().toSet(),
             )
@@ -97,6 +99,7 @@ class ShelterPetFormViewModel @Inject constructor(
     fun onGalleryChange(uris: List<Uri>) = _uiState.update { it.copy(galleryUris = uris) }
     fun onBirthDateChange(millis: Long) = _uiState.update { it.copy(birthDateMillis = millis) }
     fun onDescriptionChange(value: String) = _uiState.update { it.copy(description = value) }
+    fun onForAdoptionChange(value: Boolean) = _uiState.update { it.copy(isForAdoption = value) }
     fun onSpeciesChange(species: Species) = _uiState.update { it.copy(species = species) }
     fun onCharacteristicToggle(characteristic: Characteristic) {
         _uiState.update { state ->
@@ -136,9 +139,7 @@ class ShelterPetFormViewModel @Inject constructor(
             state.species,
             state.selectedCharacteristics.toList(),
             shelterId,
-
-            //Aqui poner el valor de que se recoge en pantalla
-            true,
+            state.isForAdoption,
         )
 
         animalRepository.updateAnimal(animal)

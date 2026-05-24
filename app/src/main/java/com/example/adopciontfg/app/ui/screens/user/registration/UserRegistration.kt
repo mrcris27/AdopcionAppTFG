@@ -58,7 +58,7 @@ fun UserRegistration(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(Dimens.screenPadding)
+                .padding(horizontal = Dimens.spacingSm, vertical = Dimens.screenPadding)
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(Dimens.spacingMd),
             horizontalAlignment = Alignment.CenterHorizontally

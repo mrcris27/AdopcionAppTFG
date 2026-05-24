@@ -73,6 +73,7 @@ fun PetRegistration(
     var galleryUris by remember { mutableStateOf<List<Uri>>(emptyList()) }
     var birthDateMillis by rememberSaveable { mutableLongStateOf(0L) }
     var description by rememberSaveable { mutableStateOf("") }
+    var isForAdoption by rememberSaveable { mutableStateOf(true) }
     var species by remember { mutableStateOf<Species?>(null) }
     var selectedCharacteristics by remember { mutableStateOf(setOf<Characteristic>()) }
 
@@ -97,6 +98,8 @@ fun PetRegistration(
         onBirthDateChange = { birthDateMillis = it },
         description = description,
         onDescriptionChange = { description = it },
+        isForAdoption = isForAdoption,
+        onForAdoptionChange = { isForAdoption = it },
         species = species,
         onSpeciesChange = { species = it },
         selectedCharacteristics = selectedCharacteristics,
@@ -131,6 +134,8 @@ fun PetRegistration(
     onBirthDateChange: (Long) -> Unit,
     description: String,
     onDescriptionChange: (String) -> Unit,
+    isForAdoption: Boolean,
+    onForAdoptionChange: (Boolean) -> Unit,
     species: Species?,
     onSpeciesChange: (Species) -> Unit,
     selectedCharacteristics: Set<Characteristic>,
@@ -236,7 +241,10 @@ fun PetRegistration(
                     )
                 }
 
-                AdoptionAvailabilitySwitchRow()
+                AdoptionAvailabilitySwitchRow(
+                    isForAdoption = isForAdoption,
+                    onForAdoptionChange = onForAdoptionChange
+                )
 
                 Text(
                     text = stringResource(R.string.fecha_nacimiento),
@@ -357,7 +365,10 @@ fun PetRegistration(
 }
 
 @Composable
-private fun AdoptionAvailabilitySwitchRow() {
+private fun AdoptionAvailabilitySwitchRow(
+    isForAdoption: Boolean,
+    onForAdoptionChange: (Boolean) -> Unit,
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -368,8 +379,8 @@ private fun AdoptionAvailabilitySwitchRow() {
             style = MaterialTheme.typography.bodyLarge
         )
         Switch(
-            checked = true,
-            onCheckedChange = null
+            checked = isForAdoption,
+            onCheckedChange = onForAdoptionChange
         )
         Text(
             text = stringResource(R.string.adoptar),

@@ -129,7 +129,7 @@ fun PetContent(
 
                 text = stringResource(R.string.sin_animales_disponibles),
 
-                modifier = Modifier.padding(Dimens.screenPadding),
+                modifier = Modifier.padding(horizontal = Dimens.spacingSm, vertical = Dimens.screenPadding),
 
                 style = MaterialTheme.typography.bodyLarge,
 
@@ -193,7 +193,7 @@ fun HomeTopBar(
 
             modifier = Modifier.padding(
 
-                start = Dimens.spacingXl,
+                start = Dimens.spacingSm,
 
                 top = Dimens.spacingMd,
 
@@ -209,7 +209,7 @@ fun HomeTopBar(
 
             color = MaterialTheme.colorScheme.subtleDivider(),
 
-            modifier = Modifier.padding(horizontal = Dimens.spacingLg)
+            modifier = Modifier.padding(horizontal = Dimens.spacingSm)
 
         )
 

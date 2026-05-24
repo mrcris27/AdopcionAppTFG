@@ -84,7 +84,6 @@ fun UserHomeScreenBody(
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.padding(
-                    start = Dimens.spacingMd,
                     top = Dimens.spacingMd,
                     bottom = Dimens.spacingXs
                 )
@@ -94,14 +93,13 @@ fun UserHomeScreenBody(
                 SearchBar(
                     query = uiState.query,
                     onQueryChange = onQueryChange,
-                    modifier = Modifier.padding(horizontal = Dimens.spacingSm, vertical = Dimens.spacingSm)
+                    modifier = Modifier.padding(vertical = Dimens.spacingSm)
                 )
             }
 
             HorizontalDivider(
                 thickness = 1.dp,
-                color = MaterialTheme.colorScheme.subtleDivider(),
-                modifier = Modifier.padding(horizontal = Dimens.spacingLg)
+                color = MaterialTheme.colorScheme.subtleDivider()
             )
 
             TabsSection(

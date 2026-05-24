@@ -69,8 +69,6 @@ import com.example.adopciontfg.app.ui.screens.components.characteristicLabel
 import com.example.adopciontfg.app.ui.screens.components.speciesLabel
 import com.example.adopciontfg.data.local.entity.AnimalEntity
 import com.example.adopciontfg.data.local.entity.ShelterEntity
-import com.example.adopciontfg.data.sampleAnimals
-import com.example.adopciontfg.data.sampleShelters
 import com.example.adopciontfg.data.local.entity.listSubtitle
 import com.example.adopciontfg.model.Characteristic
 import com.example.adopciontfg.model.Species
@@ -127,7 +125,7 @@ fun ShelterProfileScreen(
                 onClick = { shelterCardExpanded = !shelterCardExpanded },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = Dimens.spacingLg, vertical = Dimens.spacingSm)
+                    .padding(horizontal = Dimens.spacingSm, vertical = Dimens.spacingSm)
                     .animateContentSize(),
                 shape = MaterialTheme.shapes.large,
                 colors = CardDefaults.elevatedCardColors(
@@ -240,8 +238,8 @@ fun ShelterProfileScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(
-                        start = Dimens.spacingLg,
-                        end = Dimens.spacingSm,
+                        start = Dimens.spacingSm,
+                        end = Dimens.spacingXs,
                         top = Dimens.spacingSm,
                         bottom = Dimens.spacingXs
                     ),
@@ -293,14 +291,14 @@ fun ShelterProfileScreen(
                 } else if (!hasAnimals) {
                     Text(
                         text = stringResource(R.string.shelter_sin_animales_disponibles),
-                        modifier = Modifier.padding(horizontal = Dimens.spacingLg),
+                        modifier = Modifier.padding(horizontal = Dimens.spacingSm),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 } else if (animals.isEmpty() && isFiltering) {
                     Text(
                         text = stringResource(R.string.sin_resultados_animales),
-                        modifier = Modifier.padding(horizontal = Dimens.spacingLg),
+                        modifier = Modifier.padding(horizontal = Dimens.spacingSm),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -410,7 +408,7 @@ private fun AnimalFiltersBottomSheet(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = Dimens.spacingLg)
+                .padding(horizontal = Dimens.spacingSm)
                 .padding(bottom = Dimens.spacingXl),
             verticalArrangement = Arrangement.spacedBy(Dimens.spacingMd)
         ) {

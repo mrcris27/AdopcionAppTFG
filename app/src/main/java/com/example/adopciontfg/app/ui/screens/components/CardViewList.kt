@@ -39,7 +39,7 @@ fun CardViewList(
     ElevatedCard(
         onClick = onClick,
         modifier = Modifier
-            .padding(horizontal = Dimens.spacingLg)
+            .padding(horizontal = Dimens.spacingSm)
             .fillMaxWidth()
             .wrapContentHeight()
             .animateContentSize(),

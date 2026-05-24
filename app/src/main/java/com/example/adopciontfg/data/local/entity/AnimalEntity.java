@@ -35,13 +35,6 @@ public class AnimalEntity {
     @Ignore
     public AnimalEntity() {
         this.id = "";
-        this.shelterId = "";
-    }
-
-    /** Constructor sin estado explícito (por defecto: disponible). Solo para código de app, no Room. */
-    @Ignore
-    public AnimalEntity() {
-        this.id = "";
         this.name = "";
         this.sex = false;
         this.mainPhoto = "";
@@ -53,6 +46,18 @@ public class AnimalEntity {
         this.shelterId = "";
     }
 
+    /** Constructor sin estado explícito (por defecto: disponible). Solo para código de app, no Room. */
+    @Ignore
+    public AnimalEntity(@NonNull String id, String name, boolean sex,
+                        String mainPhoto, List<String> photos, long birthDate,
+                        String description, Species species,
+                        List<Characteristic> characteristics,
+                        @NonNull String shelterId) {
+        this(id, name, sex, mainPhoto, photos, birthDate, description, species,
+                characteristics, true, shelterId);
+    }
+
+    @Ignore
     public AnimalEntity(@NonNull String id, String name, boolean sex,
                         String mainPhoto, List<String> photos, long birthDate,
                         String description, Species species,
@@ -65,7 +70,7 @@ public class AnimalEntity {
     public AnimalEntity(@NonNull String id, String name, boolean sex,
                         String mainPhoto, List<String> photos, long birthDate,
                         String description, Species species,
-                        List<Characteristic> characteristics, Boolean forAdoption,
+                        List<Characteristic> characteristics, boolean forAdoption,
                         @NonNull String shelterId) {
         this.id = id;
         this.name = name;
@@ -77,7 +82,7 @@ public class AnimalEntity {
         this.species = species;
         this.characteristics = characteristics;
         this.shelterId = shelterId;
-        this.forAdoption = forAdoption != null ? forAdoption : false;
+        this.forAdoption = forAdoption;
     }
 
     // Getters y Setters

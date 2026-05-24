@@ -146,7 +146,7 @@ private fun UserSettingsContent(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
-                .padding(Dimens.screenPadding),
+                .padding(horizontal = Dimens.spacingSm, vertical = Dimens.screenPadding),
             verticalArrangement = Arrangement.spacedBy(Dimens.spacingMd)
         ) {
             AppFormSection(title = stringResource(R.string.perfil)) {
@@ -170,17 +170,6 @@ private fun UserSettingsContent(
                     onValueChange = onEmailChange,
                     label = { Text(stringResource(R.string.correo)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
-                )
-                AppFilledTextField(
-                    value = uiState.phone,
-                    onValueChange = onPhoneChange,
-                    label = { Text(stringResource(R.string.telefono)) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
-                )
-                AppFilledTextField(
-                    value = uiState.city,
-                    onValueChange = onCityChange,
-                    label = { Text(stringResource(R.string.ciudad)) }
                 )
                 AppFilledTextField(
                     value = uiState.biography,

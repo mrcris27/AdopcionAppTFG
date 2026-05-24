@@ -56,6 +56,8 @@ fun ShelterPetFormScreen(
         onBirthDateChange = viewModel::onBirthDateChange,
         description = uiState.description,
         onDescriptionChange = viewModel::onDescriptionChange,
+        isForAdoption = uiState.isForAdoption,
+        onForAdoptionChange = viewModel::onForAdoptionChange,
         species = uiState.species,
         onSpeciesChange = viewModel::onSpeciesChange,
         selectedCharacteristics = uiState.selectedCharacteristics,
@@ -86,6 +88,8 @@ private fun ShelterPetFormScreenPreview() {
             onBirthDateChange = {},
             description = "Perro cariñoso y activo que busca una familia responsable.",
             onDescriptionChange = {},
+            isForAdoption = true,
+            onForAdoptionChange = {},
             species = Species.PERRO,
             onSpeciesChange = {},
             selectedCharacteristics = setOf(

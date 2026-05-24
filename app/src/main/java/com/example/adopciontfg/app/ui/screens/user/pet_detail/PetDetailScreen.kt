@@ -135,7 +135,7 @@ fun PetDetailScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(Dimens.cardPadding),
+                            .padding(horizontal = Dimens.spacingSm, vertical = Dimens.cardPadding),
                         horizontalArrangement = Arrangement.spacedBy(Dimens.spacingMd)
                     ) {
                         AppSecondaryButton(
@@ -167,7 +167,7 @@ fun PetDetailScreen(
                     .padding(padding)
                     .fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(Dimens.spacingLg),
-                contentPadding = PaddingValues(Dimens.screenPadding)
+                contentPadding = PaddingValues(horizontal = Dimens.spacingSm, vertical = Dimens.screenPadding)
             ) {
                 item {
                     Card(

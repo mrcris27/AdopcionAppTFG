@@ -47,7 +47,7 @@ fun SettingsHubScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(Dimens.screenPadding),
+                .padding(horizontal = Dimens.spacingSm, vertical = Dimens.screenPadding),
             verticalArrangement = Arrangement.spacedBy(Dimens.spacingLg)
         ) {
             Text(
