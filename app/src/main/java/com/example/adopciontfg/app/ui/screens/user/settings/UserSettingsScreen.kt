@@ -49,7 +49,6 @@ import com.example.adopciontfg.ui.theme.AdoptionTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserSettingsScreen(
-    onBackClick: () -> Unit,
     onLogout: () -> Unit,
     viewModel: UserSettingsViewModel = hiltViewModel()
 ) {
@@ -66,7 +65,6 @@ fun UserSettingsScreen(
 
     UserSettingsContent(
         uiState = uiState.value,
-        onBackClick = onBackClick,
         onLogoutClick = {
             viewModel.logout()
             onLogout()
@@ -96,7 +94,6 @@ fun UserSettingsScreen(
 @Composable
 private fun UserSettingsContent(
     uiState: UserSettingsUiState,
-    onBackClick: () -> Unit,
     onLogoutClick: () -> Unit,
     onProfilePhotoChange: (String) -> Unit,
     onNameChange: (String) -> Unit,
@@ -135,8 +132,7 @@ private fun UserSettingsContent(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             AppTopAppBar(
-                title = stringResource(R.string.ajustes_usuario),
-                onBackClick = onBackClick
+                title = stringResource(R.string.ajustes_usuario)
             )
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
@@ -225,7 +221,6 @@ private fun UserSettingsScreenPreview() {
     AdoptionTheme {
         UserSettingsContent(
             uiState = UserSettingsUiState(),
-            onBackClick = {},
             onLogoutClick = {},
             onProfilePhotoChange = {},
             onNameChange = {},

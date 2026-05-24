@@ -50,10 +50,11 @@ public abstract class AppDatabase extends RoomDatabase {
     private static final Migration MIGRATION_4_5 = new Migration(4, 5) {
         @Override
         public void migrate(SupportSQLiteDatabase database) {
-            database.execSQL("CREATE TABLE IF NOT EXISTS `animals_new` (`id` TEXT NOT NULL, `name` TEXT, `sex` INTEGER NOT NULL, `mainPhoto` TEXT, `photos` TEXT, `birthDate` INTEGER NOT NULL, `description` TEXT, `species` TEXT, `characteristics` TEXT, `shelterId` TEXT NOT NULL, PRIMARY KEY(`id`))");
-            database.execSQL("INSERT INTO `animals_new` (`id`, `name`, `sex`, `mainPhoto`, `photos`, `birthDate`, `description`, `species`, `characteristics`, `shelterId`) SELECT `id`, `name`, `sex`, `mainPhoto`, `photos`, `birthDate`, `description`, `species`, `characteristics`, `shelterId` FROM `animals`");
+            database.execSQL("CREATE TABLE IF NOT EXISTS `animals_new` (`id` TEXT NOT NULL, `name` TEXT, `sex` INTEGER NOT NULL, `mainPhoto` TEXT, `photos` TEXT, `birthDate` INTEGER NOT NULL, `description` TEXT, `forAdoption` INTEGER NOT NULL, `species` TEXT, `characteristics` TEXT, `shelterId` TEXT NOT NULL, PRIMARY KEY(`id`))");
+            database.execSQL("INSERT INTO `animals_new` (`id`, `name`, `sex`, `mainPhoto`, `photos`, `birthDate`, `description`, `forAdoption`, `species`, `characteristics`, `shelterId`) SELECT `id`, `name`, `sex`, `mainPhoto`, `photos`, `birthDate`, `description`, 1, `species`, `characteristics`, `shelterId` FROM `animals`");
             database.execSQL("DROP TABLE `animals`");
             database.execSQL("ALTER TABLE `animals_new` RENAME TO `animals`");
+            database.execSQL("CREATE INDEX IF NOT EXISTS `index_sponsorships_animalId` ON `sponsorships` (`animalId`)");
         }
     };
 

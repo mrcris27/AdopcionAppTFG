@@ -6,12 +6,10 @@ import com.example.adopciontfg.app.ui.screens.user.settings.UserSettingsScreen
 import kotlinx.serialization.Serializable
 
 fun NavGraphBuilder.userSettingsScreen(
-    onBackClick: () -> Unit,
     onLogout: () -> Unit
 ) {
     composable<UserSettingsRoute> {
         UserSettingsScreen(
-            onBackClick = onBackClick,
             onLogout = onLogout
         )
     }
