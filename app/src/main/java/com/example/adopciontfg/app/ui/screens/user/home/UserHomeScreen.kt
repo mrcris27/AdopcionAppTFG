@@ -14,12 +14,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -34,6 +37,7 @@ import com.example.adopciontfg.R
 import com.example.adopciontfg.app.ui.components.skeleton.MapAreaSkeleton
 import com.example.adopciontfg.app.ui.components.skeleton.ShelterCardListSkeleton
 import com.example.adopciontfg.app.ui.screens.components.CardViewList
+import com.example.adopciontfg.app.ui.screens.components.DataRefreshErrorDialog
 import com.example.adopciontfg.app.ui.screens.components.ListCardView
 import com.example.adopciontfg.app.ui.screens.components.SearchBar
 import com.example.adopciontfg.app.ui.screens.user.home.components.ShelterMapView
@@ -55,6 +59,8 @@ fun UserHomeScreen(
         uiState = uiState.value,
         onQueryChange = viewModel::onQueryChange,
         onTabSelected = viewModel::onTabSelected,
+        onRefresh = viewModel::refreshShelters,
+        onRefreshErrorDismiss = viewModel::dismissRefreshError,
         onDetailClick = onDetailClick
     )
 }
@@ -65,6 +71,8 @@ fun UserHomeScreenBody(
     uiState: UserHomeUiState,
     onQueryChange: (String) -> Unit,
     onTabSelected: (Int) -> Unit,
+    onRefresh: () -> Unit,
+    onRefreshErrorDismiss: () -> Unit,
     onDetailClick: (ShelterEntity) -> Unit,
 ) {
     Column(
@@ -115,11 +123,19 @@ fun UserHomeScreenBody(
                 .weight(1f),
             selectedTab = uiState.selectedTab,
             isLoadingShelters = uiState.isLoadingShelters,
+            isRefreshing = uiState.isRefreshing,
             shelters = uiState.shelters,
             filteredShelters = uiState.filteredShelters,
+            onRefresh = onRefresh,
             onDetailClick = onDetailClick
         )
     }
+
+    DataRefreshErrorDialog(
+        error = uiState.refreshError,
+        onDismiss = onRefreshErrorDismiss,
+        onRetry = onRefresh,
+    )
 }
 
 @Composable
@@ -152,45 +168,54 @@ fun TabsSection(
 
 private const val TAB_ANIMATION_MS = 280
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeContent(
     modifier: Modifier = Modifier,
     selectedTab: Int,
     isLoadingShelters: Boolean,
+    isRefreshing: Boolean,
     shelters: List<ShelterEntity>,
     filteredShelters: List<ShelterEntity>,
+    onRefresh: () -> Unit,
     onDetailClick: (ShelterEntity) -> Unit
 ) {
-    AnimatedContent(
-        targetState = selectedTab,
+    PullToRefreshBox(
+        isRefreshing = isRefreshing,
+        onRefresh = onRefresh,
         modifier = modifier
             .fillMaxSize()
             .clipToBounds(),
-        transitionSpec = {
-            val forward = targetState > initialState
-            (slideInHorizontally(
-                animationSpec = tween(TAB_ANIMATION_MS),
-                initialOffsetX = { width -> if (forward) width else -width }
-            ) + fadeIn(tween(TAB_ANIMATION_MS)))
-                .togetherWith(
-                    slideOutHorizontally(
-                        animationSpec = tween(TAB_ANIMATION_MS),
-                        targetOffsetX = { width -> if (forward) -width else width }
-                    ) + fadeOut(tween(TAB_ANIMATION_MS))
+    ) {
+        AnimatedContent(
+            targetState = selectedTab,
+            modifier = Modifier.fillMaxSize(),
+            transitionSpec = {
+                val forward = targetState > initialState
+                (slideInHorizontally(
+                    animationSpec = tween(TAB_ANIMATION_MS),
+                    initialOffsetX = { width -> if (forward) width else -width }
+                ) + fadeIn(tween(TAB_ANIMATION_MS)))
+                    .togetherWith(
+                        slideOutHorizontally(
+                            animationSpec = tween(TAB_ANIMATION_MS),
+                            targetOffsetX = { width -> if (forward) -width else width }
+                        ) + fadeOut(tween(TAB_ANIMATION_MS))
+                    )
+            },
+            label = "home_tab_content",
+        ) { tab ->
+            when (tab) {
+                0 -> HomeListTab(
+                    isLoading = isLoadingShelters,
+                    shelters = filteredShelters,
+                    onDetailClick = onDetailClick
                 )
-        },
-        label = "home_tab_content",
-    ) { tab ->
-        when (tab) {
-            0 -> HomeListTab(
-                isLoading = isLoadingShelters,
-                shelters = filteredShelters,
-                onDetailClick = onDetailClick
-            )
-            else -> HomeMapTab(
-                isLoading = isLoadingShelters,
-                shelters = shelters
-            )
+                else -> HomeMapTab(
+                    isLoading = isLoadingShelters,
+                    shelters = shelters
+                )
+            }
         }
     }
 }
@@ -211,6 +236,8 @@ private fun HomeListTab(
                 itemContent = { shelter, onClick ->
                     CardViewList(
                         name = shelter.name.orEmpty(),
+                        photoUri = shelter.profilePicture,
+                        placeholderIcon = Icons.Default.AccountCircle,
                         onClick = onClick
                     )
                 }
@@ -258,6 +285,8 @@ fun UserHomeScreenPreview() {
             ),
             onQueryChange = {},
             onTabSelected = {},
+            onRefresh = {},
+            onRefreshErrorDismiss = {},
             onDetailClick = {}
         )
     }

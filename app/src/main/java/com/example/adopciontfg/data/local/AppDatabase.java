@@ -1,6 +1,7 @@
 package com.example.adopciontfg.data.local;
 
 import android.content.Context;
+import android.database.Cursor;
 
 import androidx.room.Database;
 import androidx.room.Room;
@@ -26,7 +27,7 @@ import com.example.adopciontfg.data.local.entity.UserEntity;
                 AnimalEntity.class,
                 SponsorshipEntity.class
         },
-        version = 5,
+        version = 6,
         exportSchema = false
 )
 @TypeConverters(Converters.class)
@@ -50,13 +51,52 @@ public abstract class AppDatabase extends RoomDatabase {
     private static final Migration MIGRATION_4_5 = new Migration(4, 5) {
         @Override
         public void migrate(SupportSQLiteDatabase database) {
-            database.execSQL("CREATE TABLE IF NOT EXISTS `animals_new` (`id` TEXT NOT NULL, `name` TEXT, `sex` INTEGER NOT NULL, `mainPhoto` TEXT, `photos` TEXT, `birthDate` INTEGER NOT NULL, `description` TEXT, `forAdoption` INTEGER NOT NULL, `species` TEXT, `characteristics` TEXT, `shelterId` TEXT NOT NULL, PRIMARY KEY(`id`))");
-            database.execSQL("INSERT INTO `animals_new` (`id`, `name`, `sex`, `mainPhoto`, `photos`, `birthDate`, `description`, `forAdoption`, `species`, `characteristics`, `shelterId`) SELECT `id`, `name`, `sex`, `mainPhoto`, `photos`, `birthDate`, `description`, 1, `species`, `characteristics`, `shelterId` FROM `animals`");
-            database.execSQL("DROP TABLE `animals`");
-            database.execSQL("ALTER TABLE `animals_new` RENAME TO `animals`");
+            recreateAnimalsTable(database);
             database.execSQL("CREATE INDEX IF NOT EXISTS `index_sponsorships_animalId` ON `sponsorships` (`animalId`)");
         }
     };
+
+    private static final Migration MIGRATION_5_6 = new Migration(5, 6) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+            recreateAnimalsTable(database);
+            database.execSQL("CREATE INDEX IF NOT EXISTS `index_sponsorships_animalId` ON `sponsorships` (`animalId`)");
+        }
+    };
+
+    private static void recreateAnimalsTable(SupportSQLiteDatabase database) {
+        String forAdoptionValue = resolveForAdoptionValue(database);
+
+        database.execSQL("DROP TABLE IF EXISTS `animals_new`");
+        database.execSQL("CREATE TABLE `animals_new` (`id` TEXT NOT NULL, `name` TEXT, `sex` INTEGER NOT NULL, `mainPhoto` TEXT, `photos` TEXT, `birthDate` INTEGER NOT NULL, `description` TEXT, `forAdoption` INTEGER NOT NULL, `species` TEXT, `characteristics` TEXT, `shelterId` TEXT NOT NULL, PRIMARY KEY(`id`))");
+        database.execSQL("INSERT INTO `animals_new` (`id`, `name`, `sex`, `mainPhoto`, `photos`, `birthDate`, `description`, `forAdoption`, `species`, `characteristics`, `shelterId`) SELECT `id`, `name`, `sex`, `mainPhoto`, `photos`, `birthDate`, `description`, " + forAdoptionValue + ", `species`, `characteristics`, `shelterId` FROM `animals`");
+        database.execSQL("DROP TABLE `animals`");
+        database.execSQL("ALTER TABLE `animals_new` RENAME TO `animals`");
+    }
+
+    private static String resolveForAdoptionValue(SupportSQLiteDatabase database) {
+        if (hasColumn(database, "animals", "forAdoption")) {
+            return "`forAdoption`";
+        }
+
+        if (hasColumn(database, "animals", "status")) {
+            return "CASE WHEN LOWER(`status`) IN ('adoptado', 'adopted', 'no disponible', 'not available') THEN 0 ELSE 1 END";
+        }
+
+        return "1";
+    }
+
+    private static boolean hasColumn(SupportSQLiteDatabase database, String tableName, String columnName) {
+        try (Cursor cursor = database.query("PRAGMA table_info(`" + tableName + "`)")) {
+            int nameIndex = cursor.getColumnIndex("name");
+            while (cursor.moveToNext()) {
+                if (nameIndex >= 0 && columnName.equals(cursor.getString(nameIndex))) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     public static AppDatabase getInstance(Context context) {
 
@@ -77,7 +117,7 @@ public abstract class AppDatabase extends RoomDatabase {
                             context.getApplicationContext(),
                             AppDatabase.class,
                             "adopcion_tfg_db"
-                    ).addMigrations(MIGRATION_3_4, MIGRATION_4_5).build();
+                    ).addMigrations(MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6).build();
                 }
             }
         }

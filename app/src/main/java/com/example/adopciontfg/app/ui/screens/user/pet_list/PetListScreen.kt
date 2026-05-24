@@ -19,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 
 import androidx.compose.runtime.Composable
 
@@ -34,6 +35,8 @@ import com.example.adopciontfg.R
 import com.example.adopciontfg.app.ui.components.skeleton.ShelterCardListSkeleton
 
 import com.example.adopciontfg.app.ui.screens.components.CardViewList
+
+import com.example.adopciontfg.app.ui.screens.components.DataRefreshErrorDialog
 
 import com.example.adopciontfg.app.ui.screens.components.ListCardView
 
@@ -53,6 +56,7 @@ import com.example.adopciontfg.ui.theme.subtleDivider
 
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 
 fun PetListScreen(
@@ -60,6 +64,10 @@ fun PetListScreen(
     uiState: PetListUiState,
 
     onQueryChange: (String) -> Unit,
+
+    onRefresh: () -> Unit,
+
+    onRefreshErrorDismiss: () -> Unit,
 
     onDetailClick: (String) -> Unit,
 
@@ -83,19 +91,33 @@ fun PetListScreen(
 
     ) { innerPadding ->
 
-        PetContent(
+        PullToRefreshBox(
+            isRefreshing = uiState.isRefreshing,
+            onRefresh = onRefresh,
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize(),
+        ) {
+            PetContent(
 
-            modifier = Modifier.padding(innerPadding),
+                modifier = Modifier.fillMaxSize(),
 
-            isLoading = uiState.isLoading,
+                isLoading = uiState.isLoading,
 
-            animals = uiState.filteredAnimals,
+                animals = uiState.filteredAnimals,
 
-            onDetailClick = onDetailClick,
+                onDetailClick = onDetailClick,
 
-        )
+            )
+        }
 
     }
+
+    DataRefreshErrorDialog(
+        error = uiState.refreshError,
+        onDismiss = onRefreshErrorDismiss,
+        onRetry = onRefresh,
+    )
 
 }
 
@@ -150,6 +172,7 @@ fun PetContent(
                         name = animal.name.orEmpty(),
 
                         subtitle = animalListSubtitle(animal),
+                        photoUri = animal.mainPhoto,
 
                         onClick = onClick,
 
@@ -240,6 +263,10 @@ fun PetListScreenPreview() {
 
             onQueryChange = {},
 
+            onRefresh = {},
+
+            onRefreshErrorDismiss = {},
+
             onDetailClick = {},
 
         )
@@ -292,6 +319,10 @@ fun PetListScreenLoadingPreview() {
             uiState = PetListUiState(isLoading = true),
 
             onQueryChange = {},
+
+            onRefresh = {},
+
+            onRefreshErrorDismiss = {},
 
             onDetailClick = {},
 

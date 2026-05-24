@@ -24,6 +24,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -38,6 +40,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.adopciontfg.R
 import com.example.adopciontfg.app.ui.components.skeleton.ShelterCardListSkeleton
 import com.example.adopciontfg.app.ui.screens.components.AppTopAppBar
+import com.example.adopciontfg.app.ui.screens.components.DataRefreshErrorDialog
 import com.example.adopciontfg.app.ui.screens.shelter.animals.components.ShelterAnimalCard
 import com.example.adopciontfg.data.local.entity.AnimalEntity
 import com.example.adopciontfg.model.Characteristic
@@ -58,15 +61,20 @@ fun ShelterAnimalsScreen(
     ShelterAnimalsContent(
         uiState = uiState,
         onQueryChange = viewModel::onQueryChange,
+        onRefresh = viewModel::refreshAnimals,
+        onRefreshErrorDismiss = viewModel::dismissRefreshError,
         onAddAnimalClick = onAddAnimalClick,
         onEditAnimalClick = onEditAnimalClick,
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ShelterAnimalsContent(
     uiState: ShelterAnimalsUiState,
     onQueryChange: (String) -> Unit,
+    onRefresh: () -> Unit,
+    onRefreshErrorDismiss: () -> Unit,
     onAddAnimalClick: () -> Unit,
     onEditAnimalClick: (String) -> Unit,
 ) {
@@ -87,57 +95,69 @@ private fun ShelterAnimalsContent(
             }
         },
     ) { innerPadding ->
-        Column(
+        PullToRefreshBox(
+            isRefreshing = uiState.isRefreshing,
+            onRefresh = onRefresh,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
         ) {
-            ShelterAnimalsOverview(
-                total = uiState.animals.size,
-                query = uiState.query,
-                onQueryChange = onQueryChange,
-                modifier = Modifier.padding(
-                    horizontal = Dimens.screenPadding,
-                    vertical = Dimens.spacingSm,
-                ),
-            )
+            Column(
+                modifier = Modifier.fillMaxSize(),
+            ) {
+                ShelterAnimalsOverview(
+                    total = uiState.animals.size,
+                    query = uiState.query,
+                    onQueryChange = onQueryChange,
+                    modifier = Modifier.padding(
+                        horizontal = Dimens.screenPadding,
+                        vertical = Dimens.spacingSm,
+                    ),
+                )
 
-            Box(modifier = Modifier.fillMaxSize()) {
-                when {
-                    uiState.shelterId == null -> {
-                        EmptyMessage(
-                            text = stringResource(R.string.shelter_sin_sesion),
-                            modifier = Modifier.align(Alignment.Center),
-                        )
-                    }
-                    uiState.isLoading -> ShelterCardListSkeleton()
-                    uiState.filteredAnimals.isEmpty() -> {
-                        EmptyMessage(
-                            text = if (uiState.animals.isEmpty()) {
-                                stringResource(R.string.shelter_sin_animales)
-                            } else {
-                                stringResource(R.string.sin_resultados_animales)
-                            },
-                            modifier = Modifier.align(Alignment.Center),
-                        )
-                    }
-                    else -> {
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
-                            verticalArrangement = Arrangement.spacedBy(Dimens.listItemSpacing),
-                            contentPadding = PaddingValues(bottom = 88.dp),
-                        ) {
-                            items(uiState.filteredAnimals, key = { it.id }) { animal ->
-                                ShelterAnimalCard(
-                                    animal = animal,
-                                    onClick = { onEditAnimalClick(animal.id) },
-                                )
+                Box(modifier = Modifier.fillMaxSize()) {
+                    when {
+                        uiState.shelterId == null -> {
+                            EmptyMessage(
+                                text = stringResource(R.string.shelter_sin_sesion),
+                                modifier = Modifier.align(Alignment.Center),
+                            )
+                        }
+                        uiState.isLoading -> ShelterCardListSkeleton()
+                        uiState.filteredAnimals.isEmpty() -> {
+                            EmptyMessage(
+                                text = if (uiState.animals.isEmpty()) {
+                                    stringResource(R.string.shelter_sin_animales)
+                                } else {
+                                    stringResource(R.string.sin_resultados_animales)
+                                },
+                                modifier = Modifier.align(Alignment.Center),
+                            )
+                        }
+                        else -> {
+                            LazyColumn(
+                                modifier = Modifier.fillMaxSize(),
+                                verticalArrangement = Arrangement.spacedBy(Dimens.listItemSpacing),
+                                contentPadding = PaddingValues(bottom = 88.dp),
+                            ) {
+                                items(uiState.filteredAnimals, key = { it.id }) { animal ->
+                                    ShelterAnimalCard(
+                                        animal = animal,
+                                        onClick = { onEditAnimalClick(animal.id) },
+                                    )
+                                }
                             }
                         }
                     }
                 }
             }
         }
+
+        DataRefreshErrorDialog(
+            error = uiState.refreshError,
+            onDismiss = onRefreshErrorDismiss,
+            onRetry = onRefresh,
+        )
     }
 }
 
@@ -265,6 +285,8 @@ private fun ShelterAnimalsScreenPreview() {
                 filteredAnimals = animals,
             ),
             onQueryChange = {},
+            onRefresh = {},
+            onRefreshErrorDismiss = {},
             onAddAnimalClick = {},
             onEditAnimalClick = {},
         )

@@ -3,6 +3,9 @@ package com.example.adopciontfg.app.ui.screens.user.pet_list
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
+import com.example.adopciontfg.app.ui.state.DataRefreshError
+import com.example.adopciontfg.app.ui.state.awaitDataRefresh
+import com.example.adopciontfg.app.ui.state.toDataRefreshError
 import com.example.adopciontfg.data.local.entity.AnimalEntity
 import com.example.adopciontfg.data.repository.AnimalRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,6 +19,8 @@ import kotlinx.coroutines.launch
 data class PetListUiState(
     val query: String = "",
     val isLoading: Boolean = true,
+    val isRefreshing: Boolean = false,
+    val refreshError: DataRefreshError? = null,
     val animals: List<AnimalEntity> = emptyList(),
     val filteredAnimals: List<AnimalEntity> = emptyList(),
 )
@@ -40,6 +45,7 @@ class PetListViewModel @Inject constructor(
                 }
             }
         }
+        refreshAnimals(showRefreshIndicator = false)
     }
 
     fun onQueryChange(query: String) {
@@ -59,4 +65,34 @@ class PetListViewModel @Inject constructor(
                 animal.name.orEmpty().contains(query, ignoreCase = true)
             }
         }
+
+    fun refreshAnimals() {
+        refreshAnimals(showRefreshIndicator = true)
+    }
+
+    private fun refreshAnimals(showRefreshIndicator: Boolean) {
+        if (_uiState.value.isRefreshing) return
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isRefreshing = showRefreshIndicator, refreshError = null) }
+            try {
+                awaitDataRefresh { onSuccess, onFailure ->
+                    animalRepository.refreshAllAnimals(
+                        { onSuccess() },
+                        { exception -> onFailure(exception) },
+                    )
+                }
+            } catch (exception: Exception) {
+                _uiState.update { it.copy(refreshError = exception.toDataRefreshError()) }
+            } finally {
+                if (showRefreshIndicator) {
+                    _uiState.update { it.copy(isRefreshing = false) }
+                }
+            }
+        }
+    }
+
+    fun dismissRefreshError() {
+        _uiState.update { it.copy(refreshError = null) }
+    }
 }

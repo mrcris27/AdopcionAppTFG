@@ -1,5 +1,8 @@
 package com.example.adopciontfg.app.ui.screens.user.pet_detail
 
+import android.graphics.BitmapFactory
+import android.net.Uri
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,6 +20,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Photo
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -32,7 +36,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -41,6 +47,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -52,8 +62,10 @@ import com.example.adopciontfg.app.ui.components.skeleton.PetDetailTopBarTitleSk
 import com.example.adopciontfg.app.ui.screens.components.AppOutlinedButton
 import com.example.adopciontfg.app.ui.screens.components.AppSecondaryButton
 import com.example.adopciontfg.app.ui.screens.components.AppSectionTitle
+import com.example.adopciontfg.app.ui.screens.components.DataRefreshErrorDialog
 import com.example.adopciontfg.app.ui.screens.components.characteristicLabel
 import com.example.adopciontfg.app.ui.screens.components.speciesLabel
+import com.example.adopciontfg.app.ui.state.DataRefreshError
 import com.example.adopciontfg.data.local.entity.AnimalEntity
 import com.example.adopciontfg.data.local.entity.ageInYears
 import com.example.adopciontfg.data.local.entity.displayPhotos
@@ -64,6 +76,8 @@ import com.example.adopciontfg.ui.theme.Dimens
 import com.example.adopciontfg.ui.theme.elevatedSurface
 import com.example.adopciontfg.ui.theme.subtleDivider
 import kotlin.math.roundToInt
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -72,6 +86,10 @@ fun PetDetailScreen(
     onBackClick: () -> Unit,
     onAdoptClick: () -> Unit,
     isLoading: Boolean = false,
+    isRefreshing: Boolean = false,
+    refreshError: DataRefreshError? = null,
+    onRefresh: () -> Unit = {},
+    onRefreshErrorDismiss: () -> Unit = {},
 ) {
     var showDonationDialog by remember { mutableStateOf(false) }
     var donationAmount by remember { mutableFloatStateOf(20f) }
@@ -125,116 +143,130 @@ fun PetDetailScreen(
             )
         },
         bottomBar = {
-            if (isLoading) {
-                PetDetailBottomBarSkeleton()
-            } else {
-                Surface(
-                    shadowElevation = 8.dp,
-                    color = MaterialTheme.colorScheme.elevatedSurface(),
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = Dimens.spacingSm, vertical = Dimens.cardPadding),
-                        horizontalArrangement = Arrangement.spacedBy(Dimens.spacingMd)
+            when {
+                isLoading -> PetDetailBottomBarSkeleton()
+                animal != null -> {
+                    Surface(
+                        shadowElevation = 8.dp,
+                        color = MaterialTheme.colorScheme.elevatedSurface(),
                     ) {
-                        AppSecondaryButton(
-                            text = stringResource(R.string.adoptar_ahora),
-                            onClick = onAdoptClick,
-                            modifier = Modifier.weight(1f)
-                        )
-                        AppOutlinedButton(
-                            text = stringResource(R.string.donar),
-                            onClick = { showDonationDialog = true },
-                            modifier = Modifier.weight(1f)
-                        )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = Dimens.spacingSm, vertical = Dimens.cardPadding),
+                            horizontalArrangement = Arrangement.spacedBy(Dimens.spacingMd)
+                        ) {
+                            if (animal.isForAdoption) {
+                                AppSecondaryButton(
+                                    text = stringResource(R.string.adoptar_ahora),
+                                    onClick = onAdoptClick,
+                                    modifier = Modifier.weight(1f)
+                                )
+                            }
+                            AppOutlinedButton(
+                                text = stringResource(R.string.donar),
+                                onClick = { showDonationDialog = true },
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
                     }
                 }
             }
         }
     ) { padding ->
-        if (isLoading || animal == null) {
-            PetDetailContentSkeleton(
-                modifier = Modifier
-                    .padding(padding)
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background)
-            )
-        } else {
-            val photos = animal.displayPhotos()
-            LazyColumn(
-                modifier = Modifier
-                    .padding(padding)
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(Dimens.spacingLg),
-                contentPadding = PaddingValues(horizontal = Dimens.spacingSm, vertical = Dimens.screenPadding)
-            ) {
-                item {
-                    Card(
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.elevatedSurface()
-                        ),
-                        shape = MaterialTheme.shapes.large,
-                        elevation = CardDefaults.cardElevation(2.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(Dimens.cardPadding),
-                            verticalArrangement = Arrangement.spacedBy(Dimens.spacingMd)
+        PullToRefreshBox(
+            isRefreshing = isRefreshing,
+            onRefresh = onRefresh,
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxSize(),
+        ) {
+            if (isLoading || animal == null) {
+                PetDetailContentSkeleton(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.background)
+                )
+            } else {
+                val photos = animal.displayPhotos()
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(Dimens.spacingLg),
+                    contentPadding = PaddingValues(horizontal = Dimens.spacingSm, vertical = Dimens.screenPadding)
+                ) {
+                    item {
+                        Card(
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.elevatedSurface()
+                            ),
+                            shape = MaterialTheme.shapes.large,
+                            elevation = CardDefaults.cardElevation(2.dp),
+                            modifier = Modifier.fillMaxWidth()
                         ) {
-                            val animalSpecies = animal.species
-                            InfoRow(stringResource(R.string.nombre), animal.name.orEmpty())
-                            HorizontalDivider(
-                                color = MaterialTheme.colorScheme.subtleDivider()
-                            )
-                            InfoRow(
-                                stringResource(R.string.edad),
-                                stringResource(R.string.animal_age_years, animal.ageInYears())
-                            )
-                            InfoRow(
-                                stringResource(R.string.especie),
-                                if (animalSpecies != null) {
-                                    speciesLabel(animalSpecies)
-                                } else {
-                                    ""
-                                }
-                            )
-                            InfoRow(
-                                stringResource(R.string.genero),
-                                if (animal.isSex) {
-                                    stringResource(R.string.hembra)
-                                } else {
-                                    stringResource(R.string.macho)
-                                }
-                            )
-                            if (!animal.characteristics.isNullOrEmpty()) {
-                                val characteristicLabels = mutableListOf<String>()
-                                for (characteristic in animal.characteristics) {
-                                    characteristicLabels += characteristicLabel(characteristic)
-                                }
+                            Column(
+                                modifier = Modifier.padding(Dimens.cardPadding),
+                                verticalArrangement = Arrangement.spacedBy(Dimens.spacingMd)
+                            ) {
+                                val animalSpecies = animal.species
+                                InfoRow(stringResource(R.string.nombre), animal.name.orEmpty())
+                                HorizontalDivider(
+                                    color = MaterialTheme.colorScheme.subtleDivider()
+                                )
                                 InfoRow(
-                                    stringResource(R.string.caracteristicas),
-                                    characteristicLabels.joinToString(", ")
+                                    stringResource(R.string.edad),
+                                    stringResource(R.string.animal_age_years, animal.ageInYears())
+                                )
+                                InfoRow(
+                                    stringResource(R.string.especie),
+                                    if (animalSpecies != null) {
+                                        speciesLabel(animalSpecies)
+                                    } else {
+                                        ""
+                                    }
+                                )
+                                InfoRow(
+                                    stringResource(R.string.genero),
+                                    if (animal.isSex) {
+                                        stringResource(R.string.hembra)
+                                    } else {
+                                        stringResource(R.string.macho)
+                                    }
+                                )
+                                if (!animal.characteristics.isNullOrEmpty()) {
+                                    val characteristicLabels = mutableListOf<String>()
+                                    for (characteristic in animal.characteristics) {
+                                        characteristicLabels += characteristicLabel(characteristic)
+                                    }
+                                    InfoRow(
+                                        stringResource(R.string.caracteristicas),
+                                        characteristicLabels.joinToString(", ")
+                                    )
+                                }
+                                Spacer(modifier = Modifier.height(Dimens.spacingXs))
+                                AppSectionTitle(text = stringResource(R.string.sobre_esta_mascota))
+                                Text(
+                                    text = animal.description?.takeIf { it.isNotBlank() }
+                                        ?: stringResource(R.string.mascota_descripcion_default),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
-                            Spacer(modifier = Modifier.height(Dimens.spacingXs))
-                            AppSectionTitle(text = stringResource(R.string.sobre_esta_mascota))
-                            Text(
-                                text = animal.description?.takeIf { it.isNotBlank() }
-                                    ?: stringResource(R.string.mascota_descripcion_default),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
                         }
                     }
-                }
 
-                item {
-                    PetPhotosCarousel(photos)
+                    item {
+                        PetPhotosCarousel(photos)
+                    }
                 }
             }
         }
     }
+
+    DataRefreshErrorDialog(
+        error = refreshError,
+        onDismiss = onRefreshErrorDismiss,
+        onRetry = onRefresh,
+    )
 }
 
 @Composable
@@ -340,21 +372,56 @@ private fun PetPhotosCarousel(photos: List<String>) {
                 horizontalArrangement = Arrangement.spacedBy(Dimens.spacingMd),
                 contentPadding = PaddingValues(vertical = Dimens.spacingXs)
             ) {
-                itemsIndexed(photos, key = { index, _ -> index }) { _, _ ->
-                    Box(
-                        modifier = Modifier
-                            .width(280.dp)
-                            .height(200.dp)
-                            .clip(MaterialTheme.shapes.large)
-                            .background(MaterialTheme.colorScheme.surfaceVariant),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "🐶",
-                            style = MaterialTheme.typography.displaySmall
-                        )
-                    }
+                itemsIndexed(photos, key = { index, _ -> index }) { _, photo ->
+                    PetPhotoItem(photoUri = photo)
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PetPhotoItem(photoUri: String) {
+    val imageBitmap by rememberPetPhotoBitmap(photoUri)
+
+    Box(
+        modifier = Modifier
+            .width(280.dp)
+            .height(200.dp)
+            .clip(MaterialTheme.shapes.large)
+            .background(MaterialTheme.colorScheme.surfaceVariant),
+        contentAlignment = Alignment.Center
+    ) {
+        if (imageBitmap != null) {
+            Image(
+                bitmap = imageBitmap!!,
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+        } else {
+            Icon(
+                imageVector = Icons.Default.Photo,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+@Composable
+private fun rememberPetPhotoBitmap(uriString: String): State<ImageBitmap?> {
+    val context = LocalContext.current
+    return androidx.compose.runtime.produceState<ImageBitmap?>(null, uriString, context) {
+        value = withContext(Dispatchers.IO) {
+            if (uriString.isBlank()) {
+                null
+            } else {
+                runCatching {
+                    context.contentResolver.openInputStream(Uri.parse(uriString))?.use { stream ->
+                        BitmapFactory.decodeStream(stream)?.asImageBitmap()
+                    }
+                }.getOrNull()
             }
         }
     }

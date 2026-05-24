@@ -20,7 +20,7 @@
     <string name="volver_inicio">Volver al inicio</string>
     <string name="registro">Registro</string>
     <string name="registro_subtitle">Elige cómo quieres usar la aplicación</string>
-    <string name="login">Login</string>6
+    <string name="login">Login</string>
     <string name="login_subtitle">Accede con tu correo y contraseña</string>
     <string name="login_empty_fields_error">Rellena el correo y la contraseña para continuar.</string>
     <string name="login_invalid_email_error">Introduce un correo electrónico válido.</string>
@@ -202,6 +202,9 @@
     <string name="error_desconocido">Error desconocido</string>
     <string name="pet_form_login_required">Inicia sesión como protectora para guardar.</string>
     <string name="animal_saved_successfully">Animal guardado correctamente</string>
+    <string name="error_refresh_title">No se pudieron actualizar los datos</string>
+    <string name="error_connection_refresh">Revisa tu conexión e inténtalo de nuevo.</string>
+    <string name="error_timeout_refresh">La actualización está tardando demasiado. Inténtalo de nuevo.</string>
 
     <string-array name="provincias_espana">
         <item>A Coruña</item>

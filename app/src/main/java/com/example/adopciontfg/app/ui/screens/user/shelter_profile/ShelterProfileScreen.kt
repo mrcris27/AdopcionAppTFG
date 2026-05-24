@@ -38,9 +38,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -62,11 +62,14 @@ import com.example.adopciontfg.app.ui.components.skeleton.ShelterCardListSkeleto
 import com.example.adopciontfg.app.ui.screens.components.AppSectionTitle
 import com.example.adopciontfg.app.ui.screens.components.AppTopAppBar
 import com.example.adopciontfg.app.ui.screens.components.CardViewList
+import com.example.adopciontfg.app.ui.screens.components.DataRefreshErrorDialog
 import com.example.adopciontfg.app.ui.screens.components.ListCardView
 import com.example.adopciontfg.app.ui.screens.components.SearchSection
+import com.example.adopciontfg.app.ui.screens.components.UriThumbnail
 import com.example.adopciontfg.app.ui.screens.components.animalListSubtitle
 import com.example.adopciontfg.app.ui.screens.components.characteristicLabel
 import com.example.adopciontfg.app.ui.screens.components.speciesLabel
+import com.example.adopciontfg.app.ui.state.DataRefreshError
 import com.example.adopciontfg.data.local.entity.AnimalEntity
 import com.example.adopciontfg.data.local.entity.ShelterEntity
 import com.example.adopciontfg.data.local.entity.listSubtitle
@@ -97,6 +100,10 @@ fun ShelterProfileScreen(
     onCharacteristicToggle: (Characteristic) -> Unit = {},
     onClearFilters: () -> Unit = {},
     isPetsLoading: Boolean = false,
+    isRefreshing: Boolean = false,
+    refreshError: DataRefreshError? = null,
+    onRefresh: () -> Unit = {},
+    onRefreshErrorDismiss: () -> Unit = {},
 ) {
     var shelterCardExpanded by remember { mutableStateOf(false) }
     var showFilters by remember { mutableStateOf(false) }
@@ -116,123 +123,119 @@ fun ShelterProfileScreen(
             )
         }
     ) { innerPadding ->
-        Column(
+        PullToRefreshBox(
+            isRefreshing = isRefreshing,
+            onRefresh = onRefresh,
             modifier = Modifier
                 .padding(innerPadding)
-                .fillMaxSize()
+                .fillMaxSize(),
         ) {
-            ElevatedCard(
-                onClick = { shelterCardExpanded = !shelterCardExpanded },
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = Dimens.spacingSm, vertical = Dimens.spacingSm)
-                    .animateContentSize(),
-                shape = MaterialTheme.shapes.large,
-                colors = CardDefaults.elevatedCardColors(
-                    containerColor = MaterialTheme.colorScheme.elevatedSurface()
-                ),
-                elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
+                    .fillMaxSize()
             ) {
-                Column(
+                ElevatedCard(
+                    onClick = { shelterCardExpanded = !shelterCardExpanded },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(Dimens.cardPadding)
+                        .padding(horizontal = Dimens.spacingSm, vertical = Dimens.spacingSm)
+                        .animateContentSize(),
+                    shape = MaterialTheme.shapes.large,
+                    colors = CardDefaults.elevatedCardColors(
+                        containerColor = MaterialTheme.colorScheme.elevatedSurface()
+                    ),
+                    elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(Dimens.cardPadding)
                     ) {
-                        Surface(
-                            modifier = Modifier.size(Dimens.avatarSize),
-                            shape = CircleShape,
-                            color = MaterialTheme.colorScheme.primaryContainer
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.AccountCircle,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(44.dp),
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
-                            }
+                            UriThumbnail(
+                                photoUri = shelter.profilePicture,
+                                placeholderIcon = Icons.Default.AccountCircle,
+                                shape = CircleShape,
+                                size = Dimens.avatarSize,
+                                iconSize = 44.dp,
+                            )
+
+                            Spacer(modifier = Modifier.width(Dimens.spacingMd))
+
+                            Text(
+                                text = shelter.name.orEmpty(),
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.SemiBold,
+                                modifier = Modifier.weight(1f)
+                            )
+
+                            Icon(
+                                imageVector = Icons.Default.ExpandMore,
+                                contentDescription = if (shelterCardExpanded) {
+                                    stringResource(R.string.ocultar_info_protectora)
+                                } else {
+                                    stringResource(R.string.mostrar_info_protectora)
+                                },
+                                modifier = Modifier.rotate(chevronRotation),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                         }
 
-                        Spacer(modifier = Modifier.width(Dimens.spacingMd))
-
-                        Text(
-                            text = shelter.name.orEmpty(),
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier.weight(1f)
-                        )
-
-                        Icon(
-                            imageVector = Icons.Default.ExpandMore,
-                            contentDescription = if (shelterCardExpanded) {
-                                stringResource(R.string.ocultar_info_protectora)
-                            } else {
-                                stringResource(R.string.mostrar_info_protectora)
-                            },
-                            modifier = Modifier.rotate(chevronRotation),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-
-                    if (shelterCardExpanded) {
-                        Spacer(modifier = Modifier.height(Dimens.spacingMd))
-                        HorizontalDivider(
-                            color = MaterialTheme.colorScheme.subtleDivider()
-                        )
-                        Spacer(modifier = Modifier.height(Dimens.spacingMd))
-
-                        val hasContactDetails = shelter.address.orEmpty().isNotBlank() ||
-                            shelter.cif.orEmpty().isNotBlank() ||
-                            shelter.email.orEmpty().isNotBlank() ||
-                            shelter.phone.orEmpty().isNotBlank()
-
-                        if (!hasContactDetails) {
-                            Text(
-                                text = stringResource(R.string.shelter_info_empty),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                        if (shelterCardExpanded) {
+                            Spacer(modifier = Modifier.height(Dimens.spacingMd))
+                            HorizontalDivider(
+                                color = MaterialTheme.colorScheme.subtleDivider()
                             )
-                        } else {
-                            if (shelter.address.orEmpty().isNotBlank()) {
+                            Spacer(modifier = Modifier.height(Dimens.spacingMd))
+
+                            val hasContactDetails = shelter.address.orEmpty().isNotBlank() ||
+                                shelter.cif.orEmpty().isNotBlank() ||
+                                shelter.email.orEmpty().isNotBlank() ||
+                                shelter.phone.orEmpty().isNotBlank()
+
+                            if (!hasContactDetails) {
                                 Text(
-                                    text = shelter.address.orEmpty(),
+                                    text = stringResource(R.string.shelter_info_empty),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
-                            }
-                            if (shelter.cif.orEmpty().isNotBlank()) {
-                                Spacer(modifier = Modifier.height(Dimens.spacingSm))
-                                Text(
-                                    text = stringResource(R.string.cif_format, shelter.cif.orEmpty()),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                            if (shelter.email.orEmpty().isNotBlank()) {
-                                Spacer(modifier = Modifier.height(Dimens.spacingSm))
-                                ContactActionText(
-                                    text = shelter.email.orEmpty(),
-                                    onClick = { openEmailApp(context, shelter.email.orEmpty()) },
-                                )
-                            }
-                            if (shelter.phone.orEmpty().isNotBlank()) {
-                                Spacer(modifier = Modifier.height(Dimens.spacingSm))
-                                ContactActionText(
-                                    text = shelter.phone.orEmpty(),
-                                    onClick = { openPhoneApp(context, shelter.phone.orEmpty()) },
-                                )
+                            } else {
+                                if (shelter.address.orEmpty().isNotBlank()) {
+                                    Text(
+                                        text = shelter.address.orEmpty(),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                                if (shelter.cif.orEmpty().isNotBlank()) {
+                                    Spacer(modifier = Modifier.height(Dimens.spacingSm))
+                                    Text(
+                                        text = stringResource(R.string.cif_format, shelter.cif.orEmpty()),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                                if (shelter.email.orEmpty().isNotBlank()) {
+                                    Spacer(modifier = Modifier.height(Dimens.spacingSm))
+                                    ContactActionText(
+                                        text = shelter.email.orEmpty(),
+                                        onClick = { openEmailApp(context, shelter.email.orEmpty()) },
+                                    )
+                                }
+                                if (shelter.phone.orEmpty().isNotBlank()) {
+                                    Spacer(modifier = Modifier.height(Dimens.spacingSm))
+                                    ContactActionText(
+                                        text = shelter.phone.orEmpty(),
+                                        onClick = { openPhoneApp(context, shelter.phone.orEmpty()) },
+                                    )
+                                }
                             }
                         }
                     }
                 }
-            }
 
             Row(
                 modifier = Modifier
@@ -310,6 +313,7 @@ fun ShelterProfileScreen(
                             CardViewList(
                                 name = animal.name.orEmpty(),
                                 subtitle = animalListSubtitle(animal),
+                                photoUri = animal.mainPhoto,
                                 onClick = onClick,
                             )
                         },
@@ -318,6 +322,13 @@ fun ShelterProfileScreen(
             }
         }
     }
+    }
+
+    DataRefreshErrorDialog(
+        error = refreshError,
+        onDismiss = onRefreshErrorDismiss,
+        onRetry = onRefresh,
+    )
 
     if (showFilters) {
         AnimalFiltersBottomSheet(

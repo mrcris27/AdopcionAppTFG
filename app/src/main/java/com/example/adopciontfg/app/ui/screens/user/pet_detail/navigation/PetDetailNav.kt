@@ -61,11 +61,28 @@ private fun PetDetailRouteContent(
             onBackClick = onBackClick,
             onAdoptClick = onAdoptClick,
             isLoading = true,
+            isRefreshing = uiState.isRefreshing,
+            refreshError = uiState.refreshError,
+            onRefresh = viewModel::refreshAnimal,
+            onRefreshErrorDismiss = viewModel::dismissRefreshError,
         )
         animal != null -> PetDetailScreen(
             animal = animal,
             onBackClick = onBackClick,
             onAdoptClick = onAdoptClick,
+            isRefreshing = uiState.isRefreshing,
+            refreshError = uiState.refreshError,
+            onRefresh = viewModel::refreshAnimal,
+            onRefreshErrorDismiss = viewModel::dismissRefreshError,
+        )
+        else -> PetDetailScreen(
+            animal = null,
+            onBackClick = onBackClick,
+            onAdoptClick = onAdoptClick,
+            isRefreshing = uiState.isRefreshing,
+            refreshError = uiState.refreshError,
+            onRefresh = viewModel::refreshAnimal,
+            onRefreshErrorDismiss = viewModel::dismissRefreshError,
         )
     }
 }

@@ -7,7 +7,10 @@ import androidx.lifecycle.LiveData;
 import com.example.adopciontfg.data.local.AppDatabase;
 import com.example.adopciontfg.data.local.dao.ShelterDao;
 import com.example.adopciontfg.data.local.entity.ShelterEntity;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Source;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +53,14 @@ public class ShelterRepository {
         return shelterDao.getSheltersByName(name);
     }
 
+    public void refreshAllShelters(OnSuccessListener<Void> onSuccess, OnFailureListener onFailure) {
+        syncSheltersFromFirebase(onSuccess, onFailure);
+    }
+
+    public void refreshShelterById(String id, OnSuccessListener<Void> onSuccess, OnFailureListener onFailure) {
+        syncShelterByIdFromFirebase(id, onSuccess, onFailure);
+    }
+
 
     // ------------ Actualiza/Inserta una protectora en firebase ---------------
     // ---- .set() lo utiliza firebase tanto para actualizar como para insertar  ----
@@ -66,8 +77,12 @@ public class ShelterRepository {
 
     // -------------- Sincronización desde Firebase -----------------
     private void syncSheltersFromFirebase() {
+        syncSheltersFromFirebase(unused -> {}, error -> {});
+    }
+
+    private void syncSheltersFromFirebase(OnSuccessListener<Void> onSuccess, OnFailureListener onFailure) {
         firestore.collection("shelters")  // 1. Ve a la colección
-                .get()                         // 2. Pide todos los documentos
+                .get(Source.SERVER)             // 2. Pide todos los documentos al servidor
                 .addOnSuccessListener(querySnapshot -> {  // 3. Cuando responde...
 
                     List<ShelterEntity> shelters = querySnapshot.toObjects(ShelterEntity.class); // 4. Convierte a objetos Java
@@ -83,8 +98,28 @@ public class ShelterRepository {
                         } else {
                             shelterDao.deleteSheltersNotIn(shelterIds);
                         }
+                        onSuccess.onSuccess(null);
                     });
-                });
+                })
+                .addOnFailureListener(onFailure);
+    }
+
+    private void syncShelterByIdFromFirebase(String id, OnSuccessListener<Void> onSuccess, OnFailureListener onFailure) {
+        firestore.collection(COLLECTION)
+                .document(id)
+                .get(Source.SERVER)
+                .addOnSuccessListener(documentSnapshot -> {
+                    ShelterEntity shelter = documentSnapshot.toObject(ShelterEntity.class);
+                    if (shelter == null) {
+                        onSuccess.onSuccess(null);
+                        return;
+                    }
+                    executor.execute(() -> {
+                        shelterDao.insertShelter(shelter);
+                        onSuccess.onSuccess(null);
+                    });
+                })
+                .addOnFailureListener(onFailure);
     }
 
 

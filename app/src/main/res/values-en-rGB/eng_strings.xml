@@ -22,6 +22,11 @@
     <string name="registro_subtitle">Choose how you want to use the app</string>
     <string name="login">Log in</string>
     <string name="login_subtitle">Access with your email and password</string>
+    <string name="login_empty_fields_error">Enter your email and password to continue.</string>
+    <string name="login_invalid_email_error">Enter a valid email address.</string>
+    <string name="login_invalid_credentials_error">Incorrect username or password.</string>
+    <string name="auth_generic_error">The operation could not be completed.</string>
+    <string name="firebase_auth_configuration_error">Firebase Authentication is not configured correctly. Enable Email/Password in Firebase Console and check the project API key.</string>
     <string name="registro_usuario">User registration</string>
     <string name="registro_protectora">Shelter registration</string>
 
@@ -42,6 +47,9 @@
     <string name="biografia"> Biography </string>
     <string name="foto_perfil"> Select profile photo </string>
     <string name="registrar"> Register </string>
+    <string name="registro_email_already_in_use_error">An account with that email address already exists.</string>
+    <string name="registro_password_min_length_error">The password must be at least 6 characters long.</string>
+    <string name="registro_passwords_do_not_match_error">The passwords do not match.</string>
 
     <string name="registro_animal">Register animal</string>
     <string name="datos_basicos">Basic details</string>
@@ -194,6 +202,9 @@
     <string name="error_desconocido">Unknown error</string>
     <string name="pet_form_login_required">Log in as a shelter to save.</string>
     <string name="animal_saved_successfully">Animal saved successfully</string>
+    <string name="error_refresh_title">Could not refresh data</string>
+    <string name="error_connection_refresh">Check your connection and try again.</string>
+    <string name="error_timeout_refresh">The refresh is taking too long. Try again.</string>
 
     <string-array name="provincias_espana">
         <item>A Coruña</item>

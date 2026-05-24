@@ -4,6 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import com.example.adopciontfg.BuildConfig
+import com.example.adopciontfg.app.ui.state.DataRefreshError
+import com.example.adopciontfg.app.ui.state.awaitDataRefresh
+import com.example.adopciontfg.app.ui.state.toDataRefreshError
 import com.example.adopciontfg.data.local.entity.AnimalEntity
 import com.example.adopciontfg.data.repository.AnimalRepository
 import com.example.adopciontfg.data.sampleAnimals
@@ -23,6 +26,8 @@ data class ShelterAnimalsUiState(
     val shelterName: String = "",
     val adoptionFormUrl: String = "",
     val isLoading: Boolean = true,
+    val isRefreshing: Boolean = false,
+    val refreshError: DataRefreshError? = null,
     val query: String = "",
     val animals: List<AnimalEntity> = emptyList(),
     val filteredAnimals: List<AnimalEntity> = emptyList(),
@@ -66,6 +71,7 @@ class ShelterAnimalsViewModel @Inject constructor(
                     }
                 }
             }
+            refreshAnimals(showRefreshIndicator = false)
         } else {
             _uiState.update { it.copy(isLoading = false) }
         }
@@ -89,6 +95,38 @@ class ShelterAnimalsViewModel @Inject constructor(
                 query.isBlank() || animal.name.orEmpty().contains(query, ignoreCase = true)
             }
             .sortedBy { it.name.orEmpty() }
+    }
+
+    fun refreshAnimals() {
+        refreshAnimals(showRefreshIndicator = true)
+    }
+
+    private fun refreshAnimals(showRefreshIndicator: Boolean) {
+        val shelterId = _uiState.value.shelterId ?: return
+        if (_uiState.value.isRefreshing) return
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isRefreshing = showRefreshIndicator, refreshError = null) }
+            try {
+                awaitDataRefresh { onSuccess, onFailure ->
+                    animalRepository.refreshAnimalsByShelter(
+                        shelterId,
+                        { onSuccess() },
+                        { exception -> onFailure(exception) },
+                    )
+                }
+            } catch (exception: Exception) {
+                _uiState.update { it.copy(refreshError = exception.toDataRefreshError()) }
+            } finally {
+                if (showRefreshIndicator) {
+                    _uiState.update { it.copy(isRefreshing = false) }
+                }
+            }
+        }
+    }
+
+    fun dismissRefreshError() {
+        _uiState.update { it.copy(refreshError = null) }
     }
 
     private fun debugSampleAnimalsFor(shelterId: String): List<AnimalEntity> {
