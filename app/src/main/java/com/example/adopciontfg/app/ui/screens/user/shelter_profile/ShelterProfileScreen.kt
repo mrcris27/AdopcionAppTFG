@@ -1,7 +1,13 @@
 package com.example.adopciontfg.app.ui.screens.user.shelter_profile
 
+import android.content.ActivityNotFoundException
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,8 +50,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.adopciontfg.R
@@ -93,6 +102,7 @@ fun ShelterProfileScreen(
 ) {
     var shelterCardExpanded by remember { mutableStateOf(false) }
     var showFilters by remember { mutableStateOf(false) }
+    val context = LocalContext.current
     val filterSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val chevronRotation by animateFloatAsState(
         targetValue = if (shelterCardExpanded) 180f else 0f,
@@ -209,18 +219,16 @@ fun ShelterProfileScreen(
                             }
                             if (shelter.email.orEmpty().isNotBlank()) {
                                 Spacer(modifier = Modifier.height(Dimens.spacingSm))
-                                Text(
+                                ContactActionText(
                                     text = shelter.email.orEmpty(),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    onClick = { openEmailApp(context, shelter.email.orEmpty()) },
                                 )
                             }
                             if (shelter.phone.orEmpty().isNotBlank()) {
                                 Spacer(modifier = Modifier.height(Dimens.spacingSm))
-                                Text(
+                                ContactActionText(
                                     text = shelter.phone.orEmpty(),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    onClick = { openPhoneApp(context, shelter.phone.orEmpty()) },
                                 )
                             }
                         }
@@ -327,6 +335,60 @@ fun ShelterProfileScreen(
         )
     }
 }
+
+@Composable
+private fun ContactActionText(
+    text: String,
+    onClick: () -> Unit,
+) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.primary,
+        textDecoration = TextDecoration.Underline,
+        modifier = Modifier.clickable(
+            role = Role.Button,
+            onClick = onClick,
+        )
+    )
+}
+
+private fun openPhoneApp(context: Context, phone: String) {
+    openExternalApp(
+        context = context,
+        intent = Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", phone, null)),
+        errorMessage = context.getString(R.string.no_phone_app_available),
+    )
+}
+
+private fun openEmailApp(context: Context, email: String) {
+    val emailUri = Uri.fromParts("mailto", email, null)
+    val gmailIntent = Intent(Intent.ACTION_SENDTO, emailUri).setPackage(GMAIL_PACKAGE)
+
+    try {
+        context.startActivity(gmailIntent)
+    } catch (_: ActivityNotFoundException) {
+        openExternalApp(
+            context = context,
+            intent = Intent(Intent.ACTION_SENDTO, emailUri),
+            errorMessage = context.getString(R.string.no_email_app_available),
+        )
+    }
+}
+
+private fun openExternalApp(
+    context: Context,
+    intent: Intent,
+    errorMessage: String,
+) {
+    try {
+        context.startActivity(intent)
+    } catch (_: ActivityNotFoundException) {
+        Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
+    }
+}
+
+private const val GMAIL_PACKAGE = "com.google.android.gm"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

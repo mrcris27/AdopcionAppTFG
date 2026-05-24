@@ -4,9 +4,11 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
+import com.example.adopciontfg.BuildConfig
 import com.example.adopciontfg.R
 import com.example.adopciontfg.data.local.entity.AnimalEntity
 import com.example.adopciontfg.data.repository.AnimalRepository
+import com.example.adopciontfg.data.sampleAnimals
 import com.example.adopciontfg.model.Characteristic
 import com.example.adopciontfg.model.Species
 import com.google.firebase.auth.FirebaseAuth
@@ -60,24 +62,33 @@ class ShelterPetFormViewModel @Inject constructor(
     private fun loadAnimalFromRepo(id: String) {
         viewModelScope.launch {
             animalRepository.getAnimalById(id).asFlow().collect { entity ->
-                if (entity == null) return@collect
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        name = entity.name.orEmpty(),
-                        isFemale = entity.isSex,
-                        mainPhotoUri = entity.mainPhoto?.takeIf { uri -> uri.isNotBlank() }?.let(Uri::parse),
-                        galleryUris = entity.photos.orEmpty()
-                            .filter { photo -> photo.isNotBlank() }
-                            .map(Uri::parse),
-                        birthDateMillis = entity.birthDate,
-                        description = entity.description.orEmpty(),
-                        species = entity.species,
-                        selectedCharacteristics = entity.characteristics.orEmpty().toSet(),
-                    )
-                }
+                val animal = entity ?: debugSampleAnimal(id) ?: return@collect
+                loadAnimalIntoState(animal)
             }
         }
+    }
+
+    private fun loadAnimalIntoState(entity: AnimalEntity) {
+        _uiState.update {
+            it.copy(
+                isLoading = false,
+                name = entity.name.orEmpty(),
+                isFemale = entity.isSex,
+                mainPhotoUri = entity.mainPhoto?.takeIf { uri -> uri.isNotBlank() }?.let(Uri::parse),
+                galleryUris = entity.photos.orEmpty()
+                    .filter { photo -> photo.isNotBlank() }
+                    .map(Uri::parse),
+                birthDateMillis = entity.birthDate,
+                description = entity.description.orEmpty(),
+                species = entity.species,
+                selectedCharacteristics = entity.characteristics.orEmpty().toSet(),
+            )
+        }
+    }
+
+    private fun debugSampleAnimal(id: String): AnimalEntity? {
+        if (!BuildConfig.DEBUG) return null
+        return sampleAnimals.firstOrNull { it.id == id }
     }
 
     fun onNameChange(value: String) = _uiState.update { it.copy(name = value) }

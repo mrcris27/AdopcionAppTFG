@@ -143,6 +143,7 @@
     <string name="camara">Cámara</string>
     <string name="foto_anadida">1 foto añadida</string>
     <string name="fotos_anadidas">%1$d fotos añadidas</string>
+    <string name="quitar_foto">Quitar foto</string>
     <string name="toca_icono_anadir_fotos">Toca un icono para añadir fotos</string>
     <string name="adoptar_ahora">Adoptar ahora</string>
     <string name="donar">Donar</string>
@@ -182,6 +183,8 @@
     <string name="mostrar_info_protectora">Mostrar información de la protectora</string>
     <string name="shelter_info_empty">Aquí se mostrará la información de la protectora cuando esté disponible.</string>
     <string name="cif_format">CIF: %1$s</string>
+    <string name="no_phone_app_available">No hay ninguna app de teléfono disponible.</string>
+    <string name="no_email_app_available">No hay ninguna app de correo disponible.</string>
     <string name="animales_disponibles">Animales disponibles</string>
     <string name="sin_animales_disponibles">No hay animales disponibles.</string>
     <string name="shelter_sin_animales_disponibles">No hay animales disponibles en esta protectora.</string>

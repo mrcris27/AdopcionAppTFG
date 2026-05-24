@@ -135,6 +135,7 @@
     <string name="camara">Camera</string>
     <string name="foto_anadida">1 photo added</string>
     <string name="fotos_anadidas">%1$d photos added</string>
+    <string name="quitar_foto">Remove photo</string>
     <string name="toca_icono_anadir_fotos">Tap an icon to add photos</string>
     <string name="adoptar_ahora">Adopt now</string>
     <string name="donar">Donate</string>
@@ -174,6 +175,8 @@
     <string name="mostrar_info_protectora">Show shelter information</string>
     <string name="shelter_info_empty">Shelter information will appear here when available.</string>
     <string name="cif_format">CIF: %1$s</string>
+    <string name="no_phone_app_available">No phone app is available.</string>
+    <string name="no_email_app_available">No email app is available.</string>
     <string name="animales_disponibles">Available animals</string>
     <string name="sin_animales_disponibles">There are no animals available.</string>
     <string name="shelter_sin_animales_disponibles">There are no available animals in this shelter.</string>
