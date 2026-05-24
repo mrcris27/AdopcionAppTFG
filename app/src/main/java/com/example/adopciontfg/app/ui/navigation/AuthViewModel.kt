@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.asStateFlow
 // los dos puntos significan que hereda de una clase
 class AuthViewModel (application: Application) : AndroidViewModel(application) {
 
-    private val app = getApplication<Application>()
     private val firebase = FirebaseService.getInstance()
     private val userRepos = UserRepository(application)
     private val shelterRepos = ShelterRepository(application)
@@ -54,7 +53,7 @@ class AuthViewModel (application: Application) : AndroidViewModel(application) {
             {
                 //Almacena el ID, si es null manda mensaje de error y sale del método sin hacer nada más
                 val uid = firebase.currentUser?.uid ?: run {
-                    _authState.value = AuthState.Error(app.getString(R.string.error_obteniendo_usuario))
+                    _authState.value = AuthState.Error("Error obteniendo usuario")
                     return@login
                 }
                 firebase.getUserRole(uid, object : RoleCallback {
@@ -73,7 +72,7 @@ class AuthViewModel (application: Application) : AndroidViewModel(application) {
                     }
                 })
             }, {
-                exception ->
+                    exception ->
                 _authState.value = AuthState.Error(getString(R.string.login_invalid_credentials_error))
             })
     }
