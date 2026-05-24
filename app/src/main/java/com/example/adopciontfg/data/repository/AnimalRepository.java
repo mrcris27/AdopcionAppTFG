@@ -8,6 +8,7 @@ import com.example.adopciontfg.data.local.entity.AnimalEntity;
 import com.example.adopciontfg.model.Characteristic;
 import com.example.adopciontfg.model.Species;
 import com.google.firebase.firestore.FirebaseFirestore;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -89,8 +90,15 @@ public class AnimalRepository {
                 .addOnSuccessListener(querySnapshot -> {
                     List<AnimalEntity> animals = querySnapshot.toObjects(AnimalEntity.class);
                     executor.execute(() -> {
+                        List<String> animalIds = new ArrayList<>();
                         for (AnimalEntity animal : animals) {
                             animalDao.insertAnimal(animal);
+                            animalIds.add(animal.getId());
+                        }
+                        if (animalIds.isEmpty()) {
+                            animalDao.deleteAllAnimals();
+                        } else {
+                            animalDao.deleteAnimalsNotIn(animalIds);
                         }
                     });
                 });
@@ -103,8 +111,15 @@ public class AnimalRepository {
                 .addOnSuccessListener(querySnapshot -> {
                     List<AnimalEntity> animals = querySnapshot.toObjects(AnimalEntity.class);
                     executor.execute(() -> {
+                        List<String> animalIds = new ArrayList<>();
                         for (AnimalEntity animal : animals) {
                             animalDao.insertAnimal(animal);
+                            animalIds.add(animal.getId());
+                        }
+                        if (animalIds.isEmpty()) {
+                            animalDao.deleteAnimalsByShelter(shelterId);
+                        } else {
+                            animalDao.deleteAnimalsByShelterNotIn(shelterId, animalIds);
                         }
                     });
                 });

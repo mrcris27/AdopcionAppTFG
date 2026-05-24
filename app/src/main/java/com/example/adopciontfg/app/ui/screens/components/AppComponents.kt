@@ -66,12 +66,14 @@ fun AppFilledTextField(
     onValueChange: (String) -> Unit,
     label: @Composable () -> Unit,
     modifier: Modifier = Modifier,
+    isError: Boolean = false,
     singleLine: Boolean = true,
     minLines: Int = 1,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     trailingIcon: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
+    supportingText: @Composable (() -> Unit)? = null,
 ) {
     TextField(
         value = value,
@@ -79,6 +81,7 @@ fun AppFilledTextField(
         label = label,
         placeholder = placeholder,
         modifier = modifier.fillMaxWidth(),
+        isError = isError,
         singleLine = singleLine,
         minLines = minLines,
         shape = MaterialTheme.shapes.medium,
@@ -92,6 +95,7 @@ fun AppFilledTextField(
             focusedIndicatorColor = MaterialTheme.colorScheme.primary,
             unfocusedIndicatorColor = MaterialTheme.colorScheme.inputOutlineUnfocused(),
         ),
+        supportingText = supportingText,
     )
 }
 

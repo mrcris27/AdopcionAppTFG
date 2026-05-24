@@ -74,8 +74,6 @@ fun UserSettingsScreen(
         onNameChange = viewModel::onNameChange,
         onSurnameChange = viewModel::onSurnameChange,
         onEmailChange = viewModel::onEmailChange,
-        onPhoneChange = viewModel::onPhoneChange,
-        onCityChange = viewModel::onCityChange,
         onBiographyChange = viewModel::onBiographyChange,
         onNotificationsChange = viewModel::onNotificationsChange,
         onDarkModeChange = viewModel::onDarkModeChange,
@@ -103,8 +101,6 @@ private fun UserSettingsContent(
     onNameChange: (String) -> Unit,
     onSurnameChange: (String) -> Unit,
     onEmailChange: (String) -> Unit,
-    onPhoneChange: (String) -> Unit,
-    onCityChange: (String) -> Unit,
     onBiographyChange: (String) -> Unit,
     onNotificationsChange: (Boolean) -> Unit,
     onDarkModeChange: (Boolean) -> Unit,
@@ -191,20 +187,6 @@ private fun UserSettingsContent(
                         singleLine = true
                     )
                     OutlinedTextField(
-                        value = uiState.phone,
-                        onValueChange = onPhoneChange,
-                        label = { Text("Telefono") },
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true
-                    )
-                    OutlinedTextField(
-                        value = uiState.city,
-                        onValueChange = onCityChange,
-                        label = { Text("Ciudad") },
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true
-                    )
-                    OutlinedTextField(
                         value = uiState.biography,
                         onValueChange = onBiographyChange,
                         label = { Text("Biografia") },
@@ -285,8 +267,6 @@ private fun UserSettingsScreenPreview() {
             onNameChange = {},
             onSurnameChange = {},
             onEmailChange = {},
-            onPhoneChange = {},
-            onCityChange = {},
             onBiographyChange = {},
             onNotificationsChange = {},
             onDarkModeChange = {},

@@ -35,7 +35,6 @@ import com.example.adopciontfg.app.ui.screens.components.ListCardView
 import com.example.adopciontfg.app.ui.screens.components.SearchBar
 import com.example.adopciontfg.app.ui.screens.user.home.components.ShelterMapView
 import com.example.adopciontfg.data.local.entity.ShelterEntity
-import com.example.adopciontfg.data.sampleShelters
 import com.example.adopciontfg.ui.theme.AdoptionTheme
 import com.example.adopciontfg.ui.theme.Dimens
 import com.example.adopciontfg.ui.theme.subtleDivider
@@ -246,11 +245,13 @@ fun BottomIcon(
 @Composable
 fun UserHomeScreenPreview() {
     AdoptionTheme {
+        val shelters = previewShelters()
+
         UserHomeScreenBody(
             uiState = UserHomeUiState(
                 isLoadingShelters = false,
-                shelters = sampleShelters,
-                filteredShelters = sampleShelters
+                shelters = shelters,
+                filteredShelters = shelters
             ),
             onQueryChange = {},
             onTabSelected = {},
@@ -258,3 +259,26 @@ fun UserHomeScreenPreview() {
         )
     }
 }
+
+private fun previewShelters(): List<ShelterEntity> = listOf(
+    ShelterEntity(
+        "preview-shelter-1",
+        "Protectora Norte",
+        "B00000001",
+        null,
+        "contacto@protectoranorte.org",
+        "Calle Mayor 1",
+        "600000001",
+        "https://forms.gle/preview",
+    ),
+    ShelterEntity(
+        "preview-shelter-2",
+        "Hogar Animal",
+        "B00000002",
+        null,
+        "info@hogaranimal.org",
+        "Avenida Central 8",
+        "600000002",
+        "https://forms.gle/preview",
+    ),
+)

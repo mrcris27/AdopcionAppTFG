@@ -100,13 +100,13 @@ fun ShelterAnimalCard(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Spacer(modifier = Modifier.height(Dimens.spacingXs))
-                AssistChip(
+              /*  AssistChip(
                     onClick = {},
                     label = { Text(animal.statusLabel()) },
                     colors = AssistChipDefaults.assistChipColors(
                         containerColor = statusChipColor(animal.status),
                     ),
-                )
+                )*/
             }
 
             IconButton(onClick = { menuExpanded = true }) {

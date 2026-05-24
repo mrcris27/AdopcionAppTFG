@@ -54,8 +54,10 @@ import com.example.adopciontfg.R
 import com.example.adopciontfg.app.ui.components.skeleton.ShelterCardListSkeleton
 import com.example.adopciontfg.app.ui.screens.components.AppTopAppBar
 import com.example.adopciontfg.app.ui.screens.shelter.animals.components.ShelterAnimalCard
-import com.example.adopciontfg.data.sampleAnimals
+import com.example.adopciontfg.data.local.entity.AnimalEntity
 import com.example.adopciontfg.model.AnimalStatus
+import com.example.adopciontfg.model.Characteristic
+import com.example.adopciontfg.model.Species
 import com.example.adopciontfg.ui.theme.AdoptionTheme
 import com.example.adopciontfg.ui.theme.Dimens
 import com.example.adopciontfg.ui.theme.elevatedSurface
@@ -469,14 +471,16 @@ private fun EmptyMessage(text: String, modifier: Modifier = Modifier) {
 @Composable
 private fun ShelterAnimalsScreenPreview() {
     AdoptionTheme {
+        val animals = previewAnimals()
+
         ShelterAnimalsContent(
             uiState = ShelterAnimalsUiState(
                 shelterId = "1",
                 shelterName = "Protectora Ejemplo",
                 adoptionFormUrl = "https://forms.gle/ejemplo",
                 isLoading = false,
-                animals = sampleAnimals.filter { it.shelterId == "1" },
-                filteredAnimals = sampleAnimals.filter { it.shelterId == "1" },
+                animals = animals,
+                filteredAnimals = animals,
                 availableCount = 2,
                 reservedCount = 0,
                 adoptedCount = 1,
@@ -489,3 +493,45 @@ private fun ShelterAnimalsScreenPreview() {
         )
     }
 }
+
+private fun previewAnimals(): List<AnimalEntity> = listOf(
+    AnimalEntity(
+        "preview-animal-1",
+        "Luna",
+        true,
+        null,
+        emptyList(),
+        0L,
+        "Busca una familia tranquila.",
+        Species.PERRO,
+        listOf(Characteristic.TRANQUILO),
+        "1",
+        true,
+    ),
+    AnimalEntity(
+        "preview-animal-2",
+        "Milo",
+        false,
+        null,
+        emptyList(),
+        0L,
+        "Muy jugueton y sociable.",
+        Species.GATO,
+        listOf(Characteristic.JUGUETON),
+        "1",
+        true,
+    ),
+    AnimalEntity(
+        "preview-animal-3",
+        "Nala",
+        true,
+        null,
+        emptyList(),
+        0L,
+        "Ya tiene familia asignada.",
+        Species.PERRO,
+        listOf(Characteristic.SOCIABLE_CON_PERROS),
+        "1",
+        false,
+    ),
+)

@@ -40,7 +40,8 @@ import com.example.adopciontfg.data.local.entity.AnimalEntity
 
 import com.example.adopciontfg.data.local.entity.listSubtitle
 
-import com.example.adopciontfg.data.sampleAnimals
+import com.example.adopciontfg.model.Characteristic
+import com.example.adopciontfg.model.Species
 
 import com.example.adopciontfg.ui.theme.AdoptionTheme
 
@@ -213,15 +214,14 @@ fun HomeTopBar(
 
 }
 
-
-
-@Preview
+@Preview(showBackground = true)
 
 @Composable
 
 fun PetListScreenPreview() {
 
     AdoptionTheme {
+        val animals = previewAnimals()
 
         PetListScreen(
 
@@ -229,9 +229,9 @@ fun PetListScreenPreview() {
 
                 isLoading = false,
 
-                animals = sampleAnimals,
+                animals = animals,
 
-                filteredAnimals = sampleAnimals,
+                filteredAnimals = animals,
 
             ),
 
@@ -244,6 +244,35 @@ fun PetListScreenPreview() {
     }
 
 }
+
+private fun previewAnimals(): List<AnimalEntity> = listOf(
+    AnimalEntity(
+        "preview-animal-1",
+        "Luna",
+        true,
+        null,
+        emptyList(),
+        0L,
+        "Busca una familia tranquila.",
+        Species.PERRO,
+        listOf(Characteristic.TRANQUILO),
+        "preview-shelter",
+        true,
+    ),
+    AnimalEntity(
+        "preview-animal-2",
+        "Milo",
+        false,
+        null,
+        emptyList(),
+        0L,
+        "Muy jugueton y sociable.",
+        Species.GATO,
+        listOf(Characteristic.JUGUETON),
+        "preview-shelter",
+        true,
+    ),
+)
 
 
 
@@ -268,4 +297,3 @@ fun PetListScreenLoadingPreview() {
     }
 
 }
-

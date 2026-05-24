@@ -22,6 +22,12 @@ public class ShelterEntity {
     private String adoptionFormUrl;
 
     @Ignore
+    public ShelterEntity() {
+        this.id = "";
+        this.adoptionFormUrl = "";
+    }
+
+    @Ignore
     public ShelterEntity(@NonNull String id, String name, String cif,
                          String profilePicture, String email,
                          String address, String phone) {

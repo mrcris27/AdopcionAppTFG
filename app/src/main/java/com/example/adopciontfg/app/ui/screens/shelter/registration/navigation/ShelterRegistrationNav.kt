@@ -7,7 +7,15 @@ import kotlinx.serialization.Serializable
 
 
 fun NavGraphBuilder.shelterRegistrationScreen(
-    onRegisterClick: () -> Unit,
+    onRegisterClick: (
+        name: String,
+        cif: String,
+        phone: String,
+        address: String,
+        profilePhotoUri: String,
+        email: String,
+        password: String
+    ) -> Unit,
     onBackClick: () -> Unit
 ){
     composable<ShelterRegistrationRoute>{

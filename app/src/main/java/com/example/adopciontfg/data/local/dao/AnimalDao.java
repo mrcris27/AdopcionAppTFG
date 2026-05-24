@@ -31,6 +31,11 @@ public interface AnimalDao {
     @Query("SELECT * FROM animals WHERE species = :species")
     LiveData<List<AnimalEntity>> getAnimalsBySpecies(String species);
 
+    // Obtener animales por estado
+    @Query("SELECT * FROM animals WHERE forAdoption = :inAdpotion")
+    LiveData<List<AnimalEntity>> getAnimalsInAdoption(String inAdpotion);
+
+
     // Obtener animales por característica
     @Query("SELECT * FROM animals WHERE characteristics LIKE '%' || :characteristic || '%'")
     LiveData<List<AnimalEntity>> getAnimalsByCharacteristic(String characteristic);
@@ -41,6 +46,18 @@ public interface AnimalDao {
 
     @Query("SELECT COUNT(*) FROM animals")
     int getAnimalCount();
+
+    @Query("DELETE FROM animals")
+    void deleteAllAnimals();
+
+    @Query("DELETE FROM animals WHERE shelterId = :shelterId")
+    void deleteAnimalsByShelter(String shelterId);
+
+    @Query("DELETE FROM animals WHERE id NOT IN (:ids)")
+    void deleteAnimalsNotIn(List<String> ids);
+
+    @Query("DELETE FROM animals WHERE shelterId = :shelterId AND id NOT IN (:ids)")
+    void deleteAnimalsByShelterNotIn(String shelterId, List<String> ids);
 
     // Eliminar animal
     @Delete

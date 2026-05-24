@@ -7,7 +7,14 @@ import kotlinx.serialization.Serializable
 
 fun NavGraphBuilder.userRegistrationScreen(
     onBackClick: () -> Unit,
-    onRegisterClick: () -> Unit
+    onRegisterClick: (
+        name: String,
+        surname: String,
+        email: String,
+        biography: String,
+        profilePhotoUri: String,
+        password: String
+    ) -> Unit
 ){
     composable<UserRegistrationRoute> {
         UserRegistration(

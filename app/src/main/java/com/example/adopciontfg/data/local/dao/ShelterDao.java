@@ -34,4 +34,10 @@ public interface ShelterDao {
     @Query("SELECT COUNT(*) FROM shelters")
     int getShelterCount();
 
+    @Query("DELETE FROM shelters")
+    void deleteAllShelters();
+
+    @Query("DELETE FROM shelters WHERE id NOT IN (:ids)")
+    void deleteSheltersNotIn(List<String> ids);
+
 }

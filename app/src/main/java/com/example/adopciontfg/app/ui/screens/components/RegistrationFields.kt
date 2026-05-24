@@ -60,17 +60,27 @@ fun RegistrationTextField(
     minLines: Int = 1,
     keyboardType: KeyboardType = KeyboardType.Text,
     capitalization: KeyboardCapitalization = KeyboardCapitalization.None,
+    errorMessage: String? = null,
 ) {
     AppFilledTextField(
         value = value,
         onValueChange = onValueChange,
         label = { Text(label) },
+        isError = errorMessage != null,
         singleLine = singleLine,
         minLines = minLines,
         keyboardOptions = KeyboardOptions(
             keyboardType = keyboardType,
             capitalization = capitalization,
         ),
+        supportingText = errorMessage?.let {
+            {
+                Text(
+                    text = it,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+        },
     )
 }
 
@@ -81,11 +91,13 @@ fun RegistrationPasswordField(
     label: String,
     hidden: Boolean,
     onToggleVisibility: () -> Unit,
+    errorMessage: String? = null,
 ) {
     AppFilledTextField(
         value = value,
         onValueChange = onValueChange,
         label = { Text(label) },
+        isError = errorMessage != null,
         visualTransformation = if (hidden) {
             PasswordVisualTransformation()
         } else {
@@ -98,6 +110,14 @@ fun RegistrationPasswordField(
                     imageVector = if (hidden) Icons.Default.Visibility else Icons.Default.VisibilityOff,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary
+                )
+            }
+        },
+        supportingText = errorMessage?.let {
+            {
+                Text(
+                    text = it,
+                    color = MaterialTheme.colorScheme.error
                 )
             }
         },

@@ -31,7 +31,14 @@ import com.example.adopciontfg.ui.theme.Dimens
 @Composable
 fun UserRegistration(
     onBackClick: () -> Unit,
-    onRegisterClick: () -> Unit,
+    onRegisterClick: (
+        name: String,
+        surname: String,
+        email: String,
+        biography: String,
+        profilePhotoUri: String,
+        password: String
+    ) -> Unit,
     viewModel: UserRegistrationViewModel = hiltViewModel()
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
@@ -68,7 +75,12 @@ fun UserRegistration(
                 value = uiState.value.email,
                 onValueChange = viewModel::onEmailChange,
                 label = stringResource(R.string.correo),
-                keyboardType = KeyboardType.Email
+                keyboardType = KeyboardType.Email,
+                errorMessage = if (uiState.value.isEmailInvalid) {
+                    stringResource(R.string.login_invalid_email_error)
+                } else {
+                    null
+                }
             )
             RegistrationTextField(
                 value = uiState.value.biography,
@@ -89,21 +101,39 @@ fun UserRegistration(
                 onValueChange = viewModel::onPasswordChange,
                 label = stringResource(R.string.contraseña),
                 hidden = uiState.value.passwordHidden,
-                onToggleVisibility = viewModel::togglePasswordVisibility
+                onToggleVisibility = viewModel::togglePasswordVisibility,
+                errorMessage = if (uiState.value.isPasswordInvalid) {
+                    stringResource(R.string.registro_password_min_length_error)
+                } else {
+                    null
+                }
             )
             RegistrationPasswordField(
                 value = uiState.value.confirmPassword,
                 onValueChange = viewModel::onConfirmPasswordChange,
                 label = stringResource(R.string.contraseña2),
                 hidden = uiState.value.confirmPasswordHidden,
-                onToggleVisibility = viewModel::toggleConfirmPasswordVisibility
+                onToggleVisibility = viewModel::toggleConfirmPasswordVisibility,
+                errorMessage = if (uiState.value.doPasswordsNotMatch) {
+                    stringResource(R.string.registro_passwords_do_not_match_error)
+                } else {
+                    null
+                }
             )
 
             AppSecondaryButton(
                 text = stringResource(R.string.registrar),
                 onClick = {
-                    viewModel.onRegisterClick()
-                    onRegisterClick()
+                    with(uiState.value) {
+                        onRegisterClick(
+                            name.trim(),
+                            surname.trim(),
+                            email.trim(),
+                            biography.trim(),
+                            profilePhotoUri,
+                            password
+                        )
+                    }
                 },
                 enabled = uiState.value.canRegister,
                 modifier = Modifier.fillMaxWidth()
@@ -118,7 +148,7 @@ fun UserRegistrationPreview() {
     AdoptionTheme {
         UserRegistration(
             onBackClick = {},
-            onRegisterClick = {},
+            onRegisterClick = { _, _, _, _, _, _ -> },
             viewModel = UserRegistrationViewModel()
         )
     }
