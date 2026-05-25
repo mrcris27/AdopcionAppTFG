@@ -45,6 +45,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -77,14 +78,17 @@ fun SavePhotos(
     }
 
     val singleSelection = maxPhotos == 1
-    val canAddMore = singleSelection || currentUris.size < maxPhotos
+    val reachedMaxPhotos = maxPhotos != Int.MAX_VALUE && currentUris.size >= maxPhotos
+    val canAddMore = !reachedMaxPhotos
     val appendUri: (Uri) -> Unit = { uri ->
-        val updatedUris = if (singleSelection) {
-            listOf(uri)
-        } else {
-            (currentUris + uri).distinct().take(maxPhotos)
+        if (canAddMore) {
+            val updatedUris = if (singleSelection) {
+                listOf(uri)
+            } else {
+                (currentUris + uri).distinct().take(maxPhotos)
+            }
+            updateUris(updatedUris)
         }
-        updateUris(updatedUris)
     }
 
     val singleGalleryLauncher = rememberLauncherForActivityResult(
@@ -96,7 +100,7 @@ fun SavePhotos(
     val multipleGalleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetMultipleContents()
     ) { picked ->
-        if (picked.isNotEmpty()) {
+        if (picked.isNotEmpty() && canAddMore) {
             updateUris((currentUris + picked).distinct().take(maxPhotos))
         }
     }
@@ -201,6 +205,17 @@ fun SavePhotos(
                     text = stringResource(R.string.toca_icono_anadir_fotos),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            if (reachedMaxPhotos) {
+                Text(
+                    text = pluralStringResource(
+                        R.plurals.maximo_imagenes_alcanzado,
+                        maxPhotos,
+                        maxPhotos
+                    ),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
             PhotoGrid(

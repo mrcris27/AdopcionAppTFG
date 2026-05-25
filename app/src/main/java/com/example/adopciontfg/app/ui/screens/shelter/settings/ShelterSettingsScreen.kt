@@ -1,5 +1,6 @@
 package com.example.adopciontfg.app.ui.screens.shelter.settings
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -40,6 +41,7 @@ import com.example.adopciontfg.app.ui.screens.components.AppOutlinedButton
 import com.example.adopciontfg.app.ui.screens.components.AppPrimaryButton
 import com.example.adopciontfg.app.ui.screens.components.AppTopAppBar
 import com.example.adopciontfg.app.ui.screens.components.ProfilePhotoPicker
+import com.example.adopciontfg.app.ui.screens.components.SavingOverlay
 import com.example.adopciontfg.ui.theme.Dimens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -155,134 +157,144 @@ private fun ShelterSettingsContent(
         )
     }
 
-    Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
-        topBar = {
-            AppTopAppBar(
-                title = stringResource(R.string.ajustes_protectora),
-                onBackClick = onBackClick
-            )
-        },
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
-                .padding(Dimens.screenPadding),
-            verticalArrangement = Arrangement.spacedBy(Dimens.spacingMd)
-        ) {
-            AppFormSection(title = stringResource(R.string.datos_protectora)) {
-                ProfilePhotoPicker(
-                    photoUri = uiState.profilePhotoUri,
-                    onPhotoChange = onProfilePhotoChange,
-                    modifier = Modifier.fillMaxWidth()
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            containerColor = MaterialTheme.colorScheme.background,
+            topBar = {
+                AppTopAppBar(
+                    title = stringResource(R.string.ajustes_protectora),
+                    onBackClick = onBackClick
                 )
-                AppFilledTextField(
-                    value = uiState.shelterName,
-                    onValueChange = onShelterNameChange,
-                    label = { Text(stringResource(R.string.nombre_protectora)) }
-                )
-                AppFilledTextField(
-                    value = uiState.email,
-                    onValueChange = onEmailChange,
-                    label = { Text(stringResource(R.string.correo)) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
-                )
-                AppFilledTextField(
-                    value = uiState.phone,
-                    onValueChange = onPhoneChange,
-                    label = { Text(stringResource(R.string.telefono)) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
-                )
-                AppFilledTextField(
-                    value = uiState.cif,
-                    onValueChange = onCifChange,
-                    label = { Text(stringResource(R.string.cif)) }
-                )
-            }
+            },
+            snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+        ) { innerPadding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .verticalScroll(rememberScrollState())
+                    .padding(Dimens.screenPadding),
+                verticalArrangement = Arrangement.spacedBy(Dimens.spacingMd)
+            ) {
+                AppFormSection(title = stringResource(R.string.datos_protectora)) {
+                    ProfilePhotoPicker(
+                        photoUri = uiState.profilePhotoUri,
+                        onPhotoChange = onProfilePhotoChange,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    AppFilledTextField(
+                        value = uiState.shelterName,
+                        onValueChange = onShelterNameChange,
+                        label = { Text(stringResource(R.string.nombre_protectora)) }
+                    )
+                    AppFilledTextField(
+                        value = uiState.email,
+                        onValueChange = onEmailChange,
+                        label = { Text(stringResource(R.string.correo)) },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+                    )
+                    AppFilledTextField(
+                        value = uiState.phone,
+                        onValueChange = onPhoneChange,
+                        label = { Text(stringResource(R.string.telefono)) },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
+                    )
+                    AppFilledTextField(
+                        value = uiState.cif,
+                        onValueChange = onCifChange,
+                        label = { Text(stringResource(R.string.cif)) }
+                    )
+                }
 
-            AppFormSection(title = stringResource(R.string.direccion)) {
-                AppFilledTextField(
-                    value = uiState.street,
-                    onValueChange = onStreetChange,
-                    label = { Text(stringResource(R.string.calle)) },
-                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words)
-                )
-                AppFilledTextField(
-                    value = uiState.streetNumber,
-                    onValueChange = onStreetNumberChange,
-                    label = { Text(stringResource(R.string.numero)) },
-                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Characters)
-                )
-                AppFilledTextField(
-                    value = uiState.postalCode,
-                    onValueChange = onPostalCodeChange,
-                    label = { Text(stringResource(R.string.codigo_postal)) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                )
-                AppFilledTextField(
-                    value = uiState.city,
-                    onValueChange = onCityChange,
-                    label = { Text(stringResource(R.string.localidad_ciudad)) },
-                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words)
-                )
-                ShelterSettingsProvinceDropdown(
-                    selectedProvince = uiState.province,
-                    provinces = stringArrayResource(R.array.provincias_espana).toList(),
-                    onProvinceSelected = onProvinceChange
-                )
-            }
+                AppFormSection(title = stringResource(R.string.direccion)) {
+                    AppFilledTextField(
+                        value = uiState.street,
+                        onValueChange = onStreetChange,
+                        label = { Text(stringResource(R.string.calle)) },
+                        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words)
+                    )
+                    AppFilledTextField(
+                        value = uiState.streetNumber,
+                        onValueChange = onStreetNumberChange,
+                        label = { Text(stringResource(R.string.numero)) },
+                        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Characters)
+                    )
+                    AppFilledTextField(
+                        value = uiState.postalCode,
+                        onValueChange = onPostalCodeChange,
+                        label = { Text(stringResource(R.string.codigo_postal)) },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    )
+                    AppFilledTextField(
+                        value = uiState.city,
+                        onValueChange = onCityChange,
+                        label = { Text(stringResource(R.string.localidad_ciudad)) },
+                        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words)
+                    )
+                    ShelterSettingsProvinceDropdown(
+                        selectedProvince = uiState.province,
+                        provinces = stringArrayResource(R.array.provincias_espana).toList(),
+                        onProvinceSelected = onProvinceChange
+                    )
+                }
 
-            AppFormSection(title = stringResource(R.string.adopciones)) {
-                Text(
-                    text = stringResource(R.string.adopciones_formulario_desc),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                AppFilledTextField(
-                    value = uiState.adoptionFormUrl,
-                    onValueChange = onAdoptionFormUrlChange,
-                    label = { Text(stringResource(R.string.enlace_google_forms)) },
-                    placeholder = { Text(stringResource(R.string.google_forms_placeholder)) }
-                )
-            }
+                AppFormSection(title = stringResource(R.string.adopciones)) {
+                    Text(
+                        text = stringResource(R.string.adopciones_formulario_desc),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    AppFilledTextField(
+                        value = uiState.adoptionFormUrl,
+                        onValueChange = onAdoptionFormUrlChange,
+                        label = { Text(stringResource(R.string.enlace_google_forms)) },
+                        placeholder = { Text(stringResource(R.string.google_forms_placeholder)) }
+                    )
+                }
 
-            AppFormSection(title = stringResource(R.string.preferencias)) {
-                SwitchRow(
-                    text = stringResource(R.string.alertas_adopcion),
-                    icon = { Icon(Icons.Outlined.Campaign, contentDescription = null) },
-                    checked = uiState.adoptionAlertsEnabled,
-                    onCheckedChange = onAdoptionAlertsChange
-                )
-                SwitchRow(
-                    text = stringResource(R.string.modo_oscuro),
-                    icon = { Icon(Icons.Outlined.Palette, contentDescription = null) },
-                    checked = uiState.darkModeEnabled,
-                    onCheckedChange = onDarkModeChange
-                )
-            }
+                AppFormSection(title = stringResource(R.string.preferencias)) {
+                    SwitchRow(
+                        text = stringResource(R.string.alertas_adopcion),
+                        icon = { Icon(Icons.Outlined.Campaign, contentDescription = null) },
+                        checked = uiState.adoptionAlertsEnabled,
+                        onCheckedChange = onAdoptionAlertsChange
+                    )
+                    SwitchRow(
+                        text = stringResource(R.string.modo_oscuro),
+                        icon = { Icon(Icons.Outlined.Palette, contentDescription = null) },
+                        checked = uiState.darkModeEnabled,
+                        onCheckedChange = onDarkModeChange
+                    )
+                }
 
-            AppFormSection(title = stringResource(R.string.seguridad)) {
-                Text(
-                    text = stringResource(R.string.actualizar_contrasena_desde_formulario),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                AppFormSection(title = stringResource(R.string.seguridad)) {
+                    Text(
+                        text = stringResource(R.string.actualizar_contrasena_desde_formulario),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    AppPrimaryButton(
+                        text = stringResource(R.string.cambiar_contrasena),
+                        onClick = onOpenPasswordDialog
+                    )
+                }
                 AppPrimaryButton(
-                    text = stringResource(R.string.cambiar_contrasena),
-                    onClick = onOpenPasswordDialog
+                    text = stringResource(R.string.guardar),
+                    onClick = onSaveClick,
+                    enabled = uiState.canSaveSettings
+                )
+                AppOutlinedButton(
+                    text = stringResource(R.string.cerrar_sesion),
+                    onClick = onLogoutClick
                 )
             }
-            AppPrimaryButton(
-                text = stringResource(R.string.guardar),
-                onClick = onSaveClick
-            )
-            AppOutlinedButton(
-                text = stringResource(R.string.cerrar_sesion),
-                onClick = onLogoutClick
-            )
+        }
+
+        if (uiState.isSavingSettings) {
+            SavingOverlay(message = stringResource(R.string.saving_shelter_settings))
+        }
+        if (uiState.isPasswordChangeLoading) {
+            SavingOverlay(message = stringResource(R.string.updating_password_overlay))
         }
     }
 }

@@ -44,6 +44,12 @@ fun ShelterPetFormScreen(
             stringResource(R.string.registrar_animal)
         },
         isLoading = uiState.isLoading,
+        isSaving = uiState.isSaving,
+        savingMessage = if (uiState.isEditMode) {
+            stringResource(R.string.saving_animal_info)
+        } else {
+            stringResource(R.string.registering_animal)
+        },
         name = uiState.name,
         onNameChange = viewModel::onNameChange,
         isFemale = uiState.isFemale,
@@ -76,6 +82,8 @@ private fun ShelterPetFormScreenPreview() {
             title = stringResource(R.string.editar_animal),
             saveButtonText = stringResource(R.string.guardar_cambios),
             isLoading = false,
+            isSaving = false,
+            savingMessage = stringResource(R.string.saving_animal_info),
             name = "Max",
             onNameChange = {},
             isFemale = false,

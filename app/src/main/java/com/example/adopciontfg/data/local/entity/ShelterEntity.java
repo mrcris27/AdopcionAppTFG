@@ -14,7 +14,7 @@ public class ShelterEntity {
 
     private String name;
     private String cif;
-    private String profilePicture; // URL de Firebase Storage
+    private String profilePicture; // URI local de la foto de perfil
     private String email;
     private String address;
     private String phone;

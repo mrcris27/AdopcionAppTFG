@@ -145,6 +145,10 @@
     <string name="fotos_anadidas">%1$d fotos añadidas</string>
     <string name="quitar_foto">Quitar foto</string>
     <string name="toca_icono_anadir_fotos">Toca un icono para añadir fotos</string>
+    <plurals name="maximo_imagenes_alcanzado">
+        <item quantity="one">Has alcanzado el máximo de %1$d imagen.</item>
+        <item quantity="other">Has alcanzado el máximo de %1$d imágenes.</item>
+    </plurals>
     <string name="adoptar_ahora">Adoptar ahora</string>
     <string name="donar">Donar</string>
     <string name="donation_dialog_title">Simular donativo</string>
@@ -202,6 +206,13 @@
     <string name="error_desconocido">Error desconocido</string>
     <string name="pet_form_login_required">Inicia sesión como protectora para guardar.</string>
     <string name="animal_saved_successfully">Animal guardado correctamente</string>
+    <string name="saving_user_settings">Guardando ajustes de usuario...</string>
+    <string name="saving_shelter_settings">Guardando ajustes de protectora...</string>
+    <string name="saving_animal_info">Guardando información del animal...</string>
+    <string name="registering_animal">Registrando animal...</string>
+    <string name="saving_user_registration">Guardando perfil de usuario...</string>
+    <string name="saving_shelter_registration">Guardando datos de la protectora...</string>
+    <string name="updating_password_overlay">Actualizando contraseña...</string>
     <string name="error_refresh_title">No se pudieron actualizar los datos</string>
     <string name="error_connection_refresh">Revisa tu conexión e inténtalo de nuevo.</string>
     <string name="error_timeout_refresh">La actualización está tardando demasiado. Inténtalo de nuevo.</string>

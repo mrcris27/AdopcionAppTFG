@@ -82,9 +82,8 @@ class AuthViewModel (application: Application) : AndroidViewModel(application) {
     /*
             Flujo de la función
             1. Registro en Firebase Auth → obtenemos el UID
-            2. Subimos la foto a Storage → obtenemos la URL
-            3. Creamos UserEntity con UID + URL + resto de datos
-            4. Guardamos UserEntity en Firestore y Room
+            2. Creamos UserEntity con UID + foto local + resto de datos
+            3. Guardamos UserEntity en Firestore y Room
      */
     fun registerUser(name: String, surname: String, email: String, bio: String, profilePic: String, password: String) {
         _authState.value = AuthState.Loading
@@ -98,26 +97,9 @@ class AuthViewModel (application: Application) : AndroidViewModel(application) {
                     _authState.value = AuthState.Error(getString(R.string.auth_generic_error))
                     return@register
                 }
-                // Si tenemos foto se sube la foto a Firebase Storage
-                if (profilePic.isNotBlank()) {
-                    firebase.uploadProfilePhoto(
-                        getApplication(), uid, android.net.Uri.parse(profilePic),
-                        { photoUrl ->
-                            //Si se sube correctamente se crea el usuario en la base de datos con la foto vinculada
-                            userRepos.saveUser(UserEntity(uid, name, surname, photoUrl, email, bio))
-                            _authState.value = AuthState.Success("user")
-                        },
-                        //Si falla al subir la foto se crea el usuario sin la foto
-                        {
-                            userRepos.saveUser(UserEntity(uid, name, surname, "", email, bio))
-                            _authState.value = AuthState.Success("user")
-                        }
-                    )
-                } else {
-                    //Si no hay foto se crea el usuario sin la foto
-                    userRepos.saveUser(UserEntity(uid, name, surname, "", email, bio))
-                    _authState.value = AuthState.Success("user")
-                }
+                // La foto se copia al almacenamiento interno desde el repositorio.
+                userRepos.saveUser(UserEntity(uid, name, surname, profilePic, email, bio))
+                _authState.value = AuthState.Success("user")
             },
             { exception ->
                 _authState.value = AuthState.Error(getRegisterErrorMessage(exception))
@@ -138,26 +120,9 @@ class AuthViewModel (application: Application) : AndroidViewModel(application) {
                     _authState.value = AuthState.Error(getString(R.string.auth_generic_error))
                     return@register
                 }
-                // Si tenemos foto se sube la foto a Firebase Storage
-                if (profilePic.isNotBlank()) {
-                    firebase.uploadProfilePhoto(
-                        getApplication(), uid, android.net.Uri.parse(profilePic),
-                        { photoUrl ->
-                            //Si se sube correctamente se crea el usuario en la base de datos con la foto vinculada
-                            shelterRepos.saveShelter(ShelterEntity(uid, name, cif, photoUrl, email,address, phoneName))
-                            _authState.value = AuthState.Success("shelter")
-                        },
-                        //Si falla al subir la foto se crea el usuario sin la foto
-                        {
-                            shelterRepos.saveShelter(ShelterEntity(uid, name, cif, "", email,address, phoneName))
-                            _authState.value = AuthState.Success("shelter")
-                        }
-                    )
-                } else {
-                    //Si no hay foto se crea el usuario sin la foto
-                    shelterRepos.saveShelter(ShelterEntity(uid, name, cif, "", email,address, phoneName ))
-                    _authState.value = AuthState.Success("shelter")
-                }
+                // La foto se copia al almacenamiento interno desde el repositorio.
+                shelterRepos.saveShelter(ShelterEntity(uid, name, cif, profilePic, email,address, phoneName ))
+                _authState.value = AuthState.Success("shelter")
             },
             { exception ->
                 _authState.value = AuthState.Error(getRegisterErrorMessage(exception))

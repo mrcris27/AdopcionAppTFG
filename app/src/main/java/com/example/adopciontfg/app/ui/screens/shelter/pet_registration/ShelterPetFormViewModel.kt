@@ -21,10 +21,23 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+data class PetFormData(
+    val name: String,
+    val isFemale: Boolean,
+    val mainPhotoUri: String,
+    val galleryUris: List<String>,
+    val birthDateMillis: Long,
+    val description: String,
+    val isForAdoption: Boolean,
+    val species: Species?,
+    val selectedCharacteristics: Set<Characteristic>,
+)
+
 data class PetFormUiState(
     val isEditMode: Boolean = false,
     val animalId: String? = null,
     val isLoading: Boolean = false,
+    val isSaving: Boolean = false,
     val name: String = "",
     val isFemale: Boolean = false,
     val mainPhotoUri: Uri? = null,
@@ -34,12 +47,38 @@ data class PetFormUiState(
     val isForAdoption: Boolean = true,
     val species: Species? = null,
     val selectedCharacteristics: Set<Characteristic> = emptySet(),
+    val savedFormData: PetFormData? = null,
     val saveMessageRes: Int? = null,
     val saveMessage: String? = null,
     val saveSucceeded: Boolean = false,
 ) {
+    val hasUnsavedChanges: Boolean
+        get() = !isEditMode || savedFormData?.let { toFormData() != it } ?: false
+
     val canSave: Boolean =
-        name.isNotBlank() && species != null && birthDateMillis > 0L && mainPhotoUri != null
+        name.isNotBlank() &&
+            species != null &&
+            birthDateMillis > 0L &&
+            mainPhotoUri != null &&
+            hasUnsavedChanges
+
+    private fun toFormData(): PetFormData {
+        return PetFormData(
+            name = name.trim(),
+            isFemale = isFemale,
+            mainPhotoUri = mainPhotoUri?.toString().orEmpty(),
+            galleryUris = galleryUris.map { it.toString() },
+            birthDateMillis = birthDateMillis,
+            description = description.trim(),
+            isForAdoption = isForAdoption,
+            species = species,
+            selectedCharacteristics = selectedCharacteristics,
+        )
+    }
+
+    fun markCurrentDataSaved(): PetFormUiState {
+        return copy(savedFormData = toFormData())
+    }
 }
 
 @HiltViewModel
@@ -70,8 +109,8 @@ class ShelterPetFormViewModel @Inject constructor(
     }
 
     private fun loadAnimalIntoState(entity: AnimalEntity) {
-        _uiState.update {
-            it.copy(
+        _uiState.update { current ->
+            current.copy(
                 isLoading = false,
                 name = entity.name.orEmpty(),
                 isFemale = entity.isSex,
@@ -84,7 +123,7 @@ class ShelterPetFormViewModel @Inject constructor(
                 isForAdoption = entity.isForAdoption,
                 species = entity.species,
                 selectedCharacteristics = entity.characteristics.orEmpty().toSet(),
-            )
+            ).markCurrentDataSaved()
         }
     }
 
@@ -122,7 +161,7 @@ class ShelterPetFormViewModel @Inject constructor(
         }
 
         val state = _uiState.value
-        if (!state.canSave) return
+        if (!state.canSave || state.isSaving) return
 
         val id = state.animalId ?: UUID.randomUUID().toString()
         val mainPhoto = state.mainPhotoUri?.toString().orEmpty()
@@ -142,17 +181,48 @@ class ShelterPetFormViewModel @Inject constructor(
             state.isForAdoption,
         )
 
-        animalRepository.updateAnimal(animal)
         _uiState.update {
             it.copy(
-                saveSucceeded = true,
-                saveMessageRes = R.string.animal_saved_successfully,
-                saveMessage = null
+                isSaving = true,
+                saveMessageRes = null,
+                saveMessage = null,
             )
         }
+        animalRepository.updateAnimal(
+            animal,
+            {
+                _uiState.update {
+                    it.markCurrentDataSaved().copy(
+                        isSaving = false,
+                        saveSucceeded = true,
+                        saveMessageRes = R.string.animal_saved_successfully,
+                        saveMessage = null
+                    )
+                }
+            },
+            { exception ->
+                _uiState.update {
+                    it.copy(
+                        isSaving = false,
+                        saveMessageRes = if (exception.message == null) {
+                            R.string.error_desconocido
+                        } else {
+                            null
+                        },
+                        saveMessage = exception.message
+                    )
+                }
+            }
+        )
     }
 
     fun onSaveHandled() {
-        _uiState.update { it.copy(saveSucceeded = false, saveMessageRes = null, saveMessage = null) }
+        _uiState.update {
+            it.copy(
+                saveSucceeded = false,
+                saveMessageRes = null,
+                saveMessage = null
+            )
+        }
     }
 }

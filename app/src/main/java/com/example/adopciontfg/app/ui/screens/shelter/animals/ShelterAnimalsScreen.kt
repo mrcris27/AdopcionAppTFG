@@ -39,7 +39,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.adopciontfg.R
 import com.example.adopciontfg.app.ui.components.skeleton.ShelterCardListSkeleton
-import com.example.adopciontfg.app.ui.screens.components.AppTopAppBar
 import com.example.adopciontfg.app.ui.screens.components.DataRefreshErrorDialog
 import com.example.adopciontfg.app.ui.screens.shelter.animals.components.ShelterAnimalCard
 import com.example.adopciontfg.data.local.entity.AnimalEntity
@@ -78,13 +77,8 @@ private fun ShelterAnimalsContent(
     onAddAnimalClick: () -> Unit,
     onEditAnimalClick: (String) -> Unit,
 ) {
-    val title = uiState.shelterName.ifBlank { stringResource(R.string.mis_animales) }
-
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
-        topBar = {
-            AppTopAppBar(title = title)
-        },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onAddAnimalClick,

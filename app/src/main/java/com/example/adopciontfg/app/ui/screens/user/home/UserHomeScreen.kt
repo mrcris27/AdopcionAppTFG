@@ -86,17 +86,6 @@ fun UserHomeScreenBody(
                 .fillMaxWidth()
                 .padding(horizontal = Dimens.spacingSm)
         ) {
-            Text(
-                text = stringResource(R.string.protectoras),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.padding(
-                    top = Dimens.spacingMd,
-                    bottom = Dimens.spacingXs
-                )
-            )
-
             if (uiState.selectedTab == 0) {
                 SearchBar(
                     query = uiState.query,

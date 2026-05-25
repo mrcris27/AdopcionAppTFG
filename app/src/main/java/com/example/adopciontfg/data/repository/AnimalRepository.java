@@ -1,9 +1,9 @@
 package com.example.adopciontfg.data.repository;
 
 import android.app.Application;
-import android.net.Uri;
 import androidx.lifecycle.LiveData;
 import com.example.adopciontfg.data.local.AppDatabase;
+import com.example.adopciontfg.data.local.LocalPhotoStorage;
 import com.example.adopciontfg.data.local.dao.AnimalDao;
 import com.example.adopciontfg.data.local.entity.AnimalEntity;
 import com.example.adopciontfg.model.Characteristic;
@@ -12,8 +12,6 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Source;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -23,7 +21,7 @@ public class AnimalRepository {
 
     private final AnimalDao animalDao;
     private final FirebaseFirestore firestore;
-    private final FirebaseStorage storage;
+    private final LocalPhotoStorage photoStorage;
     private final ExecutorService executor;
 
     private static final String COLLECTION = "animals";
@@ -32,7 +30,7 @@ public class AnimalRepository {
         AppDatabase db = AppDatabase.getInstance(application);
         this.animalDao = db.animalDao();
         this.firestore = FirebaseFirestore.getInstance();
-        this.storage = FirebaseStorage.getInstance();
+        this.photoStorage = new LocalPhotoStorage(application);
         this.executor = Executors.newSingleThreadExecutor();
     }
 
@@ -85,130 +83,68 @@ public class AnimalRepository {
     }
 
     public void updateAnimal(AnimalEntity animal, OnSuccessListener<Void> onSuccess, OnFailureListener onFailure) {
-        uploadAnimalPhotos(
-                animal,
-                uploadedAnimal -> saveAnimal(uploadedAnimal, onSuccess, onFailure),
-                onFailure
-        );
+        executor.execute(() -> {
+            AnimalEntity previousAnimal = animalDao.getAnimalByIdSync(animal.getId());
+            try {
+                AnimalEntity localAnimal = copyAnimalPhotos(animal);
+                saveAnimal(localAnimal, previousAnimal, onSuccess, onFailure);
+            } catch (Exception exception) {
+                onFailure.onFailure(exception);
+            }
+        });
     }
 
-    private void saveAnimal(AnimalEntity animal, OnSuccessListener<Void> onSuccess, OnFailureListener onFailure) {
+    private void saveAnimal(
+            AnimalEntity animal,
+            AnimalEntity previousAnimal,
+            OnSuccessListener<Void> onSuccess,
+            OnFailureListener onFailure
+    ) {
         firestore.collection(COLLECTION)
                 .document(animal.getId())
                 .set(animal)
                 .addOnSuccessListener(unused -> {
                         // Si Firebase va bien, guarda en Room
-                        executor.execute(() -> animalDao.insertAnimal(animal));
+                        executor.execute(() -> {
+                            animalDao.insertAnimal(animal);
+                            deleteReplacedAnimalPhotos(previousAnimal, animal);
+                        });
                         onSuccess.onSuccess(unused);
                 })
                 .addOnFailureListener(onFailure);
     }
 
-    private void uploadAnimalPhotos(AnimalEntity animal, OnSuccessListener<AnimalEntity> onSuccess, OnFailureListener onFailure) {
-        uploadPhotoIfNeeded(
+    private AnimalEntity copyAnimalPhotos(AnimalEntity animal) throws Exception {
+        String folderName = "animals/" + animal.getId();
+        String localMainPhoto = photoStorage.copyPhotoIfNeeded(
                 animal.getMainPhoto(),
-                animal.getId(),
-                "main.jpg",
-                uploadedMainPhoto -> {
-                    List<String> photos = animal.getPhotos() == null
-                            ? new ArrayList<>()
-                            : new ArrayList<>(animal.getPhotos());
-                    uploadGalleryPhotos(
-                            animal,
-                            uploadedMainPhoto,
-                            photos,
-                            0,
-                            new ArrayList<>(),
-                            onSuccess,
-                            onFailure
-                    );
-                },
-                onFailure
+                folderName,
+                "main.jpg"
         );
-    }
+        List<String> localPhotos = new ArrayList<>();
+        List<String> photos = animal.getPhotos() == null ? new ArrayList<>() : animal.getPhotos();
 
-    private void uploadGalleryPhotos(
-            AnimalEntity animal,
-            String uploadedMainPhoto,
-            List<String> photos,
-            int index,
-            List<String> uploadedPhotos,
-            OnSuccessListener<AnimalEntity> onSuccess,
-            OnFailureListener onFailure
-    ) {
-        if (index >= photos.size()) {
-            onSuccess.onSuccess(
-                    new AnimalEntity(
-                            animal.getId(),
-                            animal.getName(),
-                            animal.isSex(),
-                            uploadedMainPhoto,
-                            uploadedPhotos,
-                            animal.getBirthDate(),
-                            animal.getDescription(),
-                            animal.getSpecies(),
-                            animal.getCharacteristics(),
-                            animal.isForAdoption(),
-                            animal.getShelterId()
-                    )
-            );
-            return;
+        for (int index = 0; index < photos.size(); index++) {
+            localPhotos.add(photoStorage.copyPhotoIfNeeded(
+                    photos.get(index),
+                    folderName,
+                    "gallery_" + index + ".jpg"
+            ));
         }
 
-        uploadPhotoIfNeeded(
-                photos.get(index),
+        return new AnimalEntity(
                 animal.getId(),
-                "gallery_" + index + ".jpg",
-                uploadedPhoto -> {
-                    uploadedPhotos.add(uploadedPhoto);
-                    uploadGalleryPhotos(
-                            animal,
-                            uploadedMainPhoto,
-                            photos,
-                            index + 1,
-                            uploadedPhotos,
-                            onSuccess,
-                            onFailure
-                    );
-                },
-                onFailure
+                animal.getName(),
+                animal.isSex(),
+                localMainPhoto,
+                localPhotos,
+                animal.getBirthDate(),
+                animal.getDescription(),
+                animal.getSpecies(),
+                animal.getCharacteristics(),
+                animal.isForAdoption(),
+                animal.getShelterId()
         );
-    }
-
-    private void uploadPhotoIfNeeded(
-            String photoUri,
-            String animalId,
-            String fileName,
-            OnSuccessListener<String> onSuccess,
-            OnFailureListener onFailure
-    ) {
-        if (!isLocalPhotoUri(photoUri)) {
-            onSuccess.onSuccess(photoUri == null ? "" : photoUri);
-            return;
-        }
-
-        Uri uri = Uri.parse(photoUri);
-        StorageReference ref = storage.getReference("animal_photos/" + animalId + "/" + fileName);
-        ref.putFile(uri)
-                .continueWithTask(task -> {
-                    if (!task.isSuccessful()) {
-                        Exception exception = task.getException();
-                        if (exception != null) {
-                            throw exception;
-                        }
-                        throw new IllegalStateException("No se pudo subir la foto del animal");
-                    }
-                    return ref.getDownloadUrl();
-                })
-                .addOnSuccessListener(downloadUri -> onSuccess.onSuccess(downloadUri.toString()))
-                .addOnFailureListener(onFailure);
-    }
-
-    private boolean isLocalPhotoUri(String photoUri) {
-        if (photoUri == null || photoUri.isBlank()) return false;
-
-        String scheme = Uri.parse(photoUri).getScheme();
-        return "content".equalsIgnoreCase(scheme) || "file".equalsIgnoreCase(scheme);
     }
 
     // ─── Eliminar animal ────────────────────────────────────────────────
@@ -217,8 +153,38 @@ public class AnimalRepository {
                 .document(animal.getId())
                 .delete()
                 .addOnSuccessListener(unused ->
-                        executor.execute(() -> animalDao.deleteAnimal(animal))
+                        executor.execute(() -> {
+                            AnimalEntity storedAnimal = animalDao.getAnimalByIdSync(animal.getId());
+                            animalDao.deleteAnimal(animal);
+                            photoStorage.deletePhotos(collectAnimalPhotoUris(
+                                    storedAnimal == null ? animal : storedAnimal
+                            ));
+                        })
                 );
+    }
+
+    private void deleteReplacedAnimalPhotos(AnimalEntity previousAnimal, AnimalEntity currentAnimal) {
+        if (previousAnimal == null) return;
+        photoStorage.deletePhotosNotIn(
+                collectAnimalPhotoUris(previousAnimal),
+                collectAnimalPhotoUris(currentAnimal)
+        );
+    }
+
+    private List<String> collectAnimalPhotoUris(AnimalEntity animal) {
+        List<String> photoUris = new ArrayList<>();
+        if (animal == null) return photoUris;
+        if (animal.getMainPhoto() != null && !animal.getMainPhoto().isBlank()) {
+            photoUris.add(animal.getMainPhoto());
+        }
+        if (animal.getPhotos() != null) {
+            for (String photo : animal.getPhotos()) {
+                if (photo != null && !photo.isBlank()) {
+                    photoUris.add(photo);
+                }
+            }
+        }
+        return photoUris;
     }
 
     // ─── Sincronización desde Firebase ──────────────────────────────────

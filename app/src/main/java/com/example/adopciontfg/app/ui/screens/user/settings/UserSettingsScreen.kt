@@ -1,5 +1,6 @@
 package com.example.adopciontfg.app.ui.screens.user.settings
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -33,6 +34,7 @@ import com.example.adopciontfg.app.ui.screens.components.AppOutlinedButton
 import com.example.adopciontfg.app.ui.screens.components.AppPrimaryButton
 import com.example.adopciontfg.app.ui.screens.components.AppTopAppBar
 import com.example.adopciontfg.app.ui.screens.components.ProfilePhotoPicker
+import com.example.adopciontfg.app.ui.screens.components.SavingOverlay
 import com.example.adopciontfg.ui.theme.Dimens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -128,89 +130,99 @@ private fun UserSettingsContent(
         )
     }
 
-    Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
-        topBar = {
-            AppTopAppBar(
-                title = stringResource(R.string.ajustes_usuario)
-            )
-        },
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = Dimens.spacingSm, vertical = Dimens.screenPadding),
-            verticalArrangement = Arrangement.spacedBy(Dimens.spacingMd)
-        ) {
-            AppFormSection(title = stringResource(R.string.perfil)) {
-                ProfilePhotoPicker(
-                    photoUri = uiState.profilePhotoUri,
-                    onPhotoChange = onProfilePhotoChange,
-                    modifier = Modifier.fillMaxWidth()
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            containerColor = MaterialTheme.colorScheme.background,
+            topBar = {
+                AppTopAppBar(
+                    title = stringResource(R.string.ajustes_usuario)
                 )
-                AppFilledTextField(
-                    value = uiState.name,
-                    onValueChange = onNameChange,
-                    label = { Text(stringResource(R.string.nombre)) }
-                )
-                AppFilledTextField(
-                    value = uiState.surname,
-                    onValueChange = onSurnameChange,
-                    label = { Text(stringResource(R.string.apellidos)) }
-                )
-                AppFilledTextField(
-                    value = uiState.email,
-                    onValueChange = onEmailChange,
-                    label = { Text(stringResource(R.string.correo)) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
-                )
-                AppFilledTextField(
-                    value = uiState.biography,
-                    onValueChange = onBiographyChange,
-                    label = { Text(stringResource(R.string.biografia)) },
-                    singleLine = false,
-                    minLines = 3
-                )
-            }
+            },
+            snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+        ) { innerPadding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = Dimens.spacingSm, vertical = Dimens.screenPadding),
+                verticalArrangement = Arrangement.spacedBy(Dimens.spacingMd)
+            ) {
+                AppFormSection(title = stringResource(R.string.perfil)) {
+                    ProfilePhotoPicker(
+                        photoUri = uiState.profilePhotoUri,
+                        onPhotoChange = onProfilePhotoChange,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    AppFilledTextField(
+                        value = uiState.name,
+                        onValueChange = onNameChange,
+                        label = { Text(stringResource(R.string.nombre)) }
+                    )
+                    AppFilledTextField(
+                        value = uiState.surname,
+                        onValueChange = onSurnameChange,
+                        label = { Text(stringResource(R.string.apellidos)) }
+                    )
+                    AppFilledTextField(
+                        value = uiState.email,
+                        onValueChange = onEmailChange,
+                        label = { Text(stringResource(R.string.correo)) },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+                    )
+                    AppFilledTextField(
+                        value = uiState.biography,
+                        onValueChange = onBiographyChange,
+                        label = { Text(stringResource(R.string.biografia)) },
+                        singleLine = false,
+                        minLines = 3
+                    )
+                }
 
-            AppFormSection(title = stringResource(R.string.preferencias)) {
-                SettingsSwitchRow(
-                    text = stringResource(R.string.notificaciones),
-                    icon = { Icon(Icons.Outlined.Notifications, contentDescription = null) },
-                    checked = uiState.notificationsEnabled,
-                    onCheckedChange = onNotificationsChange
-                )
-                SettingsSwitchRow(
-                    text = stringResource(R.string.modo_oscuro),
-                    icon = { Icon(Icons.Outlined.Palette, contentDescription = null) },
-                    checked = uiState.darkModeEnabled,
-                    onCheckedChange = onDarkModeChange
-                )
-            }
+                AppFormSection(title = stringResource(R.string.preferencias)) {
+                    SettingsSwitchRow(
+                        text = stringResource(R.string.notificaciones),
+                        icon = { Icon(Icons.Outlined.Notifications, contentDescription = null) },
+                        checked = uiState.notificationsEnabled,
+                        onCheckedChange = onNotificationsChange
+                    )
+                    SettingsSwitchRow(
+                        text = stringResource(R.string.modo_oscuro),
+                        icon = { Icon(Icons.Outlined.Palette, contentDescription = null) },
+                        checked = uiState.darkModeEnabled,
+                        onCheckedChange = onDarkModeChange
+                    )
+                }
 
-            AppFormSection(title = stringResource(R.string.seguridad)) {
-                Text(
-                    text = stringResource(R.string.actualizar_contrasena_desde_formulario),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                AppFormSection(title = stringResource(R.string.seguridad)) {
+                    Text(
+                        text = stringResource(R.string.actualizar_contrasena_desde_formulario),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    AppPrimaryButton(
+                        text = stringResource(R.string.cambiar_contrasena),
+                        onClick = onOpenPasswordDialog
+                    )
+                }
+
                 AppPrimaryButton(
-                    text = stringResource(R.string.cambiar_contrasena),
-                    onClick = onOpenPasswordDialog
+                    text = stringResource(R.string.guardar),
+                    onClick = onSaveClick,
+                    enabled = uiState.canSaveSettings
+                )
+                AppOutlinedButton(
+                    text = stringResource(R.string.cerrar_sesion),
+                    onClick = onLogoutClick
                 )
             }
+        }
 
-            AppPrimaryButton(
-                text = stringResource(R.string.guardar),
-                onClick = onSaveClick
-            )
-            AppOutlinedButton(
-                text = stringResource(R.string.cerrar_sesion),
-                onClick = onLogoutClick
-            )
+        if (uiState.isSavingSettings) {
+            SavingOverlay(message = stringResource(R.string.saving_user_settings))
+        }
+        if (uiState.isPasswordChangeLoading) {
+            SavingOverlay(message = stringResource(R.string.updating_password_overlay))
         }
     }
 }

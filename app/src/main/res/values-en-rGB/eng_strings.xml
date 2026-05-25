@@ -145,6 +145,10 @@
     <string name="fotos_anadidas">%1$d photos added</string>
     <string name="quitar_foto">Remove photo</string>
     <string name="toca_icono_anadir_fotos">Tap an icon to add photos</string>
+    <plurals name="maximo_imagenes_alcanzado">
+        <item quantity="one">You have reached the maximum of %1$d image.</item>
+        <item quantity="other">You have reached the maximum of %1$d images.</item>
+    </plurals>
     <string name="adoptar_ahora">Adopt now</string>
     <string name="donar">Donate</string>
     <string name="donation_dialog_title">Simulate donation</string>
@@ -202,6 +206,13 @@
     <string name="error_desconocido">Unknown error</string>
     <string name="pet_form_login_required">Log in as a shelter to save.</string>
     <string name="animal_saved_successfully">Animal saved successfully</string>
+    <string name="saving_user_settings">Saving user settings...</string>
+    <string name="saving_shelter_settings">Saving shelter settings...</string>
+    <string name="saving_animal_info">Saving animal information...</string>
+    <string name="registering_animal">Registering animal...</string>
+    <string name="saving_user_registration">Saving user profile...</string>
+    <string name="saving_shelter_registration">Saving shelter details...</string>
+    <string name="updating_password_overlay">Updating password...</string>
     <string name="error_refresh_title">Could not refresh data</string>
     <string name="error_connection_refresh">Check your connection and try again.</string>
     <string name="error_timeout_refresh">The refresh is taking too long. Try again.</string>

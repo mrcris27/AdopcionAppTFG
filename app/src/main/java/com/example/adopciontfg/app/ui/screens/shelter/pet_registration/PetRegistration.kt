@@ -2,6 +2,7 @@ package com.example.adopciontfg.app.ui.screens.shelter.pet_registration
 
 import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -48,6 +49,7 @@ import com.example.adopciontfg.app.ui.screens.components.AppOutlinedButton
 import com.example.adopciontfg.app.ui.screens.components.AppSecondaryButton
 import com.example.adopciontfg.app.ui.screens.components.AppTopAppBar
 import com.example.adopciontfg.app.ui.screens.components.RegistrationTextField
+import com.example.adopciontfg.app.ui.screens.components.SavingOverlay
 import com.example.adopciontfg.app.ui.screens.components.SavePhotos
 import com.example.adopciontfg.app.ui.screens.components.characteristicLabel
 import com.example.adopciontfg.app.ui.screens.components.speciesLabel
@@ -60,6 +62,9 @@ import com.example.adopciontfg.ui.theme.subtleDivider
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+
+private const val MAX_MAIN_PHOTOS = 1
+private const val MAX_GALLERY_PHOTOS = 6
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -86,6 +91,8 @@ fun PetRegistration(
         title = stringResource(R.string.registro_animal),
         saveButtonText = stringResource(R.string.registrar_animal),
         isLoading = false,
+        isSaving = false,
+        savingMessage = stringResource(R.string.registering_animal),
         name = name,
         onNameChange = { name = it },
         isFemale = isFemale,
@@ -122,6 +129,8 @@ fun PetRegistration(
     title: String,
     saveButtonText: String,
     isLoading: Boolean,
+    isSaving: Boolean,
+    savingMessage: String,
     name: String,
     onNameChange: (String) -> Unit,
     isFemale: Boolean,
@@ -149,191 +158,198 @@ fun PetRegistration(
 
     val dateFormatter = remember { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) }
 
-    Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
-        topBar = {
-            AppTopAppBar(
-                title = title,
-                onBackClick = onBackClick,
-            )
-        }
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = Dimens.screenPadding, vertical = Dimens.spacingMd),
-            verticalArrangement = Arrangement.spacedBy(Dimens.spacingLg)
-        ) {
-            AppFormSection(title = stringResource(R.string.datos_basicos)) {
-                RegistrationTextField(
-                    value = name,
-                    onValueChange = onNameChange,
-                    label = stringResource(R.string.nombre),
-                    capitalization = KeyboardCapitalization.Words
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            containerColor = MaterialTheme.colorScheme.background,
+            topBar = {
+                AppTopAppBar(
+                    title = title,
+                    onBackClick = onBackClick,
                 )
-
-                ExposedDropdownMenuBox(
-                    expanded = speciesExpanded,
-                    onExpandedChange = { speciesExpanded = !speciesExpanded },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    TextField(
-                        value = if (species != null) {
-                            speciesLabel(species)
-                        } else {
-                            ""
-                        },
-                        onValueChange = {},
-                        readOnly = true,
-                        label = { Text(stringResource(R.string.especie)) },
-                        trailingIcon = {
-                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = speciesExpanded)
-                        },
-                        modifier = Modifier
-                            .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
-                            .fillMaxWidth(),
-                        shape = MaterialTheme.shapes.medium,
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                            focusedIndicatorColor = MaterialTheme.colorScheme.primary,
-                            unfocusedIndicatorColor = MaterialTheme.colorScheme.inputOutlineUnfocused(),
-                        )
+            }
+        ) { innerPadding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = Dimens.screenPadding, vertical = Dimens.spacingMd),
+                verticalArrangement = Arrangement.spacedBy(Dimens.spacingLg)
+            ) {
+                AppFormSection(title = stringResource(R.string.datos_basicos)) {
+                    RegistrationTextField(
+                        value = name,
+                        onValueChange = onNameChange,
+                        label = stringResource(R.string.nombre),
+                        capitalization = KeyboardCapitalization.Words
                     )
-                    ExposedDropdownMenu(
+
+                    ExposedDropdownMenuBox(
                         expanded = speciesExpanded,
-                        onDismissRequest = { speciesExpanded = false }
+                        onExpandedChange = { speciesExpanded = !speciesExpanded },
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Species.entries.forEach { option ->
-                            DropdownMenuItem(
-                                text = { Text(speciesLabel(option)) },
-                                onClick = {
-                                    onSpeciesChange(option)
-                                    speciesExpanded = false
-                                }
+                        TextField(
+                            value = if (species != null) {
+                                speciesLabel(species)
+                            } else {
+                                ""
+                            },
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text(stringResource(R.string.especie)) },
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = speciesExpanded)
+                            },
+                            modifier = Modifier
+                                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
+                                .fillMaxWidth(),
+                            shape = MaterialTheme.shapes.medium,
+                            colors = TextFieldDefaults.colors(
+                                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+                                unfocusedIndicatorColor = MaterialTheme.colorScheme.inputOutlineUnfocused(),
+                            )
+                        )
+                        ExposedDropdownMenu(
+                            expanded = speciesExpanded,
+                            onDismissRequest = { speciesExpanded = false }
+                        ) {
+                            Species.entries.forEach { option ->
+                                DropdownMenuItem(
+                                    text = { Text(speciesLabel(option)) },
+                                    onClick = {
+                                        onSpeciesChange(option)
+                                        speciesExpanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+
+                    Text(
+                        text = stringResource(R.string.sexo),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(Dimens.spacingSm)
+                    ) {
+                        FilterChip(
+                            selected = !isFemale,
+                            onClick = { onSexChange(false) },
+                            label = { Text(stringResource(R.string.macho)) },
+                            modifier = Modifier.weight(1f)
+                        )
+                        FilterChip(
+                            selected = isFemale,
+                            onClick = { onSexChange(true) },
+                            label = { Text(stringResource(R.string.hembra)) },
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+
+                    AdoptionAvailabilitySwitchRow(
+                        isForAdoption = isForAdoption,
+                        onForAdoptionChange = onForAdoptionChange
+                    )
+
+                    Text(
+                        text = stringResource(R.string.fecha_nacimiento),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    AppOutlinedButton(
+                        text = if (birthDateMillis > 0L) {
+                            dateFormatter.format(Date(birthDateMillis))
+                        } else {
+                            stringResource(R.string.seleccionar_fecha)
+                        },
+                        onClick = { showDatePicker = true }
+                    )
+                }
+
+                AppFormSection(title = stringResource(R.string.descripcion)) {
+                    RegistrationTextField(
+                        value = description,
+                        onValueChange = onDescriptionChange,
+                        label = stringResource(R.string.descripcion),
+                        singleLine = false,
+                        minLines = 4
+                    )
+                }
+
+                AppFormSection(title = stringResource(R.string.fotos)) {
+                    Text(
+                        text = stringResource(R.string.foto_principal),
+                        style = MaterialTheme.typography.titleSmall
+                    )
+                    Text(
+                        text = stringResource(R.string.foto_principal_hint),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    SavePhotos(
+                        uris = listOfNotNull(mainPhotoUri),
+                        onUrisChange = { uris -> onMainPhotoChange(uris.firstOrNull()) },
+                        maxPhotos = MAX_MAIN_PHOTOS
+                    )
+
+                    HorizontalDivider(
+                        color = MaterialTheme.colorScheme.subtleDivider()
+                    )
+
+                    Text(
+                        text = stringResource(R.string.mas_fotos),
+                        style = MaterialTheme.typography.titleSmall
+                    )
+                    Text(
+                        text = stringResource(R.string.mas_fotos_hint),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    SavePhotos(
+                        uris = galleryUris,
+                        onUrisChange = onGalleryChange,
+                        maxPhotos = MAX_GALLERY_PHOTOS
+                    )
+                }
+
+                AppFormSection(title = stringResource(R.string.caracteristicas)) {
+                    Text(
+                        text = stringResource(R.string.caracteristicas_hint),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(Dimens.spacingSm),
+                        verticalArrangement = Arrangement.spacedBy(Dimens.spacingSm),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Characteristic.entries.forEach { characteristic ->
+                            FilterChip(
+                                selected = characteristic in selectedCharacteristics,
+                                onClick = { onCharacteristicToggle(characteristic) },
+                                label = { Text(characteristicLabel(characteristic)) }
                             )
                         }
                     }
                 }
 
-                Text(
-                    text = stringResource(R.string.sexo),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(Dimens.spacingSm)
-                ) {
-                    FilterChip(
-                        selected = !isFemale,
-                        onClick = { onSexChange(false) },
-                        label = { Text(stringResource(R.string.macho)) },
-                        modifier = Modifier.weight(1f)
-                    )
-                    FilterChip(
-                        selected = isFemale,
-                        onClick = { onSexChange(true) },
-                        label = { Text(stringResource(R.string.hembra)) },
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-
-                AdoptionAvailabilitySwitchRow(
-                    isForAdoption = isForAdoption,
-                    onForAdoptionChange = onForAdoptionChange
+                AppSecondaryButton(
+                    text = saveButtonText,
+                    onClick = onSaveClick,
+                    enabled = canSave && !isLoading && !isSaving
                 )
 
-                Text(
-                    text = stringResource(R.string.fecha_nacimiento),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                AppOutlinedButton(
-                    text = if (birthDateMillis > 0L) {
-                        dateFormatter.format(Date(birthDateMillis))
-                    } else {
-                        stringResource(R.string.seleccionar_fecha)
-                    },
-                    onClick = { showDatePicker = true }
-                )
+                Spacer(modifier = Modifier.height(Dimens.spacingSm))
             }
+        }
 
-            AppFormSection(title = stringResource(R.string.descripcion)) {
-                RegistrationTextField(
-                    value = description,
-                    onValueChange = onDescriptionChange,
-                    label = stringResource(R.string.descripcion),
-                    singleLine = false,
-                    minLines = 4
-                )
-            }
-
-            AppFormSection(title = stringResource(R.string.fotos)) {
-                Text(
-                    text = stringResource(R.string.foto_principal),
-                    style = MaterialTheme.typography.titleSmall
-                )
-                Text(
-                    text = stringResource(R.string.foto_principal_hint),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                SavePhotos(
-                    uris = listOfNotNull(mainPhotoUri),
-                    onUrisChange = { uris -> onMainPhotoChange(uris.firstOrNull()) },
-                    maxPhotos = 1
-                )
-
-                HorizontalDivider(
-                    color = MaterialTheme.colorScheme.subtleDivider()
-                )
-
-                Text(
-                    text = stringResource(R.string.mas_fotos),
-                    style = MaterialTheme.typography.titleSmall
-                )
-                Text(
-                    text = stringResource(R.string.mas_fotos_hint),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                SavePhotos(
-                    uris = galleryUris,
-                    onUrisChange = onGalleryChange
-                )
-            }
-
-            AppFormSection(title = stringResource(R.string.caracteristicas)) {
-                Text(
-                    text = stringResource(R.string.caracteristicas_hint),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(Dimens.spacingSm),
-                    verticalArrangement = Arrangement.spacedBy(Dimens.spacingSm),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Characteristic.entries.forEach { characteristic ->
-                        FilterChip(
-                            selected = characteristic in selectedCharacteristics,
-                            onClick = { onCharacteristicToggle(characteristic) },
-                            label = { Text(characteristicLabel(characteristic)) }
-                        )
-                    }
-                }
-            }
-
-            AppSecondaryButton(
-                text = saveButtonText,
-                onClick = onSaveClick,
-                enabled = canSave && !isLoading
-            )
-
-            Spacer(modifier = Modifier.height(Dimens.spacingSm))
+        if (isSaving) {
+            SavingOverlay(message = savingMessage)
         }
     }
 
@@ -375,16 +391,13 @@ private fun AdoptionAvailabilitySwitchRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = stringResource(R.string.no_adoptar),
+            text = stringResource(R.string.adoptar),
+            modifier = Modifier.weight(1f),
             style = MaterialTheme.typography.bodyLarge
         )
         Switch(
             checked = isForAdoption,
             onCheckedChange = onForAdoptionChange
-        )
-        Text(
-            text = stringResource(R.string.adoptar),
-            style = MaterialTheme.typography.bodyLarge
         )
     }
 }

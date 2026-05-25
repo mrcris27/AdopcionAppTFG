@@ -1,7 +1,6 @@
 package com.example.adopciontfg.app.ui.screens.user.settings
 
 import android.content.Context
-import android.net.Uri
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
@@ -40,10 +39,30 @@ data class UserSettingsUiState(
     val confirmNewPasswordHidden: Boolean = true,
     val isPasswordChangeDialogOpen: Boolean = false,
     val isPasswordChangeLoading: Boolean = false,
+    val isSavingSettings: Boolean = false,
+    val savedSettings: UserSettingsData? = null,
     val saveMessageRes: Int? = null,
     val saveMessage: String? = null
 
-)
+) {
+    val hasUnsavedChanges: Boolean
+        get() = savedSettings?.let { toSettingsData() != it } ?: false
+
+    val canSaveSettings: Boolean
+        get() = hasUnsavedChanges && !isSavingSettings
+
+    fun toSettingsData(): UserSettingsData {
+        return UserSettingsData(
+            name = name,
+            surname = surname,
+            email = email,
+            biography = biography,
+            profilePhotoUri = profilePhotoUri,
+            notificationsEnabled = notificationsEnabled,
+            darkModeEnabled = darkModeEnabled
+        )
+    }
+}
 
 @HiltViewModel
 class UserSettingsViewModel @Inject constructor(
@@ -60,19 +79,27 @@ class UserSettingsViewModel @Inject constructor(
         viewModelScope.launch {
             settingsRepository.userSettings().collectLatest { data ->
                 val firebaseUser = auth.currentUser
+                val loadedSettings = UserSettingsData(
+                    name = data.name.ifBlank { firebaseUser?.displayName.orEmpty().substringBefore(" ") },
+                    surname = data.surname.ifBlank {
+                        firebaseUser?.displayName.orEmpty().substringAfter(" ", "")
+                    },
+                    email = data.email.ifBlank { firebaseUser?.email.orEmpty() },
+                    biography = data.biography,
+                    profilePhotoUri = data.profilePhotoUri,
+                    notificationsEnabled = data.notificationsEnabled,
+                    darkModeEnabled = data.darkModeEnabled
+                )
                 _uiState.update { current ->
                     current.copy(
-                        name = data.name.ifBlank { firebaseUser?.displayName.orEmpty().substringBefore(" ") },
-                        surname = data.surname.ifBlank {
-                            firebaseUser?.displayName.orEmpty().substringAfter(" ", "")
-                        },
-                        email = data.email.ifBlank { firebaseUser?.email.orEmpty() },
-                        biography = data.biography,
-                        profilePhotoUri = data.profilePhotoUri.ifBlank {
-                            firebaseUser?.photoUrl?.toString().orEmpty()
-                        },
-                        notificationsEnabled = data.notificationsEnabled,
-                        darkModeEnabled = data.darkModeEnabled
+                        name = loadedSettings.name,
+                        surname = loadedSettings.surname,
+                        email = loadedSettings.email,
+                        biography = loadedSettings.biography,
+                        profilePhotoUri = loadedSettings.profilePhotoUri,
+                        notificationsEnabled = loadedSettings.notificationsEnabled,
+                        darkModeEnabled = loadedSettings.darkModeEnabled,
+                        savedSettings = loadedSettings
                     )
                 }
             }
@@ -83,13 +110,14 @@ class UserSettingsViewModel @Inject constructor(
                 userRepository.getUserById(userId).asFlow().collectLatest { user ->
                     if (user != null) {
                         _uiState.update { current ->
-                            current.copy(
+                            val updated = current.copy(
                                 name = user.name.orEmpty(),
                                 surname = user.surname.orEmpty(),
                                 email = user.email.orEmpty(),
                                 biography = user.biography.orEmpty(),
                                 profilePhotoUri = user.profilePicture.orEmpty(),
                             )
+                            updated.copy(savedSettings = updated.toSettingsData())
                         }
                     }
                 }
@@ -150,15 +178,39 @@ class UserSettingsViewModel @Inject constructor(
             settingsRepository.saveUserSettings(
                 current.toSettingsData().copy(darkModeEnabled = enabled)
             )
+            _uiState.update { it.copy(savedSettings = it.toSettingsData()) }
         }
     }
 
     fun onSaveClick() {
+        val current = _uiState.value
+        if (!current.canSaveSettings) return
+
+        _uiState.update {
+            it.copy(
+                isSavingSettings = true,
+                saveMessageRes = null,
+                saveMessage = null
+            )
+        }
         viewModelScope.launch {
-            val current = _uiState.value
-            settingsRepository.saveUserSettings(current.toSettingsData())
-            syncUserToFirebase(current)
-            updateFirebaseProfile(current)
+            try {
+                settingsRepository.saveUserSettings(current.toSettingsData())
+                syncUserToFirebase(current)
+                updateFirebaseProfile(current)
+            } catch (exception: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isSavingSettings = false,
+                        saveMessageRes = if (exception.message == null) {
+                            R.string.error_desconocido
+                        } else {
+                            null
+                        },
+                        saveMessage = exception.message
+                    )
+                }
+            }
         }
     }
 
@@ -260,26 +312,36 @@ class UserSettingsViewModel @Inject constructor(
     private fun updateFirebaseProfile(current: UserSettingsUiState) {
         val user = auth.currentUser
         if (user == null) {
-            _uiState.update { it.withMessage(R.string.settings_changes_saved) }
+            _uiState.update {
+                it.withMessage(R.string.settings_changes_saved).copy(
+                    isSavingSettings = false,
+                    savedSettings = current.toSettingsData()
+                )
+            }
             return
         }
 
         val displayName = listOf(current.name, current.surname)
             .filter { it.isNotBlank() }
             .joinToString(" ")
-        val photoUri = current.profilePhotoUri.takeIf { it.isNotBlank() }?.let(Uri::parse)
         val profileUpdates = UserProfileChangeRequest.Builder()
             .setDisplayName(displayName.ifBlank { null })
-            .setPhotoUri(photoUri)
             .build()
 
         user.updateProfile(profileUpdates)
             .addOnSuccessListener {
-                _uiState.update { it.withMessage(R.string.settings_changes_saved) }
+                _uiState.update {
+                    it.withMessage(R.string.settings_changes_saved).copy(
+                        isSavingSettings = false,
+                        savedSettings = current.toSettingsData()
+                    )
+                }
             }
             .addOnFailureListener { exception ->
                 _uiState.update {
                     it.copy(
+                        isSavingSettings = false,
+                        savedSettings = current.toSettingsData(),
                         saveMessageRes = if (exception.message == null) {
                             R.string.settings_changes_saved_device_only
                         } else {
@@ -289,18 +351,6 @@ class UserSettingsViewModel @Inject constructor(
                     )
                 }
             }
-    }
-
-    private fun UserSettingsUiState.toSettingsData(): UserSettingsData {
-        return UserSettingsData(
-            name = name,
-            surname = surname,
-            email = email,
-            biography = biography,
-            profilePhotoUri = profilePhotoUri,
-            notificationsEnabled = notificationsEnabled,
-            darkModeEnabled = darkModeEnabled
-        )
     }
 
     private fun UserSettingsUiState.withMessage(@StringRes messageRes: Int): UserSettingsUiState =

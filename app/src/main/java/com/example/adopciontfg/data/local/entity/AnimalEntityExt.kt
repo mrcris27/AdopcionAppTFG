@@ -6,7 +6,7 @@ import kotlin.math.max
 /**
  * Funciones de extensión para [AnimalEntity].
  *
- * [AnimalEntity] es la entidad de Room que guarda los datos crudos del animal (IDs, URLs,
+ * [AnimalEntity] es la entidad de Room que guarda los datos crudos del animal (IDs, URIs locales,
  * timestamps, enums, etc.). Estas extensiones convierten esos datos en textos y listas listos
  * para mostrar en Compose, sin duplicar lógica en cada pantalla.
  *
@@ -16,7 +16,7 @@ import kotlin.math.max
  */
 
 /**
- * Devuelve las URLs de fotos que debe mostrar la UI.
+ * Devuelve las URIs de fotos que debe mostrar la UI.
  *
  * Prioridad:
  * 1. [AnimalEntity.photos] — galería completa, sin entradas vacías.

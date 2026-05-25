@@ -1,6 +1,5 @@
 package com.example.adopciontfg.app.ui.screens.shelter.settings
 
-import android.net.Uri
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
@@ -48,9 +47,31 @@ data class ShelterSettingsUiState(
     val confirmNewPasswordHidden: Boolean = true,
     val isPasswordChangeDialogOpen: Boolean = false,
     val isPasswordChangeLoading: Boolean = false,
+    val isSavingSettings: Boolean = false,
+    val savedSettings: ShelterSettingsData? = null,
     val saveMessageRes: Int? = null,
     val saveMessage: String? = null
-)
+) {
+    val hasUnsavedChanges: Boolean
+        get() = savedSettings?.let { toSettingsData() != it } ?: false
+
+    val canSaveSettings: Boolean
+        get() = hasUnsavedChanges && !isSavingSettings
+
+    fun toSettingsData(): ShelterSettingsData {
+        return ShelterSettingsData(
+            shelterName = shelterName,
+            email = email,
+            phone = phone,
+            address = address,
+            cif = cif,
+            profilePhotoUri = profilePhotoUri,
+            adoptionFormUrl = adoptionFormUrl,
+            adoptionAlertsEnabled = adoptionAlertsEnabled,
+            darkModeEnabled = darkModeEnabled
+        )
+    }
+}
 
 @HiltViewModel
 class ShelterSettingsViewModel @Inject constructor(
@@ -66,24 +87,34 @@ class ShelterSettingsViewModel @Inject constructor(
             settingsRepository.shelterSettings().collectLatest { data ->
                 val firebaseUser = auth.currentUser
                 val addressParts = parseShelterAddress(data.address)
+                val loadedSettings = ShelterSettingsData(
+                    shelterName = data.shelterName.ifBlank { firebaseUser?.displayName.orEmpty() },
+                    email = data.email.ifBlank { firebaseUser?.email.orEmpty() },
+                    phone = data.phone,
+                    address = data.address,
+                    cif = data.cif,
+                    profilePhotoUri = data.profilePhotoUri,
+                    adoptionFormUrl = data.adoptionFormUrl,
+                    adoptionAlertsEnabled = data.adoptionAlertsEnabled,
+                    darkModeEnabled = data.darkModeEnabled
+                )
                 _uiState.update { current ->
                     current.copy(
-                        shelterName = data.shelterName.ifBlank { firebaseUser?.displayName.orEmpty() },
-                        email = data.email.ifBlank { firebaseUser?.email.orEmpty() },
-                        phone = data.phone,
-                        address = data.address,
+                        shelterName = loadedSettings.shelterName,
+                        email = loadedSettings.email,
+                        phone = loadedSettings.phone,
+                        address = loadedSettings.address,
                         street = addressParts.street,
                         streetNumber = addressParts.streetNumber,
                         postalCode = addressParts.postalCode,
                         city = addressParts.city,
                         province = addressParts.province,
-                        cif = data.cif,
-                        profilePhotoUri = data.profilePhotoUri.ifBlank {
-                            firebaseUser?.photoUrl?.toString().orEmpty()
-                        },
-                        adoptionFormUrl = data.adoptionFormUrl,
-                        adoptionAlertsEnabled = data.adoptionAlertsEnabled,
-                        darkModeEnabled = data.darkModeEnabled
+                        cif = loadedSettings.cif,
+                        profilePhotoUri = loadedSettings.profilePhotoUri,
+                        adoptionFormUrl = loadedSettings.adoptionFormUrl,
+                        adoptionAlertsEnabled = loadedSettings.adoptionAlertsEnabled,
+                        darkModeEnabled = loadedSettings.darkModeEnabled,
+                        savedSettings = loadedSettings
                     )
                 }
             }
@@ -94,7 +125,7 @@ class ShelterSettingsViewModel @Inject constructor(
                 shelterRepository.getShelterById(shelterId).asFlow().collectLatest { shelter ->
                     if (shelter != null) {
                         _uiState.update { current ->
-                            current.copy(
+                            val updated = current.copy(
                                 shelterName = shelter.name.orEmpty(),
                                 email = shelter.email.orEmpty(),
                                 phone = shelter.phone.orEmpty(),
@@ -103,6 +134,7 @@ class ShelterSettingsViewModel @Inject constructor(
                                 profilePhotoUri = shelter.profilePicture.orEmpty(),
                                 adoptionFormUrl = shelter.adoptionFormUrl.orEmpty(),
                             )
+                            updated.copy(savedSettings = updated.toSettingsData())
                         }
                     }
                 }
@@ -170,6 +202,7 @@ class ShelterSettingsViewModel @Inject constructor(
             settingsRepository.saveShelterSettings(
                 current.toSettingsData().copy(darkModeEnabled = enabled)
             )
+            _uiState.update { it.copy(savedSettings = it.toSettingsData()) }
         }
     }
 
@@ -193,11 +226,34 @@ class ShelterSettingsViewModel @Inject constructor(
     }
 
     fun onSaveClick() {
+        val current = _uiState.value
+        if (!current.canSaveSettings) return
+
+        _uiState.update {
+            it.copy(
+                isSavingSettings = true,
+                saveMessageRes = null,
+                saveMessage = null
+            )
+        }
         viewModelScope.launch {
-            val current = _uiState.value
-            settingsRepository.saveShelterSettings(current.toSettingsData())
-            syncShelterToFirebase(current)
-            updateFirebaseProfile(current)
+            try {
+                settingsRepository.saveShelterSettings(current.toSettingsData())
+                syncShelterToFirebase(current)
+                updateFirebaseProfile(current)
+            } catch (exception: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isSavingSettings = false,
+                        saveMessageRes = if (exception.message == null) {
+                            R.string.error_desconocido
+                        } else {
+                            null
+                        },
+                        saveMessage = exception.message
+                    )
+                }
+            }
         }
     }
 
@@ -294,23 +350,33 @@ class ShelterSettingsViewModel @Inject constructor(
     private fun updateFirebaseProfile(current: ShelterSettingsUiState) {
         val user = auth.currentUser
         if (user == null) {
-            _uiState.update { it.withMessage(R.string.settings_changes_saved) }
+            _uiState.update {
+                it.withMessage(R.string.settings_changes_saved).copy(
+                    isSavingSettings = false,
+                    savedSettings = current.toSettingsData()
+                )
+            }
             return
         }
 
-        val photoUri = current.profilePhotoUri.takeIf { it.isNotBlank() }?.let(Uri::parse)
         val profileUpdates = UserProfileChangeRequest.Builder()
             .setDisplayName(current.shelterName.ifBlank { null })
-            .setPhotoUri(photoUri)
             .build()
 
         user.updateProfile(profileUpdates)
             .addOnSuccessListener {
-                _uiState.update { it.withMessage(R.string.settings_changes_saved) }
+                _uiState.update {
+                    it.withMessage(R.string.settings_changes_saved).copy(
+                        isSavingSettings = false,
+                        savedSettings = current.toSettingsData()
+                    )
+                }
             }
             .addOnFailureListener { exception ->
                 _uiState.update {
                     it.copy(
+                        isSavingSettings = false,
+                        savedSettings = current.toSettingsData(),
                         saveMessageRes = if (exception.message == null) {
                             R.string.settings_changes_saved_device_only
                         } else {
@@ -320,20 +386,6 @@ class ShelterSettingsViewModel @Inject constructor(
                     )
                 }
             }
-    }
-
-    private fun ShelterSettingsUiState.toSettingsData(): ShelterSettingsData {
-        return ShelterSettingsData(
-            shelterName = shelterName,
-            email = email,
-            phone = phone,
-            address = address,
-            cif = cif,
-            profilePhotoUri = profilePhotoUri,
-            adoptionFormUrl = adoptionFormUrl,
-            adoptionAlertsEnabled = adoptionAlertsEnabled,
-            darkModeEnabled = darkModeEnabled
-        )
     }
 
     private fun ShelterSettingsUiState.withMessage(@StringRes messageRes: Int): ShelterSettingsUiState =

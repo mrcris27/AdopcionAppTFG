@@ -43,6 +43,7 @@ fun AppNavHost(navController: NavHostController) {
 
     val authViewModel: AuthViewModel = viewModel()
     val authState by authViewModel.authState.collectAsStateWithLifecycle()
+    val isAuthLoading = authState is AuthViewModel.AuthState.Loading
 
     LaunchedEffect(authState) {
         when (val state = authState) {
@@ -136,6 +137,7 @@ fun AppNavHost(navController: NavHostController) {
                     password = password
                 )
             },
+            isSaving = isAuthLoading,
         )
 
         shelterRegistrationScreen(
@@ -151,6 +153,7 @@ fun AppNavHost(navController: NavHostController) {
                 )
             },
             onBackClick = { navController.popBackStack() },
+            isSaving = isAuthLoading,
         )
 
         /* ---------------- MAIN ---------------- */

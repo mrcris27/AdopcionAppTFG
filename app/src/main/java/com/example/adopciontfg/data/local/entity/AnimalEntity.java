@@ -19,8 +19,8 @@ public class AnimalEntity {
 
     private String name;
     private boolean sex; // true = Female, false = Male
-    private String mainPhoto;              // URL Firebase Storage
-    private List<String> photos;           // URLs Firebase Storage (TypeConverter)
+    private String mainPhoto;              // URI local de la foto principal
+    private List<String> photos;           // URIs locales de galería (TypeConverter)
     private long birthDate;                // timestamp
     private String description;
     private boolean forAdoption;
