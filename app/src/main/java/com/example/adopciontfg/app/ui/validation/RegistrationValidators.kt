@@ -12,6 +12,14 @@ fun isValidRegistrationPassword(password: String): Boolean {
     return password.length >= MIN_PASSWORD_LENGTH
 }
 
+fun isValidSpanishPhone(phone: String): Boolean {
+    val normalizedPhone = phone.trim()
+        .replace(" ", "")
+        .replace("-", "")
+
+    return Regex("""^(?:(?:\+34|0034)?[6789]\d{8})$""").matches(normalizedPhone)
+}
+
 fun doPasswordsMatch(password: String, confirmPassword: String): Boolean {
     return password == confirmPassword
 }

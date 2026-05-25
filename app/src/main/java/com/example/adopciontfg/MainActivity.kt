@@ -9,6 +9,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.example.adopciontfg.app.ui.navigation.AppNavHost
 import com.example.adopciontfg.app.ui.viewmodel.AppThemeViewModel
+import com.example.adopciontfg.data.settings.LaunchThemeController
 import com.example.adopciontfg.ui.theme.AdoptionTheme
 import dagger.hilt.android.AndroidEntryPoint
 import org.osmdroid.config.Configuration
@@ -17,6 +18,7 @@ import org.osmdroid.config.Configuration
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         Configuration.getInstance().userAgentValue = packageName
+        LaunchThemeController.applyConfiguredNightMode(this)
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 

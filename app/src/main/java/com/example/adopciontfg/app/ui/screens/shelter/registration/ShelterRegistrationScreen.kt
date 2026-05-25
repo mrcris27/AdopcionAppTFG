@@ -69,7 +69,7 @@ fun ShelterRegistration(
             containerColor = MaterialTheme.colorScheme.background,
             topBar = {
                 AppTopAppBar(
-                    title = stringResource(R.string.registro_protectora),
+                    title = stringResource(R.string.shelter_registration),
                     onBackClick = onBackClick
                 )
             }
@@ -83,27 +83,32 @@ fun ShelterRegistration(
                 verticalArrangement = Arrangement.spacedBy(Dimens.spacingMd),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                AppFormSection(title = stringResource(R.string.datos_protectora)) {
+                AppFormSection(title = stringResource(R.string.shelter_details)) {
                     RegistrationTextField(
                         value = uiState.value.name,
                         onValueChange = viewModel::onNameChange,
-                        label = stringResource(R.string.nombre)
+                        label = stringResource(R.string.name)
                     )
                     RegistrationTextField(
                         value = uiState.value.cif,
                         onValueChange = viewModel::onCifChange,
-                        label = stringResource(R.string.cif)
+                        label = stringResource(R.string.tax_id)
                     )
                     RegistrationTextField(
                         value = uiState.value.phone,
                         onValueChange = viewModel::onPhoneChange,
-                        label = stringResource(R.string.telefono),
-                        keyboardType = KeyboardType.Phone
+                        label = stringResource(R.string.phone),
+                        keyboardType = KeyboardType.Phone,
+                        errorMessage = if (uiState.value.isPhoneInvalid) {
+                            stringResource(R.string.registration_invalid_phone_error)
+                        } else {
+                            null
+                        }
                     )
                     RegistrationTextField(
                         value = uiState.value.email,
                         onValueChange = viewModel::onEmailChange,
-                        label = stringResource(R.string.correo),
+                        label = stringResource(R.string.email),
                         keyboardType = KeyboardType.Email,
                         errorMessage = if (uiState.value.isEmailInvalid) {
                             stringResource(R.string.login_invalid_email_error)
@@ -113,47 +118,47 @@ fun ShelterRegistration(
                     )
                 }
 
-                AppFormSection(title = stringResource(R.string.direccion)) {
+                AppFormSection(title = stringResource(R.string.address)) {
                     RegistrationTextField(
                         value = uiState.value.street,
                         onValueChange = viewModel::onStreetChange,
-                        label = stringResource(R.string.calle),
+                        label = stringResource(R.string.street),
                         capitalization = KeyboardCapitalization.Words
                     )
                     RegistrationTextField(
                         value = uiState.value.streetNumber,
                         onValueChange = viewModel::onStreetNumberChange,
-                        label = stringResource(R.string.numero),
+                        label = stringResource(R.string.street_number),
                         capitalization = KeyboardCapitalization.Characters
                     )
                     RegistrationTextField(
                         value = uiState.value.postalCode,
                         onValueChange = viewModel::onPostalCodeChange,
-                        label = stringResource(R.string.codigo_postal),
+                        label = stringResource(R.string.postal_code),
                         keyboardType = KeyboardType.Number
                     )
                     RegistrationTextField(
                         value = uiState.value.city,
                         onValueChange = viewModel::onCityChange,
-                        label = stringResource(R.string.localidad_ciudad),
+                        label = stringResource(R.string.town_city),
                         capitalization = KeyboardCapitalization.Words
                     )
                     ShelterProvinceDropdown(
                         selectedProvince = uiState.value.province,
-                        provinces = stringArrayResource(R.array.provincias_espana).toList(),
+                        provinces = stringArrayResource(R.array.spain_provinces).toList(),
                         onProvinceSelected = viewModel::onProvinceChange
                     )
                 }
 
-                AppFormSection(title = stringResource(R.string.acceso)) {
+                AppFormSection(title = stringResource(R.string.access)) {
                     RegistrationPasswordField(
                         value = uiState.value.password,
                         onValueChange = viewModel::onPasswordChange,
-                        label = stringResource(R.string.contraseña),
+                        label = stringResource(R.string.password),
                         hidden = uiState.value.passwordHidden,
                         onToggleVisibility = viewModel::togglePasswordVisibility,
                         errorMessage = if (uiState.value.isPasswordInvalid) {
-                            stringResource(R.string.registro_password_min_length_error)
+                            stringResource(R.string.registration_password_min_length_error)
                         } else {
                             null
                         }
@@ -161,18 +166,18 @@ fun ShelterRegistration(
                     RegistrationPasswordField(
                         value = uiState.value.confirmPassword,
                         onValueChange = viewModel::onConfirmPasswordChange,
-                        label = stringResource(R.string.contraseña2),
+                        label = stringResource(R.string.repeat_password),
                         hidden = uiState.value.confirmPasswordHidden,
                         onToggleVisibility = viewModel::toggleConfirmPasswordVisibility,
                         errorMessage = if (uiState.value.doPasswordsNotMatch) {
-                            stringResource(R.string.registro_passwords_do_not_match_error)
+                            stringResource(R.string.registration_passwords_do_not_match_error)
                         } else {
                             null
                         }
                     )
                 }
 
-                AppFormSection(title = stringResource(R.string.imagen_publica)) {
+                AppFormSection(title = stringResource(R.string.public_image)) {
                     ProfilePhotoPicker(
                         photoUri = uiState.value.profilePhotoUri,
                         onPhotoChange = viewModel::onProfilePhotoChange,
@@ -181,7 +186,7 @@ fun ShelterRegistration(
                 }
 
                 AppSecondaryButton(
-                    text = stringResource(R.string.registrar),
+                    text = stringResource(R.string.register),
                     onClick = {
                         with(uiState.value) {
                             onRegisterClick(
@@ -225,7 +230,7 @@ private fun ShelterProvinceDropdown(
             value = selectedProvince,
             onValueChange = {},
             readOnly = true,
-            label = { Text(stringResource(R.string.provincia)) },
+            label = { Text(stringResource(R.string.province)) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier
                 .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true)

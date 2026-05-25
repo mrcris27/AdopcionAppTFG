@@ -53,7 +53,7 @@ fun UserRegistration(
             containerColor = MaterialTheme.colorScheme.background,
             topBar = {
                 AppTopAppBar(
-                    title = stringResource(R.string.registro_usuario),
+                    title = stringResource(R.string.user_registration),
                     onBackClick = onBackClick
                 )
             }
@@ -67,21 +67,21 @@ fun UserRegistration(
                 verticalArrangement = Arrangement.spacedBy(Dimens.spacingMd),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                AppFormSection(title = stringResource(R.string.datos_personales)) {
+                AppFormSection(title = stringResource(R.string.personal_details)) {
                     RegistrationTextField(
                         value = uiState.value.name,
                         onValueChange = viewModel::onNameChange,
-                        label = stringResource(R.string.nombre)
+                        label = stringResource(R.string.name)
                     )
                     RegistrationTextField(
                         value = uiState.value.surname,
                         onValueChange = viewModel::onSurnameChange,
-                        label = stringResource(R.string.apellidos)
+                        label = stringResource(R.string.surnames)
                     )
                     RegistrationTextField(
                         value = uiState.value.email,
                         onValueChange = viewModel::onEmailChange,
-                        label = stringResource(R.string.correo),
+                        label = stringResource(R.string.email),
                         keyboardType = KeyboardType.Email,
                         errorMessage = if (uiState.value.isEmailInvalid) {
                             stringResource(R.string.login_invalid_email_error)
@@ -92,13 +92,13 @@ fun UserRegistration(
                     RegistrationTextField(
                         value = uiState.value.biography,
                         onValueChange = viewModel::onBiographyChange,
-                        label = stringResource(R.string.biografia),
+                        label = stringResource(R.string.biography),
                         singleLine = false,
                         minLines = 3
                     )
                 }
 
-                AppFormSection(title = stringResource(R.string.foto_perfil_section)) {
+                AppFormSection(title = stringResource(R.string.profile_photo_section)) {
                     ProfilePhotoPicker(
                         photoUri = uiState.value.profilePhotoUri,
                         onPhotoChange = viewModel::onProfilePhotoChange,
@@ -106,15 +106,15 @@ fun UserRegistration(
                     )
                 }
 
-                AppFormSection(title = stringResource(R.string.acceso)) {
+                AppFormSection(title = stringResource(R.string.access)) {
                     RegistrationPasswordField(
                         value = uiState.value.password,
                         onValueChange = viewModel::onPasswordChange,
-                        label = stringResource(R.string.contraseña),
+                        label = stringResource(R.string.password),
                         hidden = uiState.value.passwordHidden,
                         onToggleVisibility = viewModel::togglePasswordVisibility,
                         errorMessage = if (uiState.value.isPasswordInvalid) {
-                            stringResource(R.string.registro_password_min_length_error)
+                            stringResource(R.string.registration_password_min_length_error)
                         } else {
                             null
                         }
@@ -122,11 +122,11 @@ fun UserRegistration(
                     RegistrationPasswordField(
                         value = uiState.value.confirmPassword,
                         onValueChange = viewModel::onConfirmPasswordChange,
-                        label = stringResource(R.string.contraseña2),
+                        label = stringResource(R.string.repeat_password),
                         hidden = uiState.value.confirmPasswordHidden,
                         onToggleVisibility = viewModel::toggleConfirmPasswordVisibility,
                         errorMessage = if (uiState.value.doPasswordsNotMatch) {
-                            stringResource(R.string.registro_passwords_do_not_match_error)
+                            stringResource(R.string.registration_passwords_do_not_match_error)
                         } else {
                             null
                         }
@@ -134,7 +134,7 @@ fun UserRegistration(
                 }
 
                 AppSecondaryButton(
-                    text = stringResource(R.string.registrar),
+                    text = stringResource(R.string.register),
                     onClick = {
                         with(uiState.value) {
                             onRegisterClick(

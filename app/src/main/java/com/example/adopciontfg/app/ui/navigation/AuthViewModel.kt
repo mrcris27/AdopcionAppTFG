@@ -146,9 +146,9 @@ class AuthViewModel (application: Application) : AndroidViewModel(application) {
     private fun getRegisterErrorMessage(exception: Exception): String {
         val errorMessage = exception.localizedMessage.orEmpty()
         return when ((exception as? FirebaseAuthException)?.errorCode) {
-            "ERROR_EMAIL_ALREADY_IN_USE" -> getString(R.string.registro_email_already_in_use_error)
+            "ERROR_EMAIL_ALREADY_IN_USE" -> getString(R.string.registration_email_already_in_use_error)
             "ERROR_INVALID_EMAIL" -> getString(R.string.login_invalid_email_error)
-            "ERROR_WEAK_PASSWORD" -> getString(R.string.registro_password_min_length_error)
+            "ERROR_WEAK_PASSWORD" -> getString(R.string.registration_password_min_length_error)
             else -> if (errorMessage.contains("CONFIGURATION_NOT_FOUND")) {
                 getString(R.string.firebase_auth_configuration_error)
             } else {

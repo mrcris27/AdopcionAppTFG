@@ -99,11 +99,11 @@ fun LoginRegistrationScreen(onLoginClick: () -> Unit, onRegisterClick: () -> Uni
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 AppPrimaryButton(
-                    text = stringResource(R.string.iniciar_sesion),
+                    text = stringResource(R.string.sign_in),
                     onClick = onLoginClick
                 )
                 AppSecondaryButton(
-                    text = stringResource(R.string.registrarse),
+                    text = stringResource(R.string.sign_up),
                     onClick = onRegisterClick
                 )
             }

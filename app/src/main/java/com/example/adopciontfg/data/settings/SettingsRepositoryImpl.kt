@@ -1,5 +1,6 @@
 package com.example.adopciontfg.data.settings
 
+import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -9,6 +10,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import com.example.adopciontfg.domain.settings.SettingsRepository
 import com.example.adopciontfg.domain.settings.ShelterSettingsData
 import com.example.adopciontfg.domain.settings.UserSettingsData
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.IOException
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
@@ -16,7 +18,8 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 
 class SettingsRepositoryImpl @Inject constructor(
-    private val dataStore: DataStore<Preferences>
+    private val dataStore: DataStore<Preferences>,
+    @param:ApplicationContext private val context: Context
 ) : SettingsRepository {
 
     override fun userSettings(): Flow<UserSettingsData> {
@@ -47,6 +50,7 @@ class SettingsRepositoryImpl @Inject constructor(
             prefs[USER_NOTIFICATIONS] = data.notificationsEnabled
             prefs[USER_DARK_MODE] = data.darkModeEnabled
         }
+        LaunchThemeController.applyApplicationNightMode(context, data.darkModeEnabled)
     }
 
     override fun shelterSettings(): Flow<ShelterSettingsData> {
@@ -81,6 +85,7 @@ class SettingsRepositoryImpl @Inject constructor(
             prefs[SHELTER_ADOPTION_ALERTS] = data.adoptionAlertsEnabled
             prefs[SHELTER_DARK_MODE] = data.darkModeEnabled
         }
+        LaunchThemeController.applyApplicationNightMode(context, data.darkModeEnabled)
     }
 
     private companion object {

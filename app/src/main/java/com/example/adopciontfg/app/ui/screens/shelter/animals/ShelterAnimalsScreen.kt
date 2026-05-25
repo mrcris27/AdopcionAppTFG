@@ -85,7 +85,7 @@ private fun ShelterAnimalsContent(
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
             ) {
-                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.registrar_animal))
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.register_animal))
             }
         },
     ) { innerPadding ->
@@ -113,7 +113,7 @@ private fun ShelterAnimalsContent(
                     when {
                         uiState.shelterId == null -> {
                             EmptyMessage(
-                                text = stringResource(R.string.shelter_sin_sesion),
+                                text = stringResource(R.string.shelter_no_session),
                                 modifier = Modifier.align(Alignment.Center),
                             )
                         }
@@ -121,9 +121,9 @@ private fun ShelterAnimalsContent(
                         uiState.filteredAnimals.isEmpty() -> {
                             EmptyMessage(
                                 text = if (uiState.animals.isEmpty()) {
-                                    stringResource(R.string.shelter_sin_animales)
+                                    stringResource(R.string.shelter_no_animals)
                                 } else {
-                                    stringResource(R.string.sin_resultados_animales)
+                                    stringResource(R.string.no_animal_results)
                                 },
                                 modifier = Modifier.align(Alignment.Center),
                             )
@@ -175,12 +175,12 @@ private fun ShelterAnimalsOverview(
             verticalArrangement = Arrangement.spacedBy(Dimens.spacingMd),
         ) {
             Text(
-                text = stringResource(R.string.animales_registrados),
+                text = stringResource(R.string.registered_animals),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
             )
             Text(
-                text = stringResource(R.string.shelter_total_animales, total),
+                text = stringResource(R.string.shelter_total_animals, total),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -213,7 +213,7 @@ private fun ShelterSearchField(
         shape = MaterialTheme.shapes.large,
         placeholder = {
             Text(
-                text = stringResource(R.string.buscar_mis_animales),
+                text = stringResource(R.string.search_my_animals),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -230,7 +230,7 @@ private fun ShelterSearchField(
                 IconButton(onClick = { onQueryChange("") }) {
                     Icon(
                         imageVector = Icons.Default.Clear,
-                        contentDescription = stringResource(R.string.limpiar_busqueda),
+                        contentDescription = stringResource(R.string.clear_search),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }

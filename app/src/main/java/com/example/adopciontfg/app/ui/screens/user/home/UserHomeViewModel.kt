@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 data class UserHomeUiState(
     val query: String = "",
     val selectedTab: Int = 0,
-    val tabs: List<Int> = listOf(R.string.lista, R.string.mapa),
+    val tabs: List<Int> = listOf(R.string.list, R.string.map),
     val isLoadingShelters: Boolean = true,
     val isRefreshing: Boolean = false,
     val refreshError: DataRefreshError? = null,

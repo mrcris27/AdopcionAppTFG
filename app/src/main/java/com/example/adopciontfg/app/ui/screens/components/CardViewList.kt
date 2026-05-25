@@ -48,7 +48,7 @@ import kotlinx.coroutines.withContext
 fun CardViewList(
     name: String,
     onClick: () -> Unit,
-    subtitle: String = stringResource(R.string.toca_ver_mas_informacion),
+    subtitle: String = stringResource(R.string.tap_to_view_more_information),
     photoUri: String? = null,
     placeholderIcon: ImageVector = Icons.Default.Pets,
 ) {

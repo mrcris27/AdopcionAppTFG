@@ -2,6 +2,7 @@ package com.example.adopciontfg.app.ui.screens.auth.login
 
 import android.util.Patterns
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,10 +33,9 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.adopciontfg.R
 import com.example.adopciontfg.app.ui.screens.components.AppFilledTextField
-import com.example.adopciontfg.app.ui.screens.components.AppFormSection
 import com.example.adopciontfg.app.ui.screens.components.AppPrimaryButton
-import com.example.adopciontfg.app.ui.screens.components.AppSecondaryButton
 import com.example.adopciontfg.app.ui.screens.components.AppTopAppBar
+import com.example.adopciontfg.app.ui.screens.components.SavingOverlay
 import com.example.adopciontfg.ui.theme.AdoptionTheme
 import com.example.adopciontfg.ui.theme.Dimens
 
@@ -44,7 +44,7 @@ import com.example.adopciontfg.ui.theme.Dimens
 fun LoginScreen(
     onBackClick: () -> Unit,
     onContinueClick: (email: String, password: String) -> Unit,
-    onShelterPreviewClick: () -> Unit,
+    isLoading: Boolean = false,
 ) {
     var user by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
@@ -53,129 +53,131 @@ fun LoginScreen(
     val email = user.trim()
     val isEmailInvalid = email.isNotEmpty() && !Patterns.EMAIL_ADDRESS.matcher(email).matches()
 
-    Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
-        topBar = {
-            AppTopAppBar(
-                title = stringResource(R.string.login),
-                onBackClick = onBackClick
-            )
-        }
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(Dimens.screenPadding),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            containerColor = MaterialTheme.colorScheme.background,
+            topBar = {
+                AppTopAppBar(
+                    title = stringResource(R.string.login),
+                    onBackClick = onBackClick
+                )
+            }
+        ) { innerPadding ->
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(Dimens.spacingLg)
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .padding(Dimens.screenPadding),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = stringResource(R.string.login_subtitle),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(bottom = Dimens.spacingSm)
-                )
-
                 Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(Dimens.spacingXs)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(Dimens.spacingLg)
                 ) {
-                    if (isEmailInvalid) {
+                    Text(
+                        text = stringResource(R.string.login_subtitle),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(bottom = Dimens.spacingSm)
+                    )
+
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(Dimens.spacingXs)
+                    ) {
+                        if (isEmailInvalid) {
+                            Text(
+                                text = stringResource(R.string.login_invalid_email_error),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+
+                        AppFilledTextField(
+                            value = user,
+                            onValueChange = {
+                                user = it
+                                if (it.isNotBlank() && password.isNotBlank()) {
+                                    showEmptyFieldsError = false
+                                }
+                            },
+                            label = { Text(stringResource(R.string.email)) },
+                            isError = isEmailInvalid,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+                        )
+                    }
+
+                    AppFilledTextField(
+                        value = password,
+                        onValueChange = {
+                            password = it
+                            if (user.isNotBlank() && it.isNotBlank()) {
+                                showEmptyFieldsError = false
+                            }
+                        },
+                        label = { Text(stringResource(R.string.password)) },
+                        visualTransformation = if (passwordHidden) {
+                            PasswordVisualTransformation()
+                        } else {
+                            VisualTransformation.None
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        trailingIcon = {
+                            IconButton(onClick = { passwordHidden = !passwordHidden }) {
+                                Icon(
+                                    imageVector = if (passwordHidden) {
+                                        Icons.Filled.Visibility
+                                    } else {
+                                        Icons.Filled.VisibilityOff
+                                    },
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
+                    )
+
+                    if (showEmptyFieldsError) {
                         Text(
-                            text = stringResource(R.string.login_invalid_email_error),
-                            style = MaterialTheme.typography.bodySmall,
+                            text = stringResource(R.string.login_empty_fields_error),
+                            style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.error,
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
 
-                    AppFilledTextField(
-                        value = user,
-                        onValueChange = {
-                            user = it
-                            if (it.isNotBlank() && password.isNotBlank()) {
+                }
+
+                AppPrimaryButton(
+                    text = stringResource(R.string.continue_action),
+                    onClick = {
+                        when {
+                            email.isBlank() || password.isBlank() -> {
+                                showEmptyFieldsError = true
+                            }
+
+                            !Patterns.EMAIL_ADDRESS.matcher(email).matches() -> {
                                 showEmptyFieldsError = false
                             }
-                        },
-                        label = { Text(stringResource(R.string.correo)) },
-                        isError = isEmailInvalid,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
-                    )
-                }
 
-                AppFilledTextField(
-                    value = password,
-                    onValueChange = {
-                        password = it
-                        if (user.isNotBlank() && it.isNotBlank()) {
-                            showEmptyFieldsError = false
+                            else -> {
+                                showEmptyFieldsError = false
+                                onContinueClick(email, password)
+                            }
                         }
                     },
-                    label = { Text(stringResource(R.string.contraseña)) },
-                    visualTransformation = if (passwordHidden) {
-                        PasswordVisualTransformation()
-                    } else {
-                        VisualTransformation.None
-                    },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    trailingIcon = {
-                        IconButton(onClick = { passwordHidden = !passwordHidden }) {
-                            Icon(
-                                imageVector = if (passwordHidden) {
-                                    Icons.Filled.Visibility
-                                } else {
-                                    Icons.Filled.VisibilityOff
-                                },
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                        }
-                    }
+                    enabled = !isLoading,
+                    modifier = Modifier.padding(top = Dimens.spacingLg)
                 )
-
-                if (showEmptyFieldsError) {
-                    Text(
-                        text = stringResource(R.string.login_empty_fields_error),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-
             }
+        }
 
-            AppPrimaryButton(
-                text = stringResource(R.string.continuar),
-                onClick = {
-                    when {
-                        email.isBlank() || password.isBlank() -> {
-                            showEmptyFieldsError = true
-                        }
-
-                        !Patterns.EMAIL_ADDRESS.matcher(email).matches() -> {
-                            showEmptyFieldsError = false
-                        }
-
-                        else -> {
-                            showEmptyFieldsError = false
-                            onContinueClick(email, password)
-                        }
-                    }
-                },
-                modifier = Modifier.padding(top = Dimens.spacingLg)
-            )
-            AppSecondaryButton(
-                text = stringResource(R.string.ver_pantallas_protectora),
-                onClick = onShelterPreviewClick,
-                modifier = Modifier.padding(top = Dimens.spacingSm)
-            )
+        if (isLoading) {
+            SavingOverlay(message = stringResource(R.string.signing_in))
         }
     }
 }
@@ -184,6 +186,6 @@ fun LoginScreen(
 @Composable
 fun LoginScreenPreview() {
     AdoptionTheme {
-        LoginScreen(onBackClick = {}, onContinueClick = { _, _ -> }, onShelterPreviewClick = {})
+        LoginScreen(onBackClick = {}, onContinueClick = { _, _ -> })
     }
 }

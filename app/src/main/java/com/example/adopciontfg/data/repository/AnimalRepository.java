@@ -149,18 +149,46 @@ public class AnimalRepository {
 
     // ─── Eliminar animal ────────────────────────────────────────────────
     public void deleteAnimal(AnimalEntity animal) {
+        deleteAnimal(animal, unused -> {}, error -> {});
+    }
+
+    public void deleteAnimal(AnimalEntity animal, OnSuccessListener<Void> onSuccess, OnFailureListener onFailure) {
+        deleteAnimalById(animal.getId(), animal, onSuccess, onFailure);
+    }
+
+    public void deleteAnimalById(String animalId, OnSuccessListener<Void> onSuccess, OnFailureListener onFailure) {
+        deleteAnimalById(animalId, null, onSuccess, onFailure);
+    }
+
+    private void deleteAnimalById(
+            String animalId,
+            AnimalEntity fallbackAnimal,
+            OnSuccessListener<Void> onSuccess,
+            OnFailureListener onFailure
+    ) {
         firestore.collection(COLLECTION)
-                .document(animal.getId())
+                .document(animalId)
                 .delete()
                 .addOnSuccessListener(unused ->
                         executor.execute(() -> {
-                            AnimalEntity storedAnimal = animalDao.getAnimalByIdSync(animal.getId());
-                            animalDao.deleteAnimal(animal);
-                            photoStorage.deletePhotos(collectAnimalPhotoUris(
-                                    storedAnimal == null ? animal : storedAnimal
-                            ));
+                            try {
+                                AnimalEntity storedAnimal = animalDao.getAnimalByIdSync(animalId);
+                                AnimalEntity animalToDelete = storedAnimal == null
+                                        ? fallbackAnimal
+                                        : storedAnimal;
+                                if (animalToDelete == null) {
+                                    animalToDelete = new AnimalEntity();
+                                    animalToDelete.setId(animalId);
+                                }
+                                animalDao.deleteAnimal(animalToDelete);
+                                photoStorage.deletePhotos(collectAnimalPhotoUris(animalToDelete));
+                                onSuccess.onSuccess(null);
+                            } catch (Exception exception) {
+                                onFailure.onFailure(exception);
+                            }
                         })
-                );
+                )
+                .addOnFailureListener(onFailure);
     }
 
     private void deleteReplacedAnimalPhotos(AnimalEntity previousAnimal, AnimalEntity currentAnimal) {

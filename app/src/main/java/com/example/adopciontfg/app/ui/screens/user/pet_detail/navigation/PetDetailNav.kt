@@ -38,7 +38,7 @@ private fun PetDetailRouteContent(
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val formMissingMessage = stringResource(R.string.adopcion_formulario_no_configurado)
+    val formMissingMessage = stringResource(R.string.adoption_form_not_configured)
 
     LaunchedEffect(petId) {
         viewModel.loadAnimal(petId)

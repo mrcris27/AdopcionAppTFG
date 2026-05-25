@@ -6,6 +6,7 @@ import com.example.adopciontfg.data.util.buildShelterAddress
 import com.example.adopciontfg.app.ui.validation.doPasswordsMatch
 import com.example.adopciontfg.app.ui.validation.isValidEmail
 import com.example.adopciontfg.app.ui.validation.isValidRegistrationPassword
+import com.example.adopciontfg.app.ui.validation.isValidSpanishPhone
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,6 +34,9 @@ data class ShelterRegistrationUiState(
 ) {
     val isEmailInvalid: Boolean
         get() = email.isNotBlank() && !isValidEmail(email)
+
+    val isPhoneInvalid: Boolean
+        get() = phone.isNotBlank() && !isValidSpanishPhone(phone)
 
     val isPasswordInvalid: Boolean
         get() = password.isNotBlank() && !isValidRegistrationPassword(password)
@@ -98,7 +102,7 @@ class ShelterRegistrationViewModel @Inject constructor() : ViewModel() {
     private fun validate(state: ShelterRegistrationUiState): Boolean {
         return state.name.isNotBlank() &&
             state.cif.isNotBlank() &&
-            state.phone.isNotBlank() &&
+            isValidSpanishPhone(state.phone) &&
             state.street.isNotBlank() &&
             state.streetNumber.isNotBlank() &&
             state.postalCode.length == 5 &&

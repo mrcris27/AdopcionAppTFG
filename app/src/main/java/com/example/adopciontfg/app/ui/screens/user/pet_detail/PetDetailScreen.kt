@@ -132,7 +132,7 @@ fun PetDetailScreen(
                     IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.volver),
+                            contentDescription = stringResource(R.string.back),
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
@@ -158,13 +158,13 @@ fun PetDetailScreen(
                         ) {
                             if (animal.isForAdoption) {
                                 AppSecondaryButton(
-                                    text = stringResource(R.string.adoptar_ahora),
+                                    text = stringResource(R.string.adopt_now),
                                     onClick = onAdoptClick,
                                     modifier = Modifier.weight(1f)
                                 )
                             }
                             AppOutlinedButton(
-                                text = stringResource(R.string.donar),
+                                text = stringResource(R.string.donate),
                                 onClick = { showDonationDialog = true },
                                 modifier = Modifier.weight(1f)
                             )
@@ -208,16 +208,16 @@ fun PetDetailScreen(
                                 verticalArrangement = Arrangement.spacedBy(Dimens.spacingMd)
                             ) {
                                 val animalSpecies = animal.species
-                                InfoRow(stringResource(R.string.nombre), animal.name.orEmpty())
+                                InfoRow(stringResource(R.string.name), animal.name.orEmpty())
                                 HorizontalDivider(
                                     color = MaterialTheme.colorScheme.subtleDivider()
                                 )
                                 InfoRow(
-                                    stringResource(R.string.edad),
+                                    stringResource(R.string.age),
                                     stringResource(R.string.animal_age_years, animal.ageInYears())
                                 )
                                 InfoRow(
-                                    stringResource(R.string.especie),
+                                    stringResource(R.string.species),
                                     if (animalSpecies != null) {
                                         speciesLabel(animalSpecies)
                                     } else {
@@ -225,11 +225,11 @@ fun PetDetailScreen(
                                     }
                                 )
                                 InfoRow(
-                                    stringResource(R.string.genero),
+                                    stringResource(R.string.gender),
                                     if (animal.isSex) {
-                                        stringResource(R.string.hembra)
+                                        stringResource(R.string.female)
                                     } else {
-                                        stringResource(R.string.macho)
+                                        stringResource(R.string.male)
                                     }
                                 )
                                 if (!animal.characteristics.isNullOrEmpty()) {
@@ -238,15 +238,15 @@ fun PetDetailScreen(
                                         characteristicLabels += characteristicLabel(characteristic)
                                     }
                                     InfoRow(
-                                        stringResource(R.string.caracteristicas),
+                                        stringResource(R.string.characteristics),
                                         characteristicLabels.joinToString(", ")
                                     )
                                 }
                                 Spacer(modifier = Modifier.height(Dimens.spacingXs))
-                                AppSectionTitle(text = stringResource(R.string.sobre_esta_mascota))
+                                AppSectionTitle(text = stringResource(R.string.about_this_pet))
                                 Text(
                                     text = animal.description?.takeIf { it.isNotBlank() }
-                                        ?: stringResource(R.string.mascota_descripcion_default),
+                                        ?: stringResource(R.string.default_pet_description),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -325,9 +325,9 @@ private fun DonationDialog(
             ) {
                 Text(
                     if (isDonationConfirmed) {
-                        stringResource(R.string.cerrar)
+                        stringResource(R.string.close)
                     } else {
-                        stringResource(R.string.confirmar_donativo)
+                        stringResource(R.string.confirm_donation)
                     }
                 )
             }
@@ -335,7 +335,7 @@ private fun DonationDialog(
         dismissButton = {
             if (!isDonationConfirmed) {
                 TextButton(onClick = onDismissRequest) {
-                    Text(stringResource(R.string.cancelar))
+                    Text(stringResource(R.string.cancel))
                 }
             }
         }
@@ -349,7 +349,7 @@ private fun PetPhotosCarousel(photos: List<String>) {
         verticalArrangement = Arrangement.spacedBy(Dimens.spacingSm)
     ) {
         Text(
-            text = stringResource(R.string.fotos),
+            text = stringResource(R.string.photos),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.SemiBold
         )
@@ -363,7 +363,7 @@ private fun PetPhotosCarousel(photos: List<String>) {
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = stringResource(R.string.sin_fotos_disponibles),
+                    text = stringResource(R.string.no_photos_available),
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }

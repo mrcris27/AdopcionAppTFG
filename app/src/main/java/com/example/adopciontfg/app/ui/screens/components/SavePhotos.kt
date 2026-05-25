@@ -161,7 +161,7 @@ fun SavePhotos(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Photo,
-                        contentDescription = stringResource(R.string.galeria)
+                        contentDescription = stringResource(R.string.gallery)
                     )
                 }
                 FilledIconButton(
@@ -185,15 +185,15 @@ fun SavePhotos(
                 ) {
                     Icon(
                         imageVector = Icons.Default.CameraAlt,
-                        contentDescription = stringResource(R.string.camara)
+                        contentDescription = stringResource(R.string.camera)
                     )
                 }
             }
             if (currentUris.isNotEmpty()) {
                 val label = if (currentUris.size == 1) {
-                    stringResource(R.string.foto_anadida)
+                    stringResource(R.string.photo_added)
                 } else {
-                    stringResource(R.string.fotos_anadidas, currentUris.size)
+                    stringResource(R.string.photos_added, currentUris.size)
                 }
                 Text(
                     text = label,
@@ -202,7 +202,7 @@ fun SavePhotos(
                 )
             } else {
                 Text(
-                    text = stringResource(R.string.toca_icono_anadir_fotos),
+                    text = stringResource(R.string.tap_add_photos_icon),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -210,7 +210,7 @@ fun SavePhotos(
             if (reachedMaxPhotos) {
                 Text(
                     text = pluralStringResource(
-                        R.plurals.maximo_imagenes_alcanzado,
+                        R.plurals.max_images_reached,
                         maxPhotos,
                         maxPhotos
                     ),
@@ -293,7 +293,7 @@ private fun PhotoThumbnail(
         ) {
             Icon(
                 imageVector = Icons.Default.Close,
-                contentDescription = stringResource(R.string.quitar_foto),
+                contentDescription = stringResource(R.string.remove_photo),
                 tint = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.size(16.dp),
             )

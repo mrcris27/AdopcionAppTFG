@@ -23,18 +23,18 @@ fun animalListSubtitle(animal: AnimalEntity): String {
         }
         speciesLabel.isNotBlank() -> speciesLabel
         age > 0 -> stringResource(R.string.animal_list_subtitle_age, age)
-        else -> stringResource(R.string.ver_mas_informacion)
+        else -> stringResource(R.string.view_more_information)
     }
 }
 
 @Composable
 fun speciesLabel(species: Species): String = stringResource(
     when (species) {
-        Species.PERRO -> R.string.species_perro
-        Species.GATO -> R.string.species_gato
-        Species.CONEJO -> R.string.species_conejo
-        Species.RATA -> R.string.species_rata
-        Species.CABALLO -> R.string.species_caballo
+        Species.PERRO -> R.string.species_dog
+        Species.GATO -> R.string.species_cat
+        Species.CONEJO -> R.string.species_rabbit
+        Species.RATA -> R.string.species_rat
+        Species.CABALLO -> R.string.species_horse
         Species.OTHER -> R.string.species_other
     }
 )
@@ -42,13 +42,13 @@ fun speciesLabel(species: Species): String = stringResource(
 @Composable
 fun characteristicLabel(characteristic: Characteristic): String = stringResource(
     when (characteristic) {
-        Characteristic.SOCIABLE_CON_GATOS -> R.string.characteristic_sociable_con_gatos
-        Characteristic.SOCIABLE_CON_PERROS -> R.string.characteristic_sociable_con_perros
-        Characteristic.SOCIABLE_CON_GATO_Y_PERRO -> R.string.characteristic_sociable_con_gato_y_perro
-        Characteristic.SOCIABLE_CON_KIDS -> R.string.characteristic_sociable_con_kids
-        Characteristic.TRANQUILO -> R.string.characteristic_tranquilo
-        Characteristic.JUGUETON -> R.string.characteristic_jugueton
-        Characteristic.ENERGETICO -> R.string.characteristic_energetico
-        Characteristic.REACTIVO -> R.string.characteristic_reactivo
+        Characteristic.SOCIABLE_CON_GATOS -> R.string.characteristic_sociable_with_cats
+        Characteristic.SOCIABLE_CON_PERROS -> R.string.characteristic_sociable_with_dogs
+        Characteristic.SOCIABLE_CON_GATO_Y_PERRO -> R.string.characteristic_sociable_with_cats_and_dogs
+        Characteristic.SOCIABLE_CON_KIDS -> R.string.characteristic_sociable_with_kids
+        Characteristic.TRANQUILO -> R.string.characteristic_calm
+        Characteristic.JUGUETON -> R.string.characteristic_playful
+        Characteristic.ENERGETICO -> R.string.characteristic_energetic
+        Characteristic.REACTIVO -> R.string.characteristic_reactive
     }
 )

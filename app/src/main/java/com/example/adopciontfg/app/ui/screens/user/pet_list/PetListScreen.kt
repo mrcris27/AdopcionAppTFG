@@ -149,7 +149,7 @@ fun PetContent(
 
             animals.isEmpty() -> Text(
 
-                text = stringResource(R.string.sin_animales_disponibles),
+                text = stringResource(R.string.no_available_animals),
 
                 modifier = Modifier.padding(horizontal = Dimens.spacingSm, vertical = Dimens.screenPadding),
 
@@ -206,7 +206,7 @@ fun HomeTopBar(
 
         Text(
 
-            text = stringResource(R.string.animales),
+            text = stringResource(R.string.animals),
 
             style = MaterialTheme.typography.titleLarge,
 

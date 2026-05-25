@@ -19,22 +19,22 @@ enum class NavBarTab(
     UserHome(
         route = UserScreenRoute,
         icon = Icons.Filled.Home,
-        labelRes = R.string.nav_bar_inicio,
+        labelRes = R.string.nav_bar_home,
     ),
     UserSettings(
         route = UserSettingsRoute,
         icon = Icons.Filled.Settings,
-        labelRes = R.string.nav_bar_ajustes,
+        labelRes = R.string.nav_bar_settings,
     ),
     ShelterHome(
         route = ShelterAnimalsRoute,
         icon = Icons.Filled.Home,
-        labelRes = R.string.nav_bar_inicio,
+        labelRes = R.string.nav_bar_home,
     ),
     ShelterSettings(
         route = ShelterSettingsTabRoute,
         icon = Icons.Filled.Settings,
-        labelRes = R.string.nav_bar_ajustes,
+        labelRes = R.string.nav_bar_settings,
     );
 
     companion object {

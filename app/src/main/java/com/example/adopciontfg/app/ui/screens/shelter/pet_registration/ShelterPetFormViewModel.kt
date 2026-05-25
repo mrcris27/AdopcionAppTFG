@@ -38,6 +38,7 @@ data class PetFormUiState(
     val animalId: String? = null,
     val isLoading: Boolean = false,
     val isSaving: Boolean = false,
+    val isDeleting: Boolean = false,
     val name: String = "",
     val isFemale: Boolean = false,
     val mainPhotoUri: Uri? = null,
@@ -51,6 +52,7 @@ data class PetFormUiState(
     val saveMessageRes: Int? = null,
     val saveMessage: String? = null,
     val saveSucceeded: Boolean = false,
+    val deleteSucceeded: Boolean = false,
 ) {
     val hasUnsavedChanges: Boolean
         get() = !isEditMode || savedFormData?.let { toFormData() != it } ?: false
@@ -205,7 +207,7 @@ class ShelterPetFormViewModel @Inject constructor(
                     it.copy(
                         isSaving = false,
                         saveMessageRes = if (exception.message == null) {
-                            R.string.error_desconocido
+                            R.string.unknown_error
                         } else {
                             null
                         },
@@ -216,12 +218,72 @@ class ShelterPetFormViewModel @Inject constructor(
         )
     }
 
+    fun onDelete() {
+        val state = _uiState.value
+        val animalId = state.animalId
+        if (!state.isEditMode || animalId == null || state.isDeleting) return
+
+        _uiState.update {
+            it.copy(
+                isDeleting = true,
+                saveMessageRes = null,
+                saveMessage = null,
+            )
+        }
+
+        animalRepository.deleteAnimalById(
+            animalId,
+            {
+                _uiState.update {
+                    it.copy(
+                        isDeleting = false,
+                        deleteSucceeded = true,
+                        saveMessageRes = R.string.animal_deleted_successfully,
+                        saveMessage = null,
+                    )
+                }
+            },
+            { exception ->
+                _uiState.update {
+                    it.copy(
+                        isDeleting = false,
+                        saveMessageRes = if (exception.message == null) {
+                            R.string.animal_delete_failed
+                        } else {
+                            null
+                        },
+                        saveMessage = exception.message,
+                    )
+                }
+            },
+        )
+    }
+
     fun onSaveHandled() {
         _uiState.update {
             it.copy(
                 saveSucceeded = false,
                 saveMessageRes = null,
                 saveMessage = null
+            )
+        }
+    }
+
+    fun onDeleteHandled() {
+        _uiState.update {
+            it.copy(
+                deleteSucceeded = false,
+                saveMessageRes = null,
+                saveMessage = null,
+            )
+        }
+    }
+
+    fun onMessageHandled() {
+        _uiState.update {
+            it.copy(
+                saveMessageRes = null,
+                saveMessage = null,
             )
         }
     }

@@ -35,7 +35,7 @@ fun RegistrationScreen(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             AppTopAppBar(
-                title = stringResource(R.string.registro),
+                title = stringResource(R.string.registration),
                 onBackClick = onBackClick
             )
         }
@@ -61,18 +61,18 @@ fun RegistrationScreen(
                     verticalArrangement = Arrangement.spacedBy(Dimens.spacingLg)
                 ) {
                     Text(
-                        text = stringResource(R.string.registro_subtitle),
+                        text = stringResource(R.string.registration_subtitle),
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.fillMaxWidth()
                     )
 
                     AppPrimaryButton(
-                        text = stringResource(R.string.soy_usuario),
+                        text = stringResource(R.string.i_am_user),
                         onClick = onRegisterUserClick
                     )
                     AppSecondaryButton(
-                        text = stringResource(R.string.soy_protectora),
+                        text = stringResource(R.string.i_am_shelter),
                         onClick = onRegisterShelterClick
                     )
                 }

@@ -155,7 +155,7 @@ fun ShelterProfileScreen(
                             IconButton(onClick = onBackClick) {
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                    contentDescription = stringResource(R.string.volver),
+                                    contentDescription = stringResource(R.string.back),
                                     tint = MaterialTheme.colorScheme.primary,
                                 )
                             }
@@ -182,9 +182,9 @@ fun ShelterProfileScreen(
                             Icon(
                                 imageVector = Icons.Default.ExpandMore,
                                 contentDescription = if (shelterCardExpanded) {
-                                    stringResource(R.string.ocultar_info_protectora)
+                                    stringResource(R.string.hide_shelter_info)
                                 } else {
-                                    stringResource(R.string.mostrar_info_protectora)
+                                    stringResource(R.string.show_shelter_info)
                                 },
                                 modifier = Modifier.rotate(chevronRotation),
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant
@@ -220,7 +220,7 @@ fun ShelterProfileScreen(
                                 if (shelter.cif.orEmpty().isNotBlank()) {
                                     Spacer(modifier = Modifier.height(Dimens.spacingSm))
                                     Text(
-                                        text = stringResource(R.string.cif_format, shelter.cif.orEmpty()),
+                                        text = stringResource(R.string.tax_id_format, shelter.cif.orEmpty()),
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
@@ -256,7 +256,7 @@ fun ShelterProfileScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 AppSectionTitle(
-                    text = stringResource(R.string.animales_disponibles),
+                    text = stringResource(R.string.available_animals),
                     modifier = Modifier.weight(1f)
                 )
                 IconButton(
@@ -272,7 +272,7 @@ fun ShelterProfileScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.FilterList,
-                            contentDescription = stringResource(R.string.abrir_filtros_animales),
+                            contentDescription = stringResource(R.string.open_animal_filters),
                             tint = if (hasActiveFilters) {
                                 MaterialTheme.colorScheme.primary
                             } else {
@@ -287,7 +287,7 @@ fun ShelterProfileScreen(
                 SearchSection(
                     query = query,
                     onQueryChange = onQueryChange,
-                    placeholder = stringResource(R.string.buscar_animales),
+                    placeholder = stringResource(R.string.search_animals),
                 )
             }
 
@@ -300,14 +300,14 @@ fun ShelterProfileScreen(
                     ShelterCardListSkeleton(modifier = Modifier.fillMaxSize())
                 } else if (!hasAnimals) {
                     Text(
-                        text = stringResource(R.string.shelter_sin_animales_disponibles),
+                        text = stringResource(R.string.shelter_no_available_animals),
                         modifier = Modifier.padding(horizontal = Dimens.spacingSm),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 } else if (animals.isEmpty() && isFiltering) {
                     Text(
-                        text = stringResource(R.string.sin_resultados_animales),
+                        text = stringResource(R.string.no_animal_results),
                         modifier = Modifier.padding(horizontal = Dimens.spacingSm),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -431,16 +431,16 @@ private fun AnimalFiltersBottomSheet(
             verticalArrangement = Arrangement.spacedBy(Dimens.spacingMd)
         ) {
             Text(
-                text = stringResource(R.string.filtros),
+                text = stringResource(R.string.filters),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.SemiBold,
             )
 
-            FilterSection(title = stringResource(R.string.especie)) {
+            FilterSection(title = stringResource(R.string.species)) {
                 FilterChip(
                     selected = selectedSpecies == null,
                     onClick = { onSpeciesFilterChange(null) },
-                    label = { Text(stringResource(R.string.todos)) }
+                    label = { Text(stringResource(R.string.all)) }
                 )
                 Species.entries.forEach { species ->
                     FilterChip(
@@ -451,25 +451,25 @@ private fun AnimalFiltersBottomSheet(
                 }
             }
 
-            FilterSection(title = stringResource(R.string.sexo)) {
+            FilterSection(title = stringResource(R.string.sex)) {
                 FilterChip(
                     selected = selectedSex == null,
                     onClick = { onSexFilterChange(null) },
-                    label = { Text(stringResource(R.string.todos)) }
+                    label = { Text(stringResource(R.string.all)) }
                 )
                 FilterChip(
                     selected = selectedSex == false,
                     onClick = { onSexFilterChange(false) },
-                    label = { Text(stringResource(R.string.macho)) }
+                    label = { Text(stringResource(R.string.male)) }
                 )
                 FilterChip(
                     selected = selectedSex == true,
                     onClick = { onSexFilterChange(true) },
-                    label = { Text(stringResource(R.string.hembra)) }
+                    label = { Text(stringResource(R.string.female)) }
                 )
             }
 
-            FilterSection(title = stringResource(R.string.caracteristicas)) {
+            FilterSection(title = stringResource(R.string.characteristics)) {
                 Characteristic.entries.forEach { characteristic ->
                     FilterChip(
                         selected = characteristic in selectedCharacteristics,
@@ -485,10 +485,10 @@ private fun AnimalFiltersBottomSheet(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 TextButton(onClick = onClearFilters) {
-                    Text(stringResource(R.string.limpiar_filtros))
+                    Text(stringResource(R.string.clear_filters))
                 }
                 TextButton(onClick = onDismiss) {
-                    Text(stringResource(R.string.aplicar_filtros))
+                    Text(stringResource(R.string.apply_filters))
                 }
             }
         }

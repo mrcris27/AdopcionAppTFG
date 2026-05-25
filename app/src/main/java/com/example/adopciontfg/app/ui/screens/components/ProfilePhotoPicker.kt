@@ -100,7 +100,7 @@ fun ProfilePhotoPicker(
                 if (imageBitmap != null) {
                     Image(
                         bitmap = imageBitmap!!,
-                        contentDescription = stringResource(R.string.foto_perfil_content_description),
+                        contentDescription = stringResource(R.string.profile_photo_content_description),
                         modifier = Modifier
                             .size(112.dp)
                             .clip(CircleShape),
@@ -125,7 +125,7 @@ fun ProfilePhotoPicker(
             ) {
                 Icon(
                     imageVector = Icons.Default.CameraAlt,
-                    contentDescription = stringResource(R.string.cambiar_foto_perfil)
+                    contentDescription = stringResource(R.string.change_profile_photo)
                 )
             }
             DropdownMenu(
@@ -133,7 +133,7 @@ fun ProfilePhotoPicker(
                 onDismissRequest = { menuExpanded = false }
             ) {
                 DropdownMenuItem(
-                    text = { Text(stringResource(R.string.galeria)) },
+                    text = { Text(stringResource(R.string.gallery)) },
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Photo,
@@ -146,7 +146,7 @@ fun ProfilePhotoPicker(
                     }
                 )
                 DropdownMenuItem(
-                    text = { Text(stringResource(R.string.hacer_una_foto)) },
+                    text = { Text(stringResource(R.string.take_photo)) },
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.CameraAlt,

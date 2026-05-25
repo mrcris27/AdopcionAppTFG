@@ -68,7 +68,7 @@ fun MapCard(
                     fontWeight = FontWeight.SemiBold
                 )
                 Text(
-                    text = stringResource(R.string.ver_mas_informacion),
+                    text = stringResource(R.string.view_more_information),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.primary
                 )

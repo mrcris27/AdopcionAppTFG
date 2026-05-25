@@ -40,7 +40,7 @@ fun SettingsHubScreen(
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            AppTopAppBar(title = stringResource(R.string.ajustes))
+            AppTopAppBar(title = stringResource(R.string.settings))
         }
     ) { innerPadding ->
         Column(
@@ -57,14 +57,14 @@ fun SettingsHubScreen(
             )
 
             SettingsProfileCard(
-                title = stringResource(R.string.ajustes_usuario),
+                title = stringResource(R.string.user_settings),
                 subtitle = stringResource(R.string.settings_user_subtitle),
                 icon = Icons.Outlined.Person,
                 onClick = onUserSettingsClick
             )
 
             SettingsProfileCard(
-                title = stringResource(R.string.ajustes_protectora),
+                title = stringResource(R.string.shelter_settings),
                 subtitle = stringResource(R.string.settings_shelter_subtitle),
                 icon = Icons.Outlined.VolunteerActivism,
                 onClick = onShelterSettingsClick

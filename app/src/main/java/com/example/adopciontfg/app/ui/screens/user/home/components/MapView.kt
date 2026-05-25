@@ -261,7 +261,7 @@ private fun MapSearchPanel(
             IconButton(onClick = onExpand) {
                 Icon(
                     imageVector = Icons.Default.Search,
-                    contentDescription = stringResource(R.string.buscar_protectora)
+                    contentDescription = stringResource(R.string.search_shelter)
                 )
             }
         }
@@ -285,7 +285,7 @@ private fun MapSearchPanel(
                     onValueChange = onQueryChange,
                     modifier = Modifier.weight(1f),
                     singleLine = true,
-                    label = { Text(stringResource(R.string.buscar)) },
+                    label = { Text(stringResource(R.string.search)) },
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Search,
@@ -297,7 +297,7 @@ private fun MapSearchPanel(
                             IconButton(onClick = onClear) {
                                 Icon(
                                     imageVector = Icons.Default.Close,
-                                    contentDescription = stringResource(R.string.limpiar_busqueda)
+                                    contentDescription = stringResource(R.string.clear_search)
                                 )
                             }
                         }
@@ -307,7 +307,7 @@ private fun MapSearchPanel(
                 IconButton(onClick = onCollapse) {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = stringResource(R.string.plegar_buscador)
+                        contentDescription = stringResource(R.string.collapse_search)
                     )
                 }
             }
@@ -357,7 +357,7 @@ private fun MapControls(
             }
             HorizontalDivider(modifier = Modifier.width(44.dp))
             TextButton(onClick = onCenterSpain) {
-                Text(stringResource(R.string.mapa_centrar_espana_abreviado), style = MaterialTheme.typography.labelLarge)
+                Text(stringResource(R.string.map_center_spain_abbreviation), style = MaterialTheme.typography.labelLarge)
             }
         }
     }

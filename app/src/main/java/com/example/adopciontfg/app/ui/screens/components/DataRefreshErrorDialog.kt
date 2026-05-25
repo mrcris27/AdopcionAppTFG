@@ -28,18 +28,18 @@ fun DataRefreshErrorDialog(
                         onRetry()
                     },
                 ) {
-                    Text(stringResource(R.string.actualizar))
+                    Text(stringResource(R.string.update))
                 }
             } else {
                 TextButton(onClick = onDismiss) {
-                    Text(stringResource(R.string.cerrar))
+                    Text(stringResource(R.string.close))
                 }
             }
         },
         dismissButton = {
             if (onRetry != null) {
                 TextButton(onClick = onDismiss) {
-                    Text(stringResource(R.string.cerrar))
+                    Text(stringResource(R.string.close))
                 }
             }
         },

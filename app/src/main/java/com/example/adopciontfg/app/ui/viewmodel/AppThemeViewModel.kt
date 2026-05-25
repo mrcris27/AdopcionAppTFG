@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.adopciontfg.data.settings.LaunchThemeController
 import com.example.adopciontfg.domain.settings.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -25,7 +26,7 @@ class AppThemeViewModel @Inject constructor(
 ) : ViewModel() {
     private val authPreferences = context.getSharedPreferences(AUTH_PREFERENCES, Context.MODE_PRIVATE)
 
-    private val _darkModeEnabled = MutableStateFlow(false)
+    private val _darkModeEnabled = MutableStateFlow(LaunchThemeController.loadConfiguredDarkMode(context))
     val darkModeEnabled: StateFlow<Boolean> = _darkModeEnabled.asStateFlow()
 
     init {

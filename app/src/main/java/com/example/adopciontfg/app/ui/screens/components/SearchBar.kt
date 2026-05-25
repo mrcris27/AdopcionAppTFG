@@ -21,7 +21,7 @@ fun SearchBar(
     query: String,
     onQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    placeholder: String = stringResource(R.string.buscar_protectoras),
+    placeholder: String = stringResource(R.string.search_shelters),
 ) {
     TextField(
         value = query,
@@ -49,7 +49,7 @@ fun SearchBar(
                 IconButton(onClick = { onQueryChange("") }) {
                     Icon(
                         imageVector = Icons.Default.Clear,
-                        contentDescription = stringResource(R.string.limpiar_busqueda),
+                        contentDescription = stringResource(R.string.clear_search),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }

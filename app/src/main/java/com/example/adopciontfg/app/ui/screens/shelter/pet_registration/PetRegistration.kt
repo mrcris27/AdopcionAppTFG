@@ -14,6 +14,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DropdownMenuItem
@@ -23,6 +26,8 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
@@ -88,11 +93,12 @@ fun PetRegistration(
         mainPhotoUri != null
 
     PetRegistration(
-        title = stringResource(R.string.registro_animal),
-        saveButtonText = stringResource(R.string.registrar_animal),
+        title = stringResource(R.string.animal_registration),
+        saveButtonText = stringResource(R.string.register_animal),
         isLoading = false,
         isSaving = false,
         savingMessage = stringResource(R.string.registering_animal),
+        deletingMessage = stringResource(R.string.deleting_animal),
         name = name,
         onNameChange = { name = it },
         isFemale = isFemale,
@@ -131,6 +137,8 @@ fun PetRegistration(
     isLoading: Boolean,
     isSaving: Boolean,
     savingMessage: String,
+    isDeleting: Boolean = false,
+    deletingMessage: String,
     name: String,
     onNameChange: (String) -> Unit,
     isFemale: Boolean,
@@ -152,9 +160,11 @@ fun PetRegistration(
     canSave: Boolean,
     onBackClick: (() -> Unit)? = null,
     onSaveClick: () -> Unit,
+    onDeleteClick: (() -> Unit)? = null,
 ) {
     var speciesExpanded by remember { mutableStateOf(false) }
     var showDatePicker by remember { mutableStateOf(false) }
+    var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
 
     val dateFormatter = remember { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) }
 
@@ -165,6 +175,20 @@ fun PetRegistration(
                 AppTopAppBar(
                     title = title,
                     onBackClick = onBackClick,
+                    actions = {
+                        if (onDeleteClick != null) {
+                            IconButton(
+                                onClick = { showDeleteDialog = true },
+                                enabled = !isLoading && !isSaving && !isDeleting,
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = stringResource(R.string.delete_animal),
+                                    tint = MaterialTheme.colorScheme.error,
+                                )
+                            }
+                        }
+                    },
                 )
             }
         ) { innerPadding ->
@@ -176,11 +200,11 @@ fun PetRegistration(
                     .padding(horizontal = Dimens.screenPadding, vertical = Dimens.spacingMd),
                 verticalArrangement = Arrangement.spacedBy(Dimens.spacingLg)
             ) {
-                AppFormSection(title = stringResource(R.string.datos_basicos)) {
+                AppFormSection(title = stringResource(R.string.basic_details)) {
                     RegistrationTextField(
                         value = name,
                         onValueChange = onNameChange,
-                        label = stringResource(R.string.nombre),
+                        label = stringResource(R.string.name),
                         capitalization = KeyboardCapitalization.Words
                     )
 
@@ -197,7 +221,7 @@ fun PetRegistration(
                             },
                             onValueChange = {},
                             readOnly = true,
-                            label = { Text(stringResource(R.string.especie)) },
+                            label = { Text(stringResource(R.string.species)) },
                             trailingIcon = {
                                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = speciesExpanded)
                             },
@@ -229,7 +253,7 @@ fun PetRegistration(
                     }
 
                     Text(
-                        text = stringResource(R.string.sexo),
+                        text = stringResource(R.string.sex),
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -240,13 +264,13 @@ fun PetRegistration(
                         FilterChip(
                             selected = !isFemale,
                             onClick = { onSexChange(false) },
-                            label = { Text(stringResource(R.string.macho)) },
+                            label = { Text(stringResource(R.string.male)) },
                             modifier = Modifier.weight(1f)
                         )
                         FilterChip(
                             selected = isFemale,
                             onClick = { onSexChange(true) },
-                            label = { Text(stringResource(R.string.hembra)) },
+                            label = { Text(stringResource(R.string.female)) },
                             modifier = Modifier.weight(1f)
                         )
                     }
@@ -257,7 +281,7 @@ fun PetRegistration(
                     )
 
                     Text(
-                        text = stringResource(R.string.fecha_nacimiento),
+                        text = stringResource(R.string.birth_date),
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -265,29 +289,29 @@ fun PetRegistration(
                         text = if (birthDateMillis > 0L) {
                             dateFormatter.format(Date(birthDateMillis))
                         } else {
-                            stringResource(R.string.seleccionar_fecha)
+                            stringResource(R.string.select_date)
                         },
                         onClick = { showDatePicker = true }
                     )
                 }
 
-                AppFormSection(title = stringResource(R.string.descripcion)) {
+                AppFormSection(title = stringResource(R.string.description)) {
                     RegistrationTextField(
                         value = description,
                         onValueChange = onDescriptionChange,
-                        label = stringResource(R.string.descripcion),
+                        label = stringResource(R.string.description),
                         singleLine = false,
                         minLines = 4
                     )
                 }
 
-                AppFormSection(title = stringResource(R.string.fotos)) {
+                AppFormSection(title = stringResource(R.string.photos)) {
                     Text(
-                        text = stringResource(R.string.foto_principal),
+                        text = stringResource(R.string.main_photo),
                         style = MaterialTheme.typography.titleSmall
                     )
                     Text(
-                        text = stringResource(R.string.foto_principal_hint),
+                        text = stringResource(R.string.main_photo_hint),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -302,11 +326,11 @@ fun PetRegistration(
                     )
 
                     Text(
-                        text = stringResource(R.string.mas_fotos),
+                        text = stringResource(R.string.more_photos),
                         style = MaterialTheme.typography.titleSmall
                     )
                     Text(
-                        text = stringResource(R.string.mas_fotos_hint),
+                        text = stringResource(R.string.more_photos_hint),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -317,9 +341,9 @@ fun PetRegistration(
                     )
                 }
 
-                AppFormSection(title = stringResource(R.string.caracteristicas)) {
+                AppFormSection(title = stringResource(R.string.characteristics)) {
                     Text(
-                        text = stringResource(R.string.caracteristicas_hint),
+                        text = stringResource(R.string.characteristics_hint),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -341,7 +365,7 @@ fun PetRegistration(
                 AppSecondaryButton(
                     text = saveButtonText,
                     onClick = onSaveClick,
-                    enabled = canSave && !isLoading && !isSaving
+                    enabled = canSave && !isLoading && !isSaving && !isDeleting
                 )
 
                 Spacer(modifier = Modifier.height(Dimens.spacingSm))
@@ -350,6 +374,9 @@ fun PetRegistration(
 
         if (isSaving) {
             SavingOverlay(message = savingMessage)
+        }
+        if (isDeleting) {
+            SavingOverlay(message = deletingMessage)
         }
     }
 
@@ -378,6 +405,32 @@ fun PetRegistration(
             DatePicker(state = datePickerState)
         }
     }
+
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text(stringResource(R.string.delete_animal)) },
+            text = { Text(stringResource(R.string.confirm_delete_animal)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteDialog = false
+                        onDeleteClick?.invoke()
+                    },
+                ) {
+                    Text(
+                        text = stringResource(R.string.delete),
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            },
+        )
+    }
 }
 
 @Composable
@@ -391,7 +444,7 @@ private fun AdoptionAvailabilitySwitchRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = stringResource(R.string.adoptar),
+            text = stringResource(R.string.adopt),
             modifier = Modifier.weight(1f),
             style = MaterialTheme.typography.bodyLarge
         )

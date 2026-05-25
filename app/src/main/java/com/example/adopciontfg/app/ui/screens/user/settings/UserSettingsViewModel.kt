@@ -203,7 +203,7 @@ class UserSettingsViewModel @Inject constructor(
                     it.copy(
                         isSavingSettings = false,
                         saveMessageRes = if (exception.message == null) {
-                            R.string.error_desconocido
+                            R.string.unknown_error
                         } else {
                             null
                         },

@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import com.example.adopciontfg.R
+import com.example.adopciontfg.app.ui.validation.isValidSpanishPhone
 import com.example.adopciontfg.data.local.entity.ShelterEntity
 import com.example.adopciontfg.data.repository.ShelterRepository
 import com.example.adopciontfg.data.util.ShelterAddressParts
@@ -56,7 +57,10 @@ data class ShelterSettingsUiState(
         get() = savedSettings?.let { toSettingsData() != it } ?: false
 
     val canSaveSettings: Boolean
-        get() = hasUnsavedChanges && !isSavingSettings
+        get() = hasUnsavedChanges && !isSavingSettings && !isPhoneInvalid
+
+    val isPhoneInvalid: Boolean
+        get() = phone.isNotBlank() && !isValidSpanishPhone(phone)
 
     fun toSettingsData(): ShelterSettingsData {
         return ShelterSettingsData(
@@ -246,7 +250,7 @@ class ShelterSettingsViewModel @Inject constructor(
                     it.copy(
                         isSavingSettings = false,
                         saveMessageRes = if (exception.message == null) {
-                            R.string.error_desconocido
+                            R.string.unknown_error
                         } else {
                             null
                         },

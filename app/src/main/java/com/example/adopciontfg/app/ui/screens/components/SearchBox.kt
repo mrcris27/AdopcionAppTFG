@@ -14,7 +14,7 @@ import com.example.adopciontfg.ui.theme.Dimens
 fun SearchSection(
     query: String,
     onQueryChange: (String) -> Unit,
-    placeholder: String = stringResource(R.string.buscar_animales),
+    placeholder: String = stringResource(R.string.search_animals),
 ) {
     SearchBar(
         query = query,

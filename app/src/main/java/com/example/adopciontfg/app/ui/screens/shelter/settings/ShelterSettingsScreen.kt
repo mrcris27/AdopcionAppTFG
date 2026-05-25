@@ -162,7 +162,7 @@ private fun ShelterSettingsContent(
             containerColor = MaterialTheme.colorScheme.background,
             topBar = {
                 AppTopAppBar(
-                    title = stringResource(R.string.ajustes_protectora),
+                    title = stringResource(R.string.shelter_settings),
                     onBackClick = onBackClick
                 )
             },
@@ -176,7 +176,7 @@ private fun ShelterSettingsContent(
                     .padding(Dimens.screenPadding),
                 verticalArrangement = Arrangement.spacedBy(Dimens.spacingMd)
             ) {
-                AppFormSection(title = stringResource(R.string.datos_protectora)) {
+                AppFormSection(title = stringResource(R.string.shelter_details)) {
                     ProfilePhotoPicker(
                         photoUri = uiState.profilePhotoUri,
                         onPhotoChange = onProfilePhotoChange,
@@ -185,106 +185,117 @@ private fun ShelterSettingsContent(
                     AppFilledTextField(
                         value = uiState.shelterName,
                         onValueChange = onShelterNameChange,
-                        label = { Text(stringResource(R.string.nombre_protectora)) }
+                        label = { Text(stringResource(R.string.shelter_name)) }
                     )
                     AppFilledTextField(
                         value = uiState.email,
                         onValueChange = onEmailChange,
-                        label = { Text(stringResource(R.string.correo)) },
+                        label = { Text(stringResource(R.string.email)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
                     )
                     AppFilledTextField(
                         value = uiState.phone,
                         onValueChange = onPhoneChange,
-                        label = { Text(stringResource(R.string.telefono)) },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
+                        label = { Text(stringResource(R.string.phone)) },
+                        isError = uiState.isPhoneInvalid,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                        supportingText = if (uiState.isPhoneInvalid) {
+                            {
+                                Text(
+                                    text = stringResource(R.string.registration_invalid_phone_error),
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            }
+                        } else {
+                            null
+                        }
                     )
                     AppFilledTextField(
                         value = uiState.cif,
                         onValueChange = onCifChange,
-                        label = { Text(stringResource(R.string.cif)) }
+                        label = { Text(stringResource(R.string.tax_id)) }
                     )
                 }
 
-                AppFormSection(title = stringResource(R.string.direccion)) {
+                AppFormSection(title = stringResource(R.string.address)) {
                     AppFilledTextField(
                         value = uiState.street,
                         onValueChange = onStreetChange,
-                        label = { Text(stringResource(R.string.calle)) },
+                        label = { Text(stringResource(R.string.street)) },
                         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words)
                     )
                     AppFilledTextField(
                         value = uiState.streetNumber,
                         onValueChange = onStreetNumberChange,
-                        label = { Text(stringResource(R.string.numero)) },
+                        label = { Text(stringResource(R.string.street_number)) },
                         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Characters)
                     )
                     AppFilledTextField(
                         value = uiState.postalCode,
                         onValueChange = onPostalCodeChange,
-                        label = { Text(stringResource(R.string.codigo_postal)) },
+                        label = { Text(stringResource(R.string.postal_code)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                     )
                     AppFilledTextField(
                         value = uiState.city,
                         onValueChange = onCityChange,
-                        label = { Text(stringResource(R.string.localidad_ciudad)) },
+                        label = { Text(stringResource(R.string.town_city)) },
                         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words)
                     )
                     ShelterSettingsProvinceDropdown(
                         selectedProvince = uiState.province,
-                        provinces = stringArrayResource(R.array.provincias_espana).toList(),
+                        provinces = stringArrayResource(R.array.spain_provinces).toList(),
                         onProvinceSelected = onProvinceChange
                     )
                 }
 
-                AppFormSection(title = stringResource(R.string.adopciones)) {
+                AppFormSection(title = stringResource(R.string.adoptions)) {
                     Text(
-                        text = stringResource(R.string.adopciones_formulario_desc),
+                        text = stringResource(R.string.adoption_form_description),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     AppFilledTextField(
                         value = uiState.adoptionFormUrl,
                         onValueChange = onAdoptionFormUrlChange,
-                        label = { Text(stringResource(R.string.enlace_google_forms)) },
+                        label = { Text(stringResource(R.string.google_forms_link)) },
                         placeholder = { Text(stringResource(R.string.google_forms_placeholder)) }
                     )
                 }
 
-                AppFormSection(title = stringResource(R.string.preferencias)) {
+                AppFormSection(title = stringResource(R.string.preferences)) {
                     SwitchRow(
-                        text = stringResource(R.string.alertas_adopcion),
+                        text = stringResource(R.string.adoption_alerts),
                         icon = { Icon(Icons.Outlined.Campaign, contentDescription = null) },
                         checked = uiState.adoptionAlertsEnabled,
                         onCheckedChange = onAdoptionAlertsChange
                     )
                     SwitchRow(
-                        text = stringResource(R.string.modo_oscuro),
+                        text = stringResource(R.string.dark_mode),
                         icon = { Icon(Icons.Outlined.Palette, contentDescription = null) },
                         checked = uiState.darkModeEnabled,
                         onCheckedChange = onDarkModeChange
                     )
                 }
 
-                AppFormSection(title = stringResource(R.string.seguridad)) {
+                AppFormSection(title = stringResource(R.string.security)) {
                     Text(
-                        text = stringResource(R.string.actualizar_contrasena_desde_formulario),
+                        text = stringResource(R.string.update_password_from_form),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     AppPrimaryButton(
-                        text = stringResource(R.string.cambiar_contrasena),
+                        text = stringResource(R.string.change_password),
                         onClick = onOpenPasswordDialog
                     )
                 }
                 AppPrimaryButton(
-                    text = stringResource(R.string.guardar),
+                    text = stringResource(R.string.save),
                     onClick = onSaveClick,
                     enabled = uiState.canSaveSettings
                 )
                 AppOutlinedButton(
-                    text = stringResource(R.string.cerrar_sesion),
+                    text = stringResource(R.string.logout),
                     onClick = onLogoutClick
                 )
             }
@@ -317,7 +328,7 @@ private fun ShelterSettingsProvinceDropdown(
             value = selectedProvince,
             onValueChange = {},
             readOnly = true,
-            label = { Text(stringResource(R.string.provincia)) },
+            label = { Text(stringResource(R.string.province)) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier
                 .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true)
@@ -421,27 +432,27 @@ private fun ChangePasswordDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismissRequest,
-        title = { Text(stringResource(R.string.cambiar_contrasena)) },
+        title = { Text(stringResource(R.string.change_password)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(Dimens.spacingSm)) {
                 PasswordField(
                     value = uiState.currentPassword,
                     onValueChange = onCurrentPasswordChange,
-                    label = stringResource(R.string.contrasena_actual),
+                    label = stringResource(R.string.current_password),
                     hidden = uiState.currentPasswordHidden,
                     onToggleVisibility = onToggleCurrentPasswordVisibility
                 )
                 PasswordField(
                     value = uiState.newPassword,
                     onValueChange = onNewPasswordChange,
-                    label = stringResource(R.string.nueva_contrasena),
+                    label = stringResource(R.string.new_password),
                     hidden = uiState.newPasswordHidden,
                     onToggleVisibility = onToggleNewPasswordVisibility
                 )
                 PasswordField(
                     value = uiState.confirmNewPassword,
                     onValueChange = onConfirmNewPasswordChange,
-                    label = stringResource(R.string.repetir_nueva_contrasena),
+                    label = stringResource(R.string.repeat_new_password),
                     hidden = uiState.confirmNewPasswordHidden,
                     onToggleVisibility = onToggleConfirmNewPasswordVisibility
                 )
@@ -454,9 +465,9 @@ private fun ChangePasswordDialog(
             ) {
                 Text(
                     if (uiState.isPasswordChangeLoading) {
-                        stringResource(R.string.actualizando)
+                        stringResource(R.string.updating)
                     } else {
-                        stringResource(R.string.actualizar)
+                        stringResource(R.string.update)
                     }
                 )
             }
@@ -466,7 +477,7 @@ private fun ChangePasswordDialog(
                 onClick = onDismissRequest,
                 enabled = !uiState.isPasswordChangeLoading
             ) {
-                Text(stringResource(R.string.cancelar))
+                Text(stringResource(R.string.cancel))
             }
         }
     )

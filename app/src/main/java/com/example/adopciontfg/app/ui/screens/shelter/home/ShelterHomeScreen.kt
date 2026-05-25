@@ -95,7 +95,7 @@ private fun ShelterHomeScreenPreview() {
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
-                    text = stringResource(R.string.vista_principal_protectora),
+                    text = stringResource(R.string.shelter_main_view),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
