@@ -3,11 +3,15 @@ package com.example.adopciontfg.data.repository;
 import android.app.Application;
 import androidx.lifecycle.LiveData;
 import com.example.adopciontfg.data.local.AppDatabase;
+import com.example.adopciontfg.data.local.LocalPhotoStorage;
 import com.example.adopciontfg.data.local.dao.AnimalDao;
 import com.example.adopciontfg.data.local.entity.AnimalEntity;
 import com.example.adopciontfg.model.Characteristic;
 import com.example.adopciontfg.model.Species;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Source;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -17,6 +21,7 @@ public class AnimalRepository {
 
     private final AnimalDao animalDao;
     private final FirebaseFirestore firestore;
+    private final LocalPhotoStorage photoStorage;
     private final ExecutorService executor;
 
     private static final String COLLECTION = "animals";
@@ -25,6 +30,7 @@ public class AnimalRepository {
         AppDatabase db = AppDatabase.getInstance(application);
         this.animalDao = db.animalDao();
         this.firestore = FirebaseFirestore.getInstance();
+        this.photoStorage = new LocalPhotoStorage(application);
         this.executor = Executors.newSingleThreadExecutor();
     }
 
@@ -46,6 +52,18 @@ public class AnimalRepository {
         return animalDao.getAnimalsByShelter(shelterId);
     }
 
+    public void refreshAllAnimals(OnSuccessListener<Void> onSuccess, OnFailureListener onFailure) {
+        syncAnimalsFromFirebase(onSuccess, onFailure);
+    }
+
+    public void refreshAnimalById(String id, OnSuccessListener<Void> onSuccess, OnFailureListener onFailure) {
+        syncAnimalByIdFromFirebase(id, onSuccess, onFailure);
+    }
+
+    public void refreshAnimalsByShelter(String shelterId, OnSuccessListener<Void> onSuccess, OnFailureListener onFailure) {
+        syncAnimalsByShelterFromFirebase(shelterId, onSuccess, onFailure);
+    }
+
     // ─── Obtener animales por especie ───────────────────────────────────
     public LiveData<List<AnimalEntity>> getAnimalsBySpecies(Species species) {
         syncAnimalsFromFirebase();
@@ -61,32 +79,150 @@ public class AnimalRepository {
     // ─── Insertar/Actualizar animal ────────────────────────────────────────────────
     //firebase gestiona de la misma manera un update y un insert
     public void updateAnimal(AnimalEntity animal) {
-        // Guarda en Firebase
+        updateAnimal(animal, unused -> {}, error -> {});
+    }
+
+    public void updateAnimal(AnimalEntity animal, OnSuccessListener<Void> onSuccess, OnFailureListener onFailure) {
+        executor.execute(() -> {
+            AnimalEntity previousAnimal = animalDao.getAnimalByIdSync(animal.getId());
+            try {
+                AnimalEntity localAnimal = copyAnimalPhotos(animal);
+                saveAnimal(localAnimal, previousAnimal, onSuccess, onFailure);
+            } catch (Exception exception) {
+                onFailure.onFailure(exception);
+            }
+        });
+    }
+
+    private void saveAnimal(
+            AnimalEntity animal,
+            AnimalEntity previousAnimal,
+            OnSuccessListener<Void> onSuccess,
+            OnFailureListener onFailure
+    ) {
         firestore.collection(COLLECTION)
                 .document(animal.getId())
                 .set(animal)
-                .addOnSuccessListener(unused ->
+                .addOnSuccessListener(unused -> {
                         // Si Firebase va bien, guarda en Room
-                        executor.execute(() -> animalDao.insertAnimal(animal))
-                );
+                        executor.execute(() -> {
+                            animalDao.insertAnimal(animal);
+                            deleteReplacedAnimalPhotos(previousAnimal, animal);
+                        });
+                        onSuccess.onSuccess(unused);
+                })
+                .addOnFailureListener(onFailure);
     }
 
+    private AnimalEntity copyAnimalPhotos(AnimalEntity animal) throws Exception {
+        String folderName = "animals/" + animal.getId();
+        String localMainPhoto = photoStorage.copyPhotoIfNeeded(
+                animal.getMainPhoto(),
+                folderName,
+                "main.jpg"
+        );
+        List<String> localPhotos = new ArrayList<>();
+        List<String> photos = animal.getPhotos() == null ? new ArrayList<>() : animal.getPhotos();
 
+        for (int index = 0; index < photos.size(); index++) {
+            localPhotos.add(photoStorage.copyPhotoIfNeeded(
+                    photos.get(index),
+                    folderName,
+                    "gallery_" + index + ".jpg"
+            ));
+        }
+
+        return new AnimalEntity(
+                animal.getId(),
+                animal.getName(),
+                animal.isSex(),
+                localMainPhoto,
+                localPhotos,
+                animal.getBirthDate(),
+                animal.getDescription(),
+                animal.getSpecies(),
+                animal.getCharacteristics(),
+                animal.isForAdoption(),
+                animal.getShelterId()
+        );
+    }
 
     // ─── Eliminar animal ────────────────────────────────────────────────
     public void deleteAnimal(AnimalEntity animal) {
+        deleteAnimal(animal, unused -> {}, error -> {});
+    }
+
+    public void deleteAnimal(AnimalEntity animal, OnSuccessListener<Void> onSuccess, OnFailureListener onFailure) {
+        deleteAnimalById(animal.getId(), animal, onSuccess, onFailure);
+    }
+
+    public void deleteAnimalById(String animalId, OnSuccessListener<Void> onSuccess, OnFailureListener onFailure) {
+        deleteAnimalById(animalId, null, onSuccess, onFailure);
+    }
+
+    private void deleteAnimalById(
+            String animalId,
+            AnimalEntity fallbackAnimal,
+            OnSuccessListener<Void> onSuccess,
+            OnFailureListener onFailure
+    ) {
         firestore.collection(COLLECTION)
-                .document(animal.getId())
+                .document(animalId)
                 .delete()
                 .addOnSuccessListener(unused ->
-                        executor.execute(() -> animalDao.deleteAnimal(animal))
-                );
+                        executor.execute(() -> {
+                            try {
+                                AnimalEntity storedAnimal = animalDao.getAnimalByIdSync(animalId);
+                                AnimalEntity animalToDelete = storedAnimal == null
+                                        ? fallbackAnimal
+                                        : storedAnimal;
+                                if (animalToDelete == null) {
+                                    animalToDelete = new AnimalEntity();
+                                    animalToDelete.setId(animalId);
+                                }
+                                animalDao.deleteAnimal(animalToDelete);
+                                photoStorage.deletePhotos(collectAnimalPhotoUris(animalToDelete));
+                                onSuccess.onSuccess(null);
+                            } catch (Exception exception) {
+                                onFailure.onFailure(exception);
+                            }
+                        })
+                )
+                .addOnFailureListener(onFailure);
+    }
+
+    private void deleteReplacedAnimalPhotos(AnimalEntity previousAnimal, AnimalEntity currentAnimal) {
+        if (previousAnimal == null) return;
+        photoStorage.deletePhotosNotIn(
+                collectAnimalPhotoUris(previousAnimal),
+                collectAnimalPhotoUris(currentAnimal)
+        );
+    }
+
+    private List<String> collectAnimalPhotoUris(AnimalEntity animal) {
+        List<String> photoUris = new ArrayList<>();
+        if (animal == null) return photoUris;
+        if (animal.getMainPhoto() != null && !animal.getMainPhoto().isBlank()) {
+            photoUris.add(animal.getMainPhoto());
+        }
+        if (animal.getPhotos() != null) {
+            for (String photo : animal.getPhotos()) {
+                if (photo != null && !photo.isBlank()) {
+                    photoUris.add(photo);
+                }
+            }
+        }
+        return photoUris;
     }
 
     // ─── Sincronización desde Firebase ──────────────────────────────────
     private void syncAnimalsFromFirebase() {
+        syncAnimalsFromFirebase(unused -> {}, error -> {});
+    }
+
+    private void syncAnimalsFromFirebase(OnSuccessListener<Void> onSuccess, OnFailureListener onFailure) {
         firestore.collection(COLLECTION)
-                .get()
+                .get(Source.SERVER)
                 .addOnSuccessListener(querySnapshot -> {
                     List<AnimalEntity> animals = querySnapshot.toObjects(AnimalEntity.class);
                     executor.execute(() -> {
@@ -100,14 +236,38 @@ public class AnimalRepository {
                         } else {
                             animalDao.deleteAnimalsNotIn(animalIds);
                         }
+                        onSuccess.onSuccess(null);
                     });
-                });
+                })
+                .addOnFailureListener(onFailure);
+    }
+
+    private void syncAnimalByIdFromFirebase(String id, OnSuccessListener<Void> onSuccess, OnFailureListener onFailure) {
+        firestore.collection(COLLECTION)
+                .document(id)
+                .get(Source.SERVER)
+                .addOnSuccessListener(documentSnapshot -> {
+                    AnimalEntity animal = documentSnapshot.toObject(AnimalEntity.class);
+                    if (animal == null) {
+                        onSuccess.onSuccess(null);
+                        return;
+                    }
+                    executor.execute(() -> {
+                        animalDao.insertAnimal(animal);
+                        onSuccess.onSuccess(null);
+                    });
+                })
+                .addOnFailureListener(onFailure);
     }
 
     private void syncAnimalsByShelterFromFirebase(String shelterId) {
+        syncAnimalsByShelterFromFirebase(shelterId, unused -> {}, error -> {});
+    }
+
+    private void syncAnimalsByShelterFromFirebase(String shelterId, OnSuccessListener<Void> onSuccess, OnFailureListener onFailure) {
         firestore.collection(COLLECTION)
                 .whereEqualTo("shelterId", shelterId)
-                .get()
+                .get(Source.SERVER)
                 .addOnSuccessListener(querySnapshot -> {
                     List<AnimalEntity> animals = querySnapshot.toObjects(AnimalEntity.class);
                     executor.execute(() -> {
@@ -121,7 +281,9 @@ public class AnimalRepository {
                         } else {
                             animalDao.deleteAnimalsByShelterNotIn(shelterId, animalIds);
                         }
+                        onSuccess.onSuccess(null);
                     });
-                });
+                })
+                .addOnFailureListener(onFailure);
     }
 }

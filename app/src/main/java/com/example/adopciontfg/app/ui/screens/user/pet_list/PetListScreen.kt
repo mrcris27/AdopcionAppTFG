@@ -19,26 +19,32 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 
 import androidx.compose.runtime.Composable
 
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 
 import androidx.compose.ui.text.font.FontWeight
 
 import androidx.compose.ui.tooling.preview.Preview
 
+import com.example.adopciontfg.R
+
 import com.example.adopciontfg.app.ui.components.skeleton.ShelterCardListSkeleton
 
 import com.example.adopciontfg.app.ui.screens.components.CardViewList
+
+import com.example.adopciontfg.app.ui.screens.components.DataRefreshErrorDialog
 
 import com.example.adopciontfg.app.ui.screens.components.ListCardView
 
 import com.example.adopciontfg.app.ui.screens.components.SearchSection
 
-import com.example.adopciontfg.data.local.entity.AnimalEntity
+import com.example.adopciontfg.app.ui.screens.components.animalListSubtitle
 
-import com.example.adopciontfg.data.local.entity.listSubtitle
+import com.example.adopciontfg.data.local.entity.AnimalEntity
 
 import com.example.adopciontfg.model.Characteristic
 import com.example.adopciontfg.model.Species
@@ -50,6 +56,7 @@ import com.example.adopciontfg.ui.theme.subtleDivider
 
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 
 fun PetListScreen(
@@ -57,6 +64,10 @@ fun PetListScreen(
     uiState: PetListUiState,
 
     onQueryChange: (String) -> Unit,
+
+    onRefresh: () -> Unit,
+
+    onRefreshErrorDismiss: () -> Unit,
 
     onDetailClick: (String) -> Unit,
 
@@ -80,19 +91,33 @@ fun PetListScreen(
 
     ) { innerPadding ->
 
-        PetContent(
+        PullToRefreshBox(
+            isRefreshing = uiState.isRefreshing,
+            onRefresh = onRefresh,
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize(),
+        ) {
+            PetContent(
 
-            modifier = Modifier.padding(innerPadding),
+                modifier = Modifier.fillMaxSize(),
 
-            isLoading = uiState.isLoading,
+                isLoading = uiState.isLoading,
 
-            animals = uiState.filteredAnimals,
+                animals = uiState.filteredAnimals,
 
-            onDetailClick = onDetailClick,
+                onDetailClick = onDetailClick,
 
-        )
+            )
+        }
 
     }
+
+    DataRefreshErrorDialog(
+        error = uiState.refreshError,
+        onDismiss = onRefreshErrorDismiss,
+        onRetry = onRefresh,
+    )
 
 }
 
@@ -124,9 +149,9 @@ fun PetContent(
 
             animals.isEmpty() -> Text(
 
-                text = "No hay animales disponibles.",
+                text = stringResource(R.string.no_available_animals),
 
-                modifier = Modifier.padding(Dimens.screenPadding),
+                modifier = Modifier.padding(horizontal = Dimens.spacingSm, vertical = Dimens.screenPadding),
 
                 style = MaterialTheme.typography.bodyLarge,
 
@@ -146,7 +171,8 @@ fun PetContent(
 
                         name = animal.name.orEmpty(),
 
-                        subtitle = animal.listSubtitle(),
+                        subtitle = animalListSubtitle(animal),
+                        photoUri = animal.mainPhoto,
 
                         onClick = onClick,
 
@@ -180,7 +206,7 @@ fun HomeTopBar(
 
         Text(
 
-            text = "Animales",
+            text = stringResource(R.string.animals),
 
             style = MaterialTheme.typography.titleLarge,
 
@@ -190,7 +216,7 @@ fun HomeTopBar(
 
             modifier = Modifier.padding(
 
-                start = Dimens.spacingXl,
+                start = Dimens.spacingSm,
 
                 top = Dimens.spacingMd,
 
@@ -206,7 +232,7 @@ fun HomeTopBar(
 
             color = MaterialTheme.colorScheme.subtleDivider(),
 
-            modifier = Modifier.padding(horizontal = Dimens.spacingLg)
+            modifier = Modifier.padding(horizontal = Dimens.spacingSm)
 
         )
 
@@ -236,6 +262,10 @@ fun PetListScreenPreview() {
             ),
 
             onQueryChange = {},
+
+            onRefresh = {},
+
+            onRefreshErrorDismiss = {},
 
             onDetailClick = {},
 
@@ -289,6 +319,10 @@ fun PetListScreenLoadingPreview() {
             uiState = PetListUiState(isLoading = true),
 
             onQueryChange = {},
+
+            onRefresh = {},
+
+            onRefreshErrorDismiss = {},
 
             onDetailClick = {},
 

@@ -1,9 +1,13 @@
 package com.example.adopciontfg.app.ui.screens.shelter.registration
 
 import androidx.lifecycle.ViewModel
+import com.example.adopciontfg.data.util.ShelterAddressParts
+import com.example.adopciontfg.data.util.buildShelterAddress
 import com.example.adopciontfg.app.ui.validation.doPasswordsMatch
 import com.example.adopciontfg.app.ui.validation.isValidEmail
+import com.example.adopciontfg.app.ui.validation.isValidGoogleFormsUrl
 import com.example.adopciontfg.app.ui.validation.isValidRegistrationPassword
+import com.example.adopciontfg.app.ui.validation.isValidSpanishPhone
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,8 +20,14 @@ data class ShelterRegistrationUiState(
     val cif: String = "",
     val phone: String = "",
     val address: String = "",
+    val street: String = "",
+    val streetNumber: String = "",
+    val postalCode: String = "",
+    val city: String = "",
+    val province: String = "",
     val email: String = "",
     val profilePhotoUri: String = "",
+    val adoptionFormUrl: String = "",
     val password: String = "",
     val confirmPassword: String = "",
     val passwordHidden: Boolean = true,
@@ -27,8 +37,14 @@ data class ShelterRegistrationUiState(
     val isEmailInvalid: Boolean
         get() = email.isNotBlank() && !isValidEmail(email)
 
+    val isPhoneInvalid: Boolean
+        get() = phone.isNotBlank() && !isValidSpanishPhone(phone)
+
     val isPasswordInvalid: Boolean
         get() = password.isNotBlank() && !isValidRegistrationPassword(password)
+
+    val isAdoptionFormUrlInvalid: Boolean
+        get() = adoptionFormUrl.isNotBlank() && !isValidGoogleFormsUrl(adoptionFormUrl)
 
     val doPasswordsNotMatch: Boolean
         get() = confirmPassword.isNotBlank() && !doPasswordsMatch(password, confirmPassword)
@@ -42,9 +58,15 @@ class ShelterRegistrationViewModel @Inject constructor() : ViewModel() {
     fun onNameChange(name: String) = updateForm { it.copy(name = name) }
     fun onCifChange(cif: String) = updateForm { it.copy(cif = cif) }
     fun onPhoneChange(phone: String) = updateForm { it.copy(phone = phone) }
-    fun onAddressChange(address: String) = updateForm { it.copy(address = address) }
+    fun onStreetChange(street: String) = updateAddress { it.copy(street = street) }
+    fun onStreetNumberChange(streetNumber: String) = updateAddress { it.copy(streetNumber = streetNumber) }
+    fun onPostalCodeChange(postalCode: String) =
+        updateAddress { it.copy(postalCode = postalCode.filter { char -> char.isDigit() }.take(5)) }
+    fun onCityChange(city: String) = updateAddress { it.copy(city = city) }
+    fun onProvinceChange(province: String) = updateAddress { it.copy(province = province) }
     fun onEmailChange(email: String) = updateForm { it.copy(email = email) }
     fun onProfilePhotoChange(value: String) = _uiState.update { it.copy(profilePhotoUri = value) }
+    fun onAdoptionFormUrlChange(value: String) = updateForm { it.copy(adoptionFormUrl = value) }
     fun onPasswordChange(password: String) = updateForm { it.copy(password = password) }
     fun onConfirmPasswordChange(confirmPassword: String) =
         updateForm { it.copy(confirmPassword = confirmPassword) }
@@ -64,12 +86,37 @@ class ShelterRegistrationViewModel @Inject constructor() : ViewModel() {
         }
     }
 
+    private fun updateAddress(transform: (ShelterRegistrationUiState) -> ShelterRegistrationUiState) {
+        updateForm { current ->
+            val updated = transform(current)
+            updated.copy(address = buildFullAddress(updated))
+        }
+    }
+
+    private fun buildFullAddress(state: ShelterRegistrationUiState): String {
+        return buildShelterAddress(
+            ShelterAddressParts(
+                street = state.street,
+                streetNumber = state.streetNumber,
+                postalCode = state.postalCode,
+                city = state.city,
+                province = state.province,
+            )
+        )
+    }
+
     private fun validate(state: ShelterRegistrationUiState): Boolean {
         return state.name.isNotBlank() &&
             state.cif.isNotBlank() &&
-            state.phone.isNotBlank() &&
-            state.address.isNotBlank() &&
+            isValidSpanishPhone(state.phone) &&
+            state.street.isNotBlank() &&
+            state.streetNumber.isNotBlank() &&
+            state.postalCode.length == 5 &&
+            state.postalCode.all { it.isDigit() } &&
+            state.city.isNotBlank() &&
+            state.province.isNotBlank() &&
             isValidEmail(state.email) &&
+            isValidGoogleFormsUrl(state.adoptionFormUrl) &&
             isValidRegistrationPassword(state.password) &&
             doPasswordsMatch(state.password, state.confirmPassword)
     }

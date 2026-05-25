@@ -23,6 +23,9 @@ public interface AnimalDao {
     @Query("SELECT * FROM animals WHERE id = :id LIMIT 1")
     LiveData<AnimalEntity> getAnimalById(String id);
 
+    @Query("SELECT * FROM animals WHERE id = :id LIMIT 1")
+    AnimalEntity getAnimalByIdSync(String id);
+
     // Obtener animales por protectora
     @Query("SELECT * FROM animals WHERE shelterId = :shelterId")
     LiveData<List<AnimalEntity>> getAnimalsByShelter(String shelterId);

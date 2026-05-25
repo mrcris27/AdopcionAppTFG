@@ -22,8 +22,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.adopciontfg.R
 import com.example.adopciontfg.app.ui.screens.components.AppTopAppBar
 import com.example.adopciontfg.ui.theme.AdoptionTheme
 import com.example.adopciontfg.ui.theme.Dimens
@@ -38,32 +40,32 @@ fun SettingsHubScreen(
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            AppTopAppBar(title = "Ajustes")
+            AppTopAppBar(title = stringResource(R.string.settings))
         }
     ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(Dimens.screenPadding),
+                .padding(horizontal = Dimens.spacingSm, vertical = Dimens.screenPadding),
             verticalArrangement = Arrangement.spacedBy(Dimens.spacingLg)
         ) {
             Text(
-                text = "Selecciona el tipo de perfil para editar sus preferencias.",
+                text = stringResource(R.string.settings_hub_desc),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             SettingsProfileCard(
-                title = "Ajustes de usuario",
-                subtitle = "Perfil, contacto y preferencias de la app",
+                title = stringResource(R.string.user_settings),
+                subtitle = stringResource(R.string.settings_user_subtitle),
                 icon = Icons.Outlined.Person,
                 onClick = onUserSettingsClick
             )
 
             SettingsProfileCard(
-                title = "Ajustes de protectora",
-                subtitle = "Datos de la entidad y alertas de adopción",
+                title = stringResource(R.string.shelter_settings),
+                subtitle = stringResource(R.string.settings_shelter_subtitle),
                 icon = Icons.Outlined.VolunteerActivism,
                 onClick = onShelterSettingsClick
             )

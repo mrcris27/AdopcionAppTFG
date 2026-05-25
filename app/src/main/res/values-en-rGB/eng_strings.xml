@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Adopta+</string>
+    <string name="app_tagline">Find your ideal companion</string>
+    <string name="search_shelters">Search shelters</string>
+    <string name="search_animals">Search animals</string>
+    <string name="clear_search">Clear search</string>
+    <string name="open_animal_filters">Open animal filters</string>
+    <string name="filters">Filters</string>
+    <string name="all">All</string>
+    <string name="clear_filters">Clear filters</string>
+    <string name="apply_filters">Apply filters</string>
+    <string name="adoption_status">Adoption status</string>
+    <string name="available_for_adoption">Available</string>
+    <string name="not_available_for_adoption">Not available</string>
+    <string name="no_animal_results">No animals match your search.</string>
+
+    <string name="i_am_user">I am a user</string>
+    <string name="i_am_shelter">I am a shelter</string>
+    <string name="continue_action">Continue</string>
+
+    <string name="back_to_start">Back to start</string>
+    <string name="registration">Sign up</string>
+    <string name="registration_subtitle">Choose how you want to use the app</string>
+    <string name="login">Log in</string>
+    <string name="login_subtitle">Access with your email and password</string>
+    <string name="login_empty_fields_error">Enter your email and password to continue.</string>
+    <string name="login_invalid_email_error">Enter a valid email address.</string>
+    <string name="login_invalid_credentials_error">Incorrect username or password.</string>
+    <string name="signing_in">Signing in…</string>
+    <string name="auth_generic_error">The operation could not be completed.</string>
+    <string name="firebase_auth_configuration_error">Firebase Authentication is not configured correctly. Enable Email/Password in Firebase Console and check the project API key.</string>
+    <string name="user_registration">User registration</string>
+    <string name="shelter_registration">Shelter registration</string>
+
+    <string name="name"> Name </string>
+    <string name="surnames"> Surnames </string>
+    <string name="id_number"> ID number </string>
+    <string name="password"> Password </string>
+    <string name="repeat_password"> Repeat password </string>
+    <string name="phone"> Phone </string>
+    <string name="email"> Email </string>
+    <string name="tax_id"> CIF </string>
+    <string name="address"> Address </string>
+    <string name="street">Street</string>
+    <string name="street_number">Number</string>
+    <string name="postal_code">Postal code</string>
+    <string name="town_city">Town / city</string>
+    <string name="province">Province</string>
+    <string name="biography"> Biography </string>
+    <string name="select_profile_photo"> Select profile photo </string>
+    <string name="register"> Register </string>
+    <string name="registration_email_already_in_use_error">An account with that email address already exists.</string>
+    <string name="registration_invalid_phone_error">Enter a valid 9-digit phone number, with optional +34 prefix.</string>
+    <string name="registration_password_min_length_error">The password must be at least 6 characters long.</string>
+    <string name="registration_passwords_do_not_match_error">The passwords do not match.</string>
+    <string name="registration_invalid_google_forms_url_error">Enter a valid Google Forms link.</string>
+
+    <string name="animal_registration">Register animal</string>
+    <string name="basic_details">Basic details</string>
+    <string name="species">Species</string>
+    <string name="sex">Sex</string>
+    <string name="male">Male</string>
+    <string name="female">Female</string>
+    <string name="adopted">Adopted</string>
+    <string name="adopt">Adopt</string>
+    <string name="do_not_adopt">Do not adopt</string>
+    <string name="birth_date">Date of birth</string>
+    <string name="select_date">Select date</string>
+    <string name="description">Description</string>
+    <string name="animal_description_hint">Tell us about their personality, needs, or history…</string>
+    <string name="photos">Photos</string>
+    <string name="main_photo">Main photo</string>
+    <string name="main_photo_hint">This will be the image users see in the list.</string>
+    <string name="more_photos">More photos</string>
+    <string name="more_photos_hint">Optional. Add extra photos for the animal detail page.</string>
+    <string name="characteristics">Characteristics</string>
+    <string name="characteristics_hint">Select the ones that best describe the animal.</string>
+    <string name="register_animal">Register animal</string>
+
+    <string name="nav_bar_home">Home</string>
+    <string name="nav_bar_add">Add</string>
+    <string name="nav_bar_settings">Settings</string>
+
+    <string name="my_animals">My animals</string>
+    <string name="search_my_animals">Search my animals…</string>
+    <string name="registered_animals">Registered animals</string>
+    <string name="shelter_total_animals">Total registered: %1$d</string>
+    <string name="edit_animal">Edit animal</string>
+    <string name="save_changes">Save changes</string>
+    <string name="delete">Delete</string>
+    <string name="delete_animal">Delete animal</string>
+    <string name="confirm_delete_animal">Are you sure you want to delete this animal? This action cannot be undone.</string>
+    <string name="shelter_no_animals">You have not registered any animals yet. Tap + to add the first one.</string>
+    <string name="shelter_no_session">Log in as a shelter to manage your animals.</string>
+    <string name="shelter_adoption_requests_title">Adoption requests</string>
+    <string name="shelter_adoption_requests_description">Open your Google Form to review received requests.</string>
+    <string name="shelter_adoption_form_missing_url">Configure your form link in Settings -> Adoptions.</string>
+    <string name="shelter_open_form">Open form</string>
+    <string name="adoption_form_not_configured">This shelter has not configured the adoption form yet.</string>
+
+    <string name="sign_in">Log in</string>
+    <string name="sign_up">Sign up</string>
+    <string name="personal_details">Personal details</string>
+    <string name="access">Access</string>
+    <string name="profile_photo_section">Profile photo</string>
+    <string name="public_image">Public image</string>
+    <string name="settings">Settings</string>
+    <string name="user_settings">User settings</string>
+    <string name="shelter_settings">Shelter settings</string>
+    <string name="profile">Profile</string>
+    <string name="preferences">Preferences</string>
+    <string name="security">Security</string>
+    <string name="city">City</string>
+    <string name="notifications">Notifications</string>
+    <string name="dark_mode">Dark mode</string>
+    <string name="update_password_from_form">Update your password from a private form.</string>
+    <string name="change_password">Change password</string>
+    <string name="save">Save</string>
+    <string name="logout">Log out</string>
+    <string name="logging_out">Logging out…</string>
+    <string name="current_password">Current password</string>
+    <string name="new_password">New password</string>
+    <string name="repeat_new_password">Repeat new password</string>
+    <string name="updating">Updating…</string>
+    <string name="update">Update</string>
+    <string name="cancel">Cancel</string>
+    <string name="shelter_details">Shelter details</string>
+    <string name="shelter_name">Shelter name</string>
+    <string name="adoptions">Adoptions</string>
+    <string name="adoption_form_description">Users will fill out this form when they request to adopt an animal.</string>
+    <string name="google_forms_link">Google Forms link</string>
+    <string name="google_forms_placeholder">https://forms.gle/…</string>
+    <string name="adoption_alerts">Adoption alerts</string>
+    <string name="settings_hub_desc">Select the profile type to edit its preferences.</string>
+    <string name="settings_user_subtitle">Profile, contact, and app preferences</string>
+    <string name="settings_shelter_subtitle">Organization details and adoption alerts</string>
+    <string name="shelters">Shelters</string>
+    <string name="list">List</string>
+    <string name="map">Map</string>
+    <string name="shelter_main_view">Shelter main view</string>
+    <string name="search">Search</string>
+    <string name="search_shelter">Search shelter</string>
+    <string name="collapse_search">Collapse search</string>
+    <string name="map_center_spain_abbreviation">ES</string>
+    <string name="view_more_information">View more information</string>
+    <string name="tap_to_view_more_information">Tap to view more information</string>
+    <string name="profile_photo_content_description">Profile photo</string>
+    <string name="change_profile_photo">Change profile photo</string>
+    <string name="gallery">Gallery</string>
+    <string name="take_photo">Take a photo</string>
+    <string name="camera">Camera</string>
+    <string name="photo_added">1 photo added</string>
+    <string name="photos_added">%1$d photos added</string>
+    <string name="remove_photo">Remove photo</string>
+    <string name="tap_add_photos_icon">Tap an icon to add photos</string>
+    <plurals name="max_images_reached">
+        <item quantity="one">You have reached the maximum of %1$d image.</item>
+        <item quantity="other">You have reached the maximum of %1$d images.</item>
+    </plurals>
+    <string name="adopt_now">Adopt now</string>
+    <string name="donate">Donate</string>
+    <string name="donation_dialog_title">Simulate donation</string>
+    <string name="donation_dialog_pet_name">Donation for %1$s</string>
+    <string name="donation_dialog_description">Choose an amount to see what the donation would look like. This action is only a demo and does not make any real payment.</string>
+    <string name="donation_amount_selected">Selected amount: €%1$d</string>
+    <string name="confirm_donation">Confirm donation</string>
+    <string name="donation_confirmation_message">Simulated donation confirmed for %1$s. Thank you for supporting their care.</string>
+    <string name="close">Close</string>
+    <string name="back">Back</string>
+    <string name="age">Age</string>
+    <string name="gender">Gender</string>
+    <string name="about_this_pet">About this pet</string>
+    <string name="default_pet_description">This pet is looking for a home full of love. They are waiting for someone special to give them a second chance 🐾</string>
+    <string name="no_photos_available">No photos available</string>
+    <string name="animal_age_years">%1$d years</string>
+    <string name="animal_list_subtitle_species_age">%1$s · %2$d years</string>
+    <string name="animal_list_subtitle_age">%1$d years</string>
+    <string name="stat_pill_label"> %1$s</string>
+    <string name="species_dog">Dog</string>
+    <string name="species_cat">Cat</string>
+    <string name="species_rabbit">Rabbit</string>
+    <string name="species_rat">Rat</string>
+    <string name="species_horse">Horse</string>
+    <string name="species_other">Other</string>
+    <string name="characteristic_sociable_with_cats">Sociable with cats</string>
+    <string name="characteristic_sociable_with_dogs">Sociable with dogs</string>
+    <string name="characteristic_sociable_with_cats_and_dogs">Sociable with cats and dogs</string>
+    <string name="characteristic_sociable_with_kids">Sociable with children</string>
+    <string name="characteristic_calm">Calm</string>
+    <string name="characteristic_playful">Playful</string>
+    <string name="characteristic_energetic">Energetic</string>
+    <string name="characteristic_reactive">Reactive</string>
+    <string name="shelter">Shelter</string>
+    <string name="hide_shelter_info">Hide shelter information</string>
+    <string name="show_shelter_info">Show shelter information</string>
+    <string name="shelter_info_empty">Shelter information will appear here when available.</string>
+    <string name="tax_id_format">CIF: %1$s</string>
+    <string name="no_phone_app_available">No phone app is available.</string>
+    <string name="no_email_app_available">No email app is available.</string>
+    <string name="no_browser_app_available">No browser app is available.</string>
+    <string name="available_animals">Available animals</string>
+    <string name="no_available_animals">There are no animals available.</string>
+    <string name="shelter_no_available_animals">There are no available animals in this shelter.</string>
+    <string name="animals">Animals</string>
+    <string name="settings_error_current_password_required">Enter your current password</string>
+    <string name="settings_error_password_too_short">The new password must be at least 6 characters long</string>
+    <string name="settings_error_password_mismatch">The new passwords do not match</string>
+    <string name="settings_error_no_active_session">There is no active session</string>
+    <string name="settings_password_updated">Password updated</string>
+    <string name="settings_password_update_failed">Could not update the password</string>
+    <string name="settings_current_password_incorrect">The current password is not correct</string>
+    <string name="settings_changes_saved">Changes saved</string>
+    <string name="settings_changes_saved_device_only">Changes saved only on this device</string>
+    <string name="error_getting_user">Error getting user</string>
+    <string name="unknown_error">Unknown error</string>
+    <string name="pet_form_login_required">Log in as a shelter to save.</string>
+    <string name="animal_saved_successfully">Animal saved successfully</string>
+    <string name="animal_deleted_successfully">Animal deleted successfully</string>
+    <string name="animal_delete_failed">Could not delete the animal</string>
+    <string name="saving_user_settings">Saving user settings…</string>
+    <string name="saving_shelter_settings">Saving shelter settings…</string>
+    <string name="saving_animal_info">Saving animal information…</string>
+    <string name="registering_animal">Registering animal…</string>
+    <string name="deleting_animal">Deleting animal…</string>
+    <string name="saving_user_registration">Registering user…</string>
+    <string name="saving_shelter_registration">Registering shelter…</string>
+    <string name="updating_password_overlay">Updating password…</string>
+    <string name="error_refresh_title">Could not refresh data</string>
+    <string name="error_connection_refresh">Check your connection and try again.</string>
+    <string name="error_timeout_refresh">The refresh is taking too long. Try again.</string>
+
+    <string-array name="spain_provinces">
+        <item>A Coruña</item>
+        <item>Álava</item>
+        <item>Albacete</item>
+        <item>Alicante</item>
+        <item>Almería</item>
+        <item>Asturias</item>
+        <item>Ávila</item>
+        <item>Badajoz</item>
+        <item>Barcelona</item>
+        <item>Burgos</item>
+        <item>Cáceres</item>
+        <item>Cádiz</item>
+        <item>Cantabria</item>
+        <item>Castellón</item>
+        <item>Ciudad Real</item>
+        <item>Córdoba</item>
+        <item>Cuenca</item>
+        <item>Girona</item>
+        <item>Granada</item>
+        <item>Guadalajara</item>
+        <item>Gipuzkoa</item>
+        <item>Huelva</item>
+        <item>Huesca</item>
+        <item>Illes Balears</item>
+        <item>Jaén</item>
+        <item>La Rioja</item>
+        <item>Las Palmas</item>
+        <item>León</item>
+        <item>Lleida</item>
+        <item>Lugo</item>
+        <item>Madrid</item>
+        <item>Málaga</item>
+        <item>Murcia</item>
+        <item>Navarra</item>
+        <item>Ourense</item>
+        <item>Palencia</item>
+        <item>Pontevedra</item>
+        <item>Salamanca</item>
+        <item>Santa Cruz de Tenerife</item>
+        <item>Segovia</item>
+        <item>Sevilla</item>
+        <item>Soria</item>
+        <item>Tarragona</item>
+        <item>Teruel</item>
+        <item>Toledo</item>
+        <item>Valencia</item>
+        <item>Valladolid</item>
+        <item>Bizkaia</item>
+        <item>Zamora</item>
+        <item>Zaragoza</item>
+        <item>Ceuta</item>
+        <item>Melilla</item>
+    </string-array>
+</resources>

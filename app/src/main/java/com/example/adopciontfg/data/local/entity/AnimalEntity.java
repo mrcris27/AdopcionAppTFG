@@ -5,7 +5,6 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
-import com.example.adopciontfg.model.AnimalStatus;
 import com.example.adopciontfg.model.Characteristic;
 import com.example.adopciontfg.model.Species;
 
@@ -20,8 +19,8 @@ public class AnimalEntity {
 
     private String name;
     private boolean sex; // true = Female, false = Male
-    private String mainPhoto;              // URL Firebase Storage
-    private List<String> photos;           // URLs Firebase Storage (TypeConverter)
+    private String mainPhoto;              // URI local de la foto principal
+    private List<String> photos;           // URIs locales de galería (TypeConverter)
     private long birthDate;                // timestamp
     private String description;
     private boolean forAdoption;
@@ -36,10 +35,28 @@ public class AnimalEntity {
     @Ignore
     public AnimalEntity() {
         this.id = "";
+        this.name = "";
+        this.sex = false;
+        this.mainPhoto = "";
+        this.photos = null;
+        this.birthDate = 0L;
+        this.description = "";
+        this.species = null;
+        this.characteristics = null;
         this.shelterId = "";
     }
 
     /** Constructor sin estado explícito (por defecto: disponible). Solo para código de app, no Room. */
+    @Ignore
+    public AnimalEntity(@NonNull String id, String name, boolean sex,
+                        String mainPhoto, List<String> photos, long birthDate,
+                        String description, Species species,
+                        List<Characteristic> characteristics,
+                        @NonNull String shelterId) {
+        this(id, name, sex, mainPhoto, photos, birthDate, description, species,
+                characteristics, true, shelterId);
+    }
+
     @Ignore
     public AnimalEntity(@NonNull String id, String name, boolean sex,
                         String mainPhoto, List<String> photos, long birthDate,
@@ -53,7 +70,7 @@ public class AnimalEntity {
     public AnimalEntity(@NonNull String id, String name, boolean sex,
                         String mainPhoto, List<String> photos, long birthDate,
                         String description, Species species,
-                        List<Characteristic> characteristics, Boolean forAdoption,
+                        List<Characteristic> characteristics, boolean forAdoption,
                         @NonNull String shelterId) {
         this.id = id;
         this.name = name;
@@ -65,7 +82,7 @@ public class AnimalEntity {
         this.species = species;
         this.characteristics = characteristics;
         this.shelterId = shelterId;
-        this.forAdoption = forAdoption != null ? forAdoption : false;
+        this.forAdoption = forAdoption;
     }
 
     // Getters y Setters

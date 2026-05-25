@@ -90,7 +90,7 @@ fun ShelterCardRowSkeleton(
 ) {
     ElevatedCard(
         modifier = modifier
-            .padding(horizontal = Dimens.spacingLg)
+            .padding(horizontal = Dimens.spacingSm)
             .fillMaxWidth(),
         shape = MaterialTheme.shapes.large,
         colors = CardDefaults.elevatedCardColors(
@@ -212,7 +212,7 @@ fun ShelterProfileHeaderCardSkeleton(
     ElevatedCard(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = Dimens.spacingLg, vertical = Dimens.spacingSm),
+            .padding(horizontal = Dimens.spacingSm, vertical = Dimens.spacingSm),
         shape = MaterialTheme.shapes.large,
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.elevatedSurface()
@@ -251,7 +251,7 @@ fun ShelterProfilePetsSectionSkeleton(
     Column(modifier = modifier) {
         SkeletonBox(
             modifier = Modifier
-                .padding(horizontal = Dimens.spacingLg, vertical = Dimens.spacingSm)
+                .padding(horizontal = Dimens.spacingSm, vertical = Dimens.spacingSm)
                 .fillMaxWidth(0.4f)
                 .height(16.dp)
         )
@@ -301,7 +301,7 @@ fun PetDetailBottomBarSkeleton(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(Dimens.cardPadding),
+            .padding(horizontal = Dimens.spacingSm, vertical = Dimens.cardPadding),
         horizontalArrangement = Arrangement.spacedBy(Dimens.spacingMd)
     ) {
         SkeletonBox(
@@ -422,7 +422,7 @@ fun PetDetailContentSkeleton(
     LazyColumn(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(Dimens.spacingLg),
-        contentPadding = PaddingValues(Dimens.screenPadding)
+        contentPadding = PaddingValues(horizontal = Dimens.spacingSm, vertical = Dimens.screenPadding)
     ) {
         item { PetDetailInfoCardSkeleton() }
         item { PetDetailPhotosSectionSkeleton() }

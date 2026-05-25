@@ -14,12 +14,14 @@ fun NavGraphBuilder.userRegistrationScreen(
         biography: String,
         profilePhotoUri: String,
         password: String
-    ) -> Unit
+    ) -> Unit,
+    isSaving: Boolean = false
 ){
     composable<UserRegistrationRoute> {
         UserRegistration(
             onBackClick = onBackClick,
             onRegisterClick = onRegisterClick,
+            isSaving = isSaving,
             //            authViewModel = authViewModel
         )
     }

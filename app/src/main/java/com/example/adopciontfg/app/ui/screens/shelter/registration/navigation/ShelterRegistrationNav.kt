@@ -14,14 +14,17 @@ fun NavGraphBuilder.shelterRegistrationScreen(
         address: String,
         profilePhotoUri: String,
         email: String,
+        adoptionFormUrl: String,
         password: String
     ) -> Unit,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    isSaving: Boolean = false
 ){
     composable<ShelterRegistrationRoute>{
         ShelterRegistration(
             onRegisterClick = onRegisterClick,
-            onBackClick = onBackClick
+            onBackClick = onBackClick,
+            isSaving = isSaving
         )
     }
 }

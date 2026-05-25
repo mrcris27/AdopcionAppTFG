@@ -3,6 +3,7 @@ package com.example.adopciontfg.data.local.entity;
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.Index;
 
 @Entity(
         tableName = "sponsorships",
@@ -20,6 +21,9 @@ import androidx.room.ForeignKey;
                         childColumns = "animalId",
                         onDelete = ForeignKey.CASCADE
                 )
+        },
+        indices = {
+                @Index("animalId")
         }
 )
 public class SponsorshipEntity {

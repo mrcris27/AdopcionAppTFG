@@ -7,9 +7,11 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -21,7 +23,6 @@ import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -30,11 +31,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetState
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -52,10 +54,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.adopciontfg.R
 import com.example.adopciontfg.app.ui.components.skeleton.ShelterCardListSkeleton
-import com.example.adopciontfg.app.ui.screens.components.AppTopAppBar
+import com.example.adopciontfg.app.ui.screens.components.DataRefreshErrorDialog
+import com.example.adopciontfg.app.ui.screens.components.characteristicLabel
+import com.example.adopciontfg.app.ui.screens.components.speciesLabel
 import com.example.adopciontfg.app.ui.screens.shelter.animals.components.ShelterAnimalCard
 import com.example.adopciontfg.data.local.entity.AnimalEntity
-import com.example.adopciontfg.model.AnimalStatus
 import com.example.adopciontfg.model.Characteristic
 import com.example.adopciontfg.model.Species
 import com.example.adopciontfg.ui.theme.AdoptionTheme
@@ -73,126 +76,141 @@ fun ShelterAnimalsScreen(
     ShelterAnimalsContent(
         uiState = uiState,
         onQueryChange = viewModel::onQueryChange,
-        onStatusFilterChange = viewModel::onStatusFilterChange,
+        onSpeciesFilterChange = viewModel::onSpeciesFilterChange,
+        onSexFilterChange = viewModel::onSexFilterChange,
+        onAdoptionStatusFilterChange = viewModel::onAdoptionStatusFilterChange,
+        onCharacteristicToggle = viewModel::onCharacteristicToggle,
+        onClearFilters = viewModel::clearFilters,
+        onRefresh = viewModel::refreshAnimals,
+        onRefreshErrorDismiss = viewModel::dismissRefreshError,
         onAddAnimalClick = onAddAnimalClick,
         onEditAnimalClick = onEditAnimalClick,
-        onQuickStatusChange = viewModel::updateAnimalStatus,
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ShelterAnimalsContent(
     uiState: ShelterAnimalsUiState,
     onQueryChange: (String) -> Unit,
-    onStatusFilterChange: (ShelterAnimalFilter) -> Unit,
+    onSpeciesFilterChange: (Species?) -> Unit,
+    onSexFilterChange: (Boolean?) -> Unit,
+    onAdoptionStatusFilterChange: (ShelterAnimalAdoptionStatus?) -> Unit,
+    onCharacteristicToggle: (Characteristic) -> Unit,
+    onClearFilters: () -> Unit,
+    onRefresh: () -> Unit,
+    onRefreshErrorDismiss: () -> Unit,
     onAddAnimalClick: () -> Unit,
     onEditAnimalClick: (String) -> Unit,
-    onQuickStatusChange: (String, AnimalStatus) -> Unit,
 ) {
-    val title = uiState.shelterName.ifBlank { stringResource(R.string.mis_animales) }
     var showFilters by remember { mutableStateOf(false) }
     val filterSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val hasActiveFilters = uiState.statusFilter != ShelterAnimalFilter.ALL
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
-        topBar = {
-            AppTopAppBar(title = title)
-        },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onAddAnimalClick,
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
             ) {
-                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.registrar_animal))
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.register_animal))
             }
         },
     ) { innerPadding ->
-        Column(
+        PullToRefreshBox(
+            isRefreshing = uiState.isRefreshing,
+            onRefresh = onRefresh,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
         ) {
-            ShelterAnimalsOverview(
-                total = uiState.animals.size,
-                available = uiState.availableCount,
-                reserved = uiState.reservedCount,
-                adopted = uiState.adoptedCount,
-                query = uiState.query,
-                onQueryChange = onQueryChange,
-                hasActiveFilters = hasActiveFilters,
-                onOpenFilters = { showFilters = true },
-                modifier = Modifier.padding(
-                    horizontal = Dimens.screenPadding,
-                    vertical = Dimens.spacingSm,
-                ),
-            )
+            Column(
+                modifier = Modifier.fillMaxSize(),
+            ) {
+                ShelterAnimalsOverview(
+                    total = uiState.animals.size,
+                    query = uiState.query,
+                    hasActiveFilters = uiState.hasActiveFilters,
+                    filtersEnabled = !uiState.isLoading && (uiState.animals.isNotEmpty() || uiState.hasActiveFilters),
+                    onQueryChange = onQueryChange,
+                    onFilterClick = { showFilters = true },
+                    modifier = Modifier.padding(
+                        horizontal = Dimens.screenPadding,
+                        vertical = Dimens.spacingSm,
+                    ),
+                )
 
-            Box(modifier = Modifier.fillMaxSize()) {
-                when {
-                    uiState.shelterId == null -> {
-                        EmptyMessage(
-                            text = stringResource(R.string.shelter_sin_sesion),
-                            modifier = Modifier.align(Alignment.Center),
-                        )
-                    }
-                    uiState.isLoading -> ShelterCardListSkeleton()
-                    uiState.filteredAnimals.isEmpty() -> {
-                        EmptyMessage(
-                            text = if (uiState.animals.isEmpty()) {
-                                stringResource(R.string.shelter_sin_animales)
-                            } else {
-                                stringResource(R.string.sin_resultados_animales)
-                            },
-                            modifier = Modifier.align(Alignment.Center),
-                        )
-                    }
-                    else -> {
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
-                            verticalArrangement = Arrangement.spacedBy(Dimens.listItemSpacing),
-                            contentPadding = PaddingValues(bottom = 88.dp),
-                        ) {
-                            items(uiState.filteredAnimals, key = { it.id }) { animal ->
-                                ShelterAnimalCard(
-                                    animal = animal,
-                                    onClick = { onEditAnimalClick(animal.id) },
-                                    onStatusChange = { status ->
-                                        onQuickStatusChange(animal.id, status)
-                                    },
-                                )
+                Box(modifier = Modifier.fillMaxSize()) {
+                    when {
+                        uiState.shelterId == null -> {
+                            EmptyMessage(
+                                text = stringResource(R.string.shelter_no_session),
+                                modifier = Modifier.align(Alignment.Center),
+                            )
+                        }
+                        uiState.isLoading -> ShelterCardListSkeleton()
+                        uiState.filteredAnimals.isEmpty() -> {
+                            EmptyMessage(
+                                text = if (uiState.animals.isEmpty()) {
+                                    stringResource(R.string.shelter_no_animals)
+                                } else {
+                                    stringResource(R.string.no_animal_results)
+                                },
+                                modifier = Modifier.align(Alignment.Center),
+                            )
+                        }
+                        else -> {
+                            LazyColumn(
+                                modifier = Modifier.fillMaxSize(),
+                                verticalArrangement = Arrangement.spacedBy(Dimens.listItemSpacing),
+                                contentPadding = PaddingValues(bottom = 88.dp),
+                            ) {
+                                items(uiState.filteredAnimals, key = { it.id }) { animal ->
+                                    ShelterAnimalCard(
+                                        animal = animal,
+                                        onClick = { onEditAnimalClick(animal.id) },
+                                    )
+                                }
                             }
                         }
                     }
                 }
             }
         }
+
+        DataRefreshErrorDialog(
+            error = uiState.refreshError,
+            onDismiss = onRefreshErrorDismiss,
+            onRetry = onRefresh,
+        )
     }
 
     if (showFilters) {
-        ShelterAnimalFiltersBottomSheet(
-            selected = uiState.statusFilter,
-            onSelect = onStatusFilterChange,
-            onClearFilters = { onStatusFilterChange(ShelterAnimalFilter.ALL) },
+        AnimalFiltersBottomSheet(
+            selectedSpecies = uiState.selectedSpecies,
+            selectedSex = uiState.selectedSex,
+            selectedAdoptionStatus = uiState.selectedAdoptionStatus,
+            selectedCharacteristics = uiState.selectedCharacteristics,
+            onSpeciesFilterChange = onSpeciesFilterChange,
+            onSexFilterChange = onSexFilterChange,
+            onAdoptionStatusFilterChange = onAdoptionStatusFilterChange,
+            onCharacteristicToggle = onCharacteristicToggle,
+            onClearFilters = onClearFilters,
             onDismiss = { showFilters = false },
             sheetState = filterSheetState,
         )
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ShelterAnimalsOverview(
     total: Int,
-    available: Int,
-    reserved: Int,
-    adopted: Int,
     query: String,
-    onQueryChange: (String) -> Unit,
     hasActiveFilters: Boolean,
-    onOpenFilters: () -> Unit,
+    filtersEnabled: Boolean,
+    onQueryChange: (String) -> Unit,
+    onFilterClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     ElevatedCard(
@@ -207,27 +225,16 @@ private fun ShelterAnimalsOverview(
             modifier = Modifier.padding(Dimens.cardPadding),
             verticalArrangement = Arrangement.spacedBy(Dimens.spacingMd),
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = stringResource(R.string.animales_registrados),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                    Text(
-                        text = stringResource(R.string.shelter_total_animales, total),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-                FilterIconButton(
-                    hasActiveFilters = hasActiveFilters,
-                    onOpenFilters = onOpenFilters,
-                )
-            }
+            Text(
+                text = stringResource(R.string.registered_animals),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+            )
+            Text(
+                text = stringResource(R.string.shelter_total_animals, total),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -238,39 +245,30 @@ private fun ShelterAnimalsOverview(
                     onQueryChange = onQueryChange,
                     modifier = Modifier.weight(1f),
                 )
-            }
-
-            ShelterStatsRow(
-                available = available,
-                reserved = reserved,
-                adopted = adopted,
-            )
-        }
-    }
-}
-
-@Composable
-private fun FilterIconButton(
-    hasActiveFilters: Boolean,
-    onOpenFilters: () -> Unit,
-) {
-    IconButton(onClick = onOpenFilters) {
-        BadgedBox(
-            badge = {
-                if (hasActiveFilters) {
-                    Badge()
+                Spacer(modifier = Modifier.width(Dimens.spacingSm))
+                IconButton(
+                    onClick = onFilterClick,
+                    enabled = filtersEnabled,
+                ) {
+                    BadgedBox(
+                        badge = {
+                            if (hasActiveFilters) {
+                                Badge()
+                            }
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.FilterList,
+                            contentDescription = stringResource(R.string.open_animal_filters),
+                            tint = if (hasActiveFilters) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            },
+                        )
+                    }
                 }
-            },
-        ) {
-            Icon(
-                imageVector = Icons.Default.FilterList,
-                contentDescription = stringResource(R.string.abrir_filtros_animales),
-                tint = if (hasActiveFilters) {
-                    MaterialTheme.colorScheme.primary
-                } else {
-                    MaterialTheme.colorScheme.onSurfaceVariant
-                },
-            )
+            }
         }
     }
 }
@@ -289,7 +287,7 @@ private fun ShelterSearchField(
         shape = MaterialTheme.shapes.large,
         placeholder = {
             Text(
-                text = stringResource(R.string.buscar_mis_animales),
+                text = stringResource(R.string.search_my_animals),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -306,7 +304,7 @@ private fun ShelterSearchField(
                 IconButton(onClick = { onQueryChange("") }) {
                     Icon(
                         imageVector = Icons.Default.Clear,
-                        contentDescription = stringResource(R.string.limpiar_busqueda),
+                        contentDescription = stringResource(R.string.clear_search),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
@@ -330,53 +328,26 @@ private fun ShelterSearchField(
 }
 
 @Composable
-private fun ShelterStatsRow(
-    available: Int,
-    reserved: Int,
-    adopted: Int,
-    modifier: Modifier = Modifier,
-) {
-    FlowRow(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(Dimens.spacingSm),
-        verticalArrangement = Arrangement.spacedBy(Dimens.spacingXs),
-    ) {
-        StatPill(label = stringResource(R.string.disponibles), count = available)
-        StatPill(label = stringResource(R.string.reservados), count = reserved)
-        StatPill(label = stringResource(R.string.adoptados), count = adopted)
-    }
-}
-
-@Composable
-private fun StatPill(label: String, count: Int) {
-    Surface(
-        shape = MaterialTheme.shapes.medium,
-        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.45f),
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = Dimens.spacingSm, vertical = Dimens.spacingXs),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = count.toString(),
-                style = MaterialTheme.typography.labelLarge,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.primary,
-            )
-            Text(
-                text = " $label",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-    }
+private fun EmptyMessage(text: String, modifier: Modifier = Modifier) {
+    Text(
+        text = text,
+        modifier = modifier.padding(Dimens.screenPadding),
+        style = MaterialTheme.typography.bodyLarge,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ShelterAnimalFiltersBottomSheet(
-    selected: ShelterAnimalFilter,
-    onSelect: (ShelterAnimalFilter) -> Unit,
+private fun AnimalFiltersBottomSheet(
+    selectedSpecies: Species?,
+    selectedSex: Boolean?,
+    selectedAdoptionStatus: ShelterAnimalAdoptionStatus?,
+    selectedCharacteristics: Set<Characteristic>,
+    onSpeciesFilterChange: (Species?) -> Unit,
+    onSexFilterChange: (Boolean?) -> Unit,
+    onAdoptionStatusFilterChange: (ShelterAnimalAdoptionStatus?) -> Unit,
+    onCharacteristicToggle: (Characteristic) -> Unit,
     onClearFilters: () -> Unit,
     onDismiss: () -> Unit,
     sheetState: SheetState,
@@ -388,22 +359,77 @@ private fun ShelterAnimalFiltersBottomSheet(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = Dimens.spacingLg)
+                .padding(horizontal = Dimens.spacingSm)
                 .padding(bottom = Dimens.spacingXl),
             verticalArrangement = Arrangement.spacedBy(Dimens.spacingMd),
         ) {
             Text(
-                text = stringResource(R.string.filtros),
+                text = stringResource(R.string.filters),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.SemiBold,
             )
 
-            FilterSection(title = stringResource(R.string.estado_publicacion)) {
-                ShelterAnimalFilter.entries.forEach { filter ->
+            FilterSection(title = stringResource(R.string.species)) {
+                FilterChip(
+                    selected = selectedSpecies == null,
+                    onClick = { onSpeciesFilterChange(null) },
+                    label = { Text(stringResource(R.string.all)) },
+                )
+                Species.entries.forEach { species ->
                     FilterChip(
-                        selected = selected == filter,
-                        onClick = { onSelect(filter) },
-                        label = { Text(statusFilterLabel(filter)) },
+                        selected = selectedSpecies == species,
+                        onClick = { onSpeciesFilterChange(species) },
+                        label = { Text(speciesLabel(species)) },
+                    )
+                }
+            }
+
+            FilterSection(title = stringResource(R.string.sex)) {
+                FilterChip(
+                    selected = selectedSex == null,
+                    onClick = { onSexFilterChange(null) },
+                    label = { Text(stringResource(R.string.all)) },
+                )
+                FilterChip(
+                    selected = selectedSex == false,
+                    onClick = { onSexFilterChange(false) },
+                    label = { Text(stringResource(R.string.male)) },
+                )
+                FilterChip(
+                    selected = selectedSex == true,
+                    onClick = { onSexFilterChange(true) },
+                    label = { Text(stringResource(R.string.female)) },
+                )
+            }
+
+            FilterSection(title = stringResource(R.string.adoption_status)) {
+                FilterChip(
+                    selected = selectedAdoptionStatus == null,
+                    onClick = { onAdoptionStatusFilterChange(null) },
+                    label = { Text(stringResource(R.string.all)) },
+                )
+                FilterChip(
+                    selected = selectedAdoptionStatus == ShelterAnimalAdoptionStatus.AVAILABLE,
+                    onClick = {
+                        onAdoptionStatusFilterChange(ShelterAnimalAdoptionStatus.AVAILABLE)
+                    },
+                    label = { Text(stringResource(R.string.available_for_adoption)) },
+                )
+                FilterChip(
+                    selected = selectedAdoptionStatus == ShelterAnimalAdoptionStatus.NOT_AVAILABLE,
+                    onClick = {
+                        onAdoptionStatusFilterChange(ShelterAnimalAdoptionStatus.NOT_AVAILABLE)
+                    },
+                    label = { Text(stringResource(R.string.not_available_for_adoption)) },
+                )
+            }
+
+            FilterSection(title = stringResource(R.string.characteristics)) {
+                Characteristic.entries.forEach { characteristic ->
+                    FilterChip(
+                        selected = characteristic in selectedCharacteristics,
+                        onClick = { onCharacteristicToggle(characteristic) },
+                        label = { Text(characteristicLabel(characteristic)) },
                     )
                 }
             }
@@ -414,10 +440,10 @@ private fun ShelterAnimalFiltersBottomSheet(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 TextButton(onClick = onClearFilters) {
-                    Text(stringResource(R.string.limpiar_filtros))
+                    Text(stringResource(R.string.clear_filters))
                 }
                 TextButton(onClick = onDismiss) {
-                    Text(stringResource(R.string.aplicar_filtros))
+                    Text(stringResource(R.string.apply_filters))
                 }
             }
         }
@@ -448,25 +474,6 @@ private fun FilterSection(
     }
 }
 
-@Composable
-private fun statusFilterLabel(filter: ShelterAnimalFilter): String = when (filter) {
-    ShelterAnimalFilter.ALL -> stringResource(R.string.todos)
-    ShelterAnimalFilter.AVAILABLE -> stringResource(R.string.disponibles)
-    ShelterAnimalFilter.RESERVED -> stringResource(R.string.reservados)
-    ShelterAnimalFilter.ADOPTED -> stringResource(R.string.adoptados)
-    ShelterAnimalFilter.UNAVAILABLE -> stringResource(R.string.no_disponibles)
-}
-
-@Composable
-private fun EmptyMessage(text: String, modifier: Modifier = Modifier) {
-    Text(
-        text = text,
-        modifier = modifier.padding(Dimens.screenPadding),
-        style = MaterialTheme.typography.bodyLarge,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-    )
-}
-
 @Preview(showBackground = true)
 @Composable
 private fun ShelterAnimalsScreenPreview() {
@@ -481,15 +488,17 @@ private fun ShelterAnimalsScreenPreview() {
                 isLoading = false,
                 animals = animals,
                 filteredAnimals = animals,
-                availableCount = 2,
-                reservedCount = 0,
-                adoptedCount = 1,
             ),
             onQueryChange = {},
-            onStatusFilterChange = {},
+            onSpeciesFilterChange = {},
+            onSexFilterChange = {},
+            onAdoptionStatusFilterChange = {},
+            onCharacteristicToggle = {},
+            onClearFilters = {},
+            onRefresh = {},
+            onRefreshErrorDismiss = {},
             onAddAnimalClick = {},
             onEditAnimalClick = {},
-            onQuickStatusChange = { _, _ -> },
         )
     }
 }

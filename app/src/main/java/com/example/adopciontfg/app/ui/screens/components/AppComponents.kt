@@ -1,12 +1,23 @@
 package com.example.adopciontfg.app.ui.screens.components
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -18,10 +29,15 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.example.adopciontfg.ui.theme.Dimens
 import com.example.adopciontfg.ui.theme.elevatedSurface
 import com.example.adopciontfg.ui.theme.inputOutlineUnfocused
@@ -32,6 +48,7 @@ fun AppTopAppBar(
     title: String,
     onBackClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
+    actions: @Composable RowScope.() -> Unit = {},
 ) {
     TopAppBar(
         modifier = modifier,
@@ -57,6 +74,7 @@ fun AppTopAppBar(
                 }
             }
         },
+        actions = actions,
     )
 }
 
@@ -104,9 +122,11 @@ fun AppPrimaryButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
     Button(
         onClick = onClick,
+        enabled = enabled,
         modifier = modifier
             .fillMaxWidth()
             .height(Dimens.buttonHeight),
@@ -148,6 +168,8 @@ fun AppOutlinedButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    contentColor: Color = MaterialTheme.colorScheme.primary,
+    borderColor: Color = contentColor,
 ) {
     OutlinedButton(
         onClick = onClick,
@@ -155,6 +177,10 @@ fun AppOutlinedButton(
             .fillMaxWidth()
             .height(Dimens.buttonHeight),
         shape = MaterialTheme.shapes.large,
+        colors = ButtonDefaults.outlinedButtonColors(
+            contentColor = contentColor,
+        ),
+        border = BorderStroke(1.dp, borderColor),
     ) {
         Text(text = text, style = MaterialTheme.typography.labelLarge)
     }
@@ -172,4 +198,48 @@ fun AppSectionTitle(
         color = MaterialTheme.colorScheme.primary,
         fontWeight = FontWeight.SemiBold,
     )
+}
+
+@Composable
+fun SavingOverlay(
+    message: String,
+    modifier: Modifier = Modifier,
+) {
+    Dialog(
+        onDismissRequest = {},
+        properties = DialogProperties(
+            dismissOnBackPress = false,
+            dismissOnClickOutside = false,
+            usePlatformDefaultWidth = false,
+        ),
+    ) {
+        Box(
+            modifier = modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.36f)),
+            contentAlignment = Alignment.Center,
+        ) {
+            ElevatedCard(
+                shape = MaterialTheme.shapes.large,
+                colors = CardDefaults.elevatedCardColors(
+                    containerColor = MaterialTheme.colorScheme.elevatedSurface()
+                ),
+                elevation = CardDefaults.elevatedCardElevation(defaultElevation = 6.dp),
+            ) {
+                Column(
+                    modifier = Modifier.padding(Dimens.spacingXl),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(Dimens.spacingMd),
+                ) {
+                    CircularProgressIndicator()
+                    Text(
+                        text = message,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        textAlign = TextAlign.Center,
+                    )
+                }
+            }
+        }
+    }
 }

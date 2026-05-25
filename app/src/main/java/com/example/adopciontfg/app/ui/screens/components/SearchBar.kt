@@ -1,7 +1,6 @@
 package com.example.adopciontfg.app.ui.screens.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
@@ -16,21 +15,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import com.example.adopciontfg.R
-import com.example.adopciontfg.ui.theme.Dimens
 
 @Composable
 fun SearchBar(
     query: String,
     onQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    placeholder: String = stringResource(R.string.buscar_protectoras),
+    placeholder: String = stringResource(R.string.search_shelters),
 ) {
     TextField(
         value = query,
         onValueChange = onQueryChange,
         modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = Dimens.spacingMd, vertical = Dimens.spacingSm),
+            .fillMaxWidth(),
         singleLine = true,
         shape = MaterialTheme.shapes.large,
         placeholder = {
@@ -52,7 +49,7 @@ fun SearchBar(
                 IconButton(onClick = { onQueryChange("") }) {
                     Icon(
                         imageVector = Icons.Default.Clear,
-                        contentDescription = stringResource(R.string.limpiar_busqueda),
+                        contentDescription = stringResource(R.string.clear_search),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }

@@ -1,7 +1,14 @@
 package com.example.adopciontfg.app.ui.screens.user.shelter_profile
 
+import android.content.ActivityNotFoundException
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,9 +21,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.FilterList
@@ -31,10 +40,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -44,17 +52,25 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.adopciontfg.R
 import com.example.adopciontfg.app.ui.components.skeleton.ShelterCardListSkeleton
 import com.example.adopciontfg.app.ui.screens.components.AppSectionTitle
-import com.example.adopciontfg.app.ui.screens.components.AppTopAppBar
 import com.example.adopciontfg.app.ui.screens.components.CardViewList
+import com.example.adopciontfg.app.ui.screens.components.DataRefreshErrorDialog
 import com.example.adopciontfg.app.ui.screens.components.ListCardView
 import com.example.adopciontfg.app.ui.screens.components.SearchSection
+import com.example.adopciontfg.app.ui.screens.components.UriThumbnail
+import com.example.adopciontfg.app.ui.screens.components.animalListSubtitle
+import com.example.adopciontfg.app.ui.screens.components.characteristicLabel
+import com.example.adopciontfg.app.ui.screens.components.speciesLabel
+import com.example.adopciontfg.app.ui.state.DataRefreshError
 import com.example.adopciontfg.data.local.entity.AnimalEntity
 import com.example.adopciontfg.data.local.entity.ShelterEntity
 import com.example.adopciontfg.data.local.entity.listSubtitle
@@ -85,157 +101,162 @@ fun ShelterProfileScreen(
     onCharacteristicToggle: (Characteristic) -> Unit = {},
     onClearFilters: () -> Unit = {},
     isPetsLoading: Boolean = false,
+    isRefreshing: Boolean = false,
+    refreshError: DataRefreshError? = null,
+    onRefresh: () -> Unit = {},
+    onRefreshErrorDismiss: () -> Unit = {},
 ) {
     var shelterCardExpanded by remember { mutableStateOf(false) }
     var showFilters by remember { mutableStateOf(false) }
+    val context = LocalContext.current
     val filterSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val chevronRotation by animateFloatAsState(
         targetValue = if (shelterCardExpanded) 180f else 0f,
         label = "shelterCardChevron",
     )
 
-    Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
-        topBar = {
-            AppTopAppBar(
-                title = "Protectora",
-                onBackClick = onBackClick
-            )
-        }
-    ) { innerPadding ->
-        Column(
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .statusBarsPadding(),
+    ) {
+        PullToRefreshBox(
+            isRefreshing = isRefreshing,
+            onRefresh = onRefresh,
             modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
+                .fillMaxSize(),
         ) {
-            ElevatedCard(
-                onClick = { shelterCardExpanded = !shelterCardExpanded },
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = Dimens.spacingLg, vertical = Dimens.spacingSm)
-                    .animateContentSize(),
-                shape = MaterialTheme.shapes.large,
-                colors = CardDefaults.elevatedCardColors(
-                    containerColor = MaterialTheme.colorScheme.elevatedSurface()
-                ),
-                elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
+                    .fillMaxSize()
             ) {
-                Column(
+                ElevatedCard(
+                    onClick = { shelterCardExpanded = !shelterCardExpanded },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(Dimens.cardPadding)
+                        .padding(horizontal = Dimens.spacingSm, vertical = Dimens.spacingSm)
+                        .animateContentSize(),
+                    shape = MaterialTheme.shapes.large,
+                    colors = CardDefaults.elevatedCardColors(
+                        containerColor = MaterialTheme.colorScheme.elevatedSurface()
+                    ),
+                    elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(Dimens.cardPadding)
                     ) {
-                        Surface(
-                            modifier = Modifier.size(Dimens.avatarSize),
-                            shape = CircleShape,
-                            color = MaterialTheme.colorScheme.primaryContainer
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
-                            ) {
+                            IconButton(onClick = onBackClick) {
                                 Icon(
-                                    imageVector = Icons.Default.AccountCircle,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(44.dp),
-                                    tint = MaterialTheme.colorScheme.primary
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = stringResource(R.string.back),
+                                    tint = MaterialTheme.colorScheme.primary,
                                 )
                             }
+
+                            Spacer(modifier = Modifier.width(Dimens.spacingSm))
+
+                            UriThumbnail(
+                                photoUri = shelter.profilePicture,
+                                placeholderIcon = Icons.Default.AccountCircle,
+                                shape = CircleShape,
+                                size = Dimens.avatarSize,
+                                iconSize = 44.dp,
+                            )
+
+                            Spacer(modifier = Modifier.width(Dimens.spacingMd))
+
+                            Text(
+                                text = shelter.name.orEmpty(),
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.SemiBold,
+                                modifier = Modifier.weight(1f)
+                            )
+
+                            Icon(
+                                imageVector = Icons.Default.ExpandMore,
+                                contentDescription = if (shelterCardExpanded) {
+                                    stringResource(R.string.hide_shelter_info)
+                                } else {
+                                    stringResource(R.string.show_shelter_info)
+                                },
+                                modifier = Modifier.rotate(chevronRotation),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                         }
 
-                        Spacer(modifier = Modifier.width(Dimens.spacingMd))
-
-                        Text(
-                            text = shelter.name.orEmpty(),
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier.weight(1f)
-                        )
-
-                        Icon(
-                            imageVector = Icons.Default.ExpandMore,
-                            contentDescription = if (shelterCardExpanded) {
-                                "Ocultar información de la protectora"
-                            } else {
-                                "Mostrar información de la protectora"
-                            },
-                            modifier = Modifier.rotate(chevronRotation),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-
-                    if (shelterCardExpanded) {
-                        Spacer(modifier = Modifier.height(Dimens.spacingMd))
-                        HorizontalDivider(
-                            color = MaterialTheme.colorScheme.subtleDivider()
-                        )
-                        Spacer(modifier = Modifier.height(Dimens.spacingMd))
-
-                        val hasContactDetails = shelter.address.orEmpty().isNotBlank() ||
-                            shelter.cif.orEmpty().isNotBlank() ||
-                            shelter.email.orEmpty().isNotBlank() ||
-                            shelter.phone.orEmpty().isNotBlank()
-
-                        if (!hasContactDetails) {
-                            Text(
-                                text = "Aquí se mostrará la información de la protectora cuando esté disponible.",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                        if (shelterCardExpanded) {
+                            Spacer(modifier = Modifier.height(Dimens.spacingMd))
+                            HorizontalDivider(
+                                color = MaterialTheme.colorScheme.subtleDivider()
                             )
-                        } else {
-                            if (shelter.address.orEmpty().isNotBlank()) {
+                            Spacer(modifier = Modifier.height(Dimens.spacingMd))
+
+                            val hasContactDetails = shelter.address.orEmpty().isNotBlank() ||
+                                shelter.cif.orEmpty().isNotBlank() ||
+                                shelter.email.orEmpty().isNotBlank() ||
+                                shelter.phone.orEmpty().isNotBlank()
+
+                            if (!hasContactDetails) {
                                 Text(
-                                    text = shelter.address.orEmpty(),
+                                    text = stringResource(R.string.shelter_info_empty),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
-                            }
-                            if (shelter.cif.orEmpty().isNotBlank()) {
-                                Spacer(modifier = Modifier.height(Dimens.spacingSm))
-                                Text(
-                                    text = "CIF: ${shelter.cif.orEmpty()}",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                            if (shelter.email.orEmpty().isNotBlank()) {
-                                Spacer(modifier = Modifier.height(Dimens.spacingSm))
-                                Text(
-                                    text = shelter.email.orEmpty(),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                            if (shelter.phone.orEmpty().isNotBlank()) {
-                                Spacer(modifier = Modifier.height(Dimens.spacingSm))
-                                Text(
-                                    text = shelter.phone.orEmpty(),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
+                            } else {
+                                if (shelter.address.orEmpty().isNotBlank()) {
+                                    Text(
+                                        text = shelter.address.orEmpty(),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                                if (shelter.cif.orEmpty().isNotBlank()) {
+                                    Spacer(modifier = Modifier.height(Dimens.spacingSm))
+                                    Text(
+                                        text = stringResource(R.string.tax_id_format, shelter.cif.orEmpty()),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                                if (shelter.email.orEmpty().isNotBlank()) {
+                                    Spacer(modifier = Modifier.height(Dimens.spacingSm))
+                                    ContactActionText(
+                                        text = shelter.email.orEmpty(),
+                                        onClick = { openEmailApp(context, shelter.email.orEmpty()) },
+                                    )
+                                }
+                                if (shelter.phone.orEmpty().isNotBlank()) {
+                                    Spacer(modifier = Modifier.height(Dimens.spacingSm))
+                                    ContactActionText(
+                                        text = shelter.phone.orEmpty(),
+                                        onClick = { openPhoneApp(context, shelter.phone.orEmpty()) },
+                                    )
+                                }
                             }
                         }
                     }
                 }
-            }
 
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(
-                        start = Dimens.spacingLg,
-                        end = Dimens.spacingSm,
+                        start = Dimens.spacingSm,
+                        end = Dimens.spacingXs,
                         top = Dimens.spacingSm,
                         bottom = Dimens.spacingXs
                     ),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 AppSectionTitle(
-                    text = "Animales disponibles",
+                    text = stringResource(R.string.available_animals),
                     modifier = Modifier.weight(1f)
                 )
                 IconButton(
@@ -251,7 +272,7 @@ fun ShelterProfileScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.FilterList,
-                            contentDescription = stringResource(R.string.abrir_filtros_animales),
+                            contentDescription = stringResource(R.string.open_animal_filters),
                             tint = if (hasActiveFilters) {
                                 MaterialTheme.colorScheme.primary
                             } else {
@@ -266,7 +287,7 @@ fun ShelterProfileScreen(
                 SearchSection(
                     query = query,
                     onQueryChange = onQueryChange,
-                    placeholder = stringResource(R.string.buscar_animales),
+                    placeholder = stringResource(R.string.search_animals),
                 )
             }
 
@@ -279,15 +300,15 @@ fun ShelterProfileScreen(
                     ShelterCardListSkeleton(modifier = Modifier.fillMaxSize())
                 } else if (!hasAnimals) {
                     Text(
-                        text = "No hay animales disponibles en esta protectora.",
-                        modifier = Modifier.padding(horizontal = Dimens.spacingLg),
+                        text = stringResource(R.string.shelter_no_available_animals),
+                        modifier = Modifier.padding(horizontal = Dimens.spacingSm),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 } else if (animals.isEmpty() && isFiltering) {
                     Text(
-                        text = stringResource(R.string.sin_resultados_animales),
-                        modifier = Modifier.padding(horizontal = Dimens.spacingLg),
+                        text = stringResource(R.string.no_animal_results),
+                        modifier = Modifier.padding(horizontal = Dimens.spacingSm),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -298,7 +319,8 @@ fun ShelterProfileScreen(
                         itemContent = { animal, onClick ->
                             CardViewList(
                                 name = animal.name.orEmpty(),
-                                subtitle = animal.listSubtitle(),
+                                subtitle = animalListSubtitle(animal),
+                                photoUri = animal.mainPhoto,
                                 onClick = onClick,
                             )
                         },
@@ -307,6 +329,13 @@ fun ShelterProfileScreen(
             }
         }
     }
+    }
+
+    DataRefreshErrorDialog(
+        error = refreshError,
+        onDismiss = onRefreshErrorDismiss,
+        onRetry = onRefresh,
+    )
 
     if (showFilters) {
         AnimalFiltersBottomSheet(
@@ -322,6 +351,60 @@ fun ShelterProfileScreen(
         )
     }
 }
+
+@Composable
+private fun ContactActionText(
+    text: String,
+    onClick: () -> Unit,
+) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.primary,
+        textDecoration = TextDecoration.Underline,
+        modifier = Modifier.clickable(
+            role = Role.Button,
+            onClick = onClick,
+        )
+    )
+}
+
+private fun openPhoneApp(context: Context, phone: String) {
+    openExternalApp(
+        context = context,
+        intent = Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", phone, null)),
+        errorMessage = context.getString(R.string.no_phone_app_available),
+    )
+}
+
+private fun openEmailApp(context: Context, email: String) {
+    val emailUri = Uri.fromParts("mailto", email, null)
+    val gmailIntent = Intent(Intent.ACTION_SENDTO, emailUri).setPackage(GMAIL_PACKAGE)
+
+    try {
+        context.startActivity(gmailIntent)
+    } catch (_: ActivityNotFoundException) {
+        openExternalApp(
+            context = context,
+            intent = Intent(Intent.ACTION_SENDTO, emailUri),
+            errorMessage = context.getString(R.string.no_email_app_available),
+        )
+    }
+}
+
+private fun openExternalApp(
+    context: Context,
+    intent: Intent,
+    errorMessage: String,
+) {
+    try {
+        context.startActivity(intent)
+    } catch (_: ActivityNotFoundException) {
+        Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
+    }
+}
+
+private const val GMAIL_PACKAGE = "com.google.android.gm"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -343,55 +426,55 @@ private fun AnimalFiltersBottomSheet(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = Dimens.spacingLg)
+                .padding(horizontal = Dimens.spacingSm)
                 .padding(bottom = Dimens.spacingXl),
             verticalArrangement = Arrangement.spacedBy(Dimens.spacingMd)
         ) {
             Text(
-                text = stringResource(R.string.filtros),
+                text = stringResource(R.string.filters),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.SemiBold,
             )
 
-            FilterSection(title = stringResource(R.string.especie)) {
+            FilterSection(title = stringResource(R.string.species)) {
                 FilterChip(
                     selected = selectedSpecies == null,
                     onClick = { onSpeciesFilterChange(null) },
-                    label = { Text(stringResource(R.string.todos)) }
+                    label = { Text(stringResource(R.string.all)) }
                 )
                 Species.entries.forEach { species ->
                     FilterChip(
                         selected = selectedSpecies == species,
                         onClick = { onSpeciesFilterChange(species) },
-                        label = { Text(enumLabel(species.name)) }
+                        label = { Text(speciesLabel(species)) }
                     )
                 }
             }
 
-            FilterSection(title = stringResource(R.string.sexo)) {
+            FilterSection(title = stringResource(R.string.sex)) {
                 FilterChip(
                     selected = selectedSex == null,
                     onClick = { onSexFilterChange(null) },
-                    label = { Text(stringResource(R.string.todos)) }
+                    label = { Text(stringResource(R.string.all)) }
                 )
                 FilterChip(
                     selected = selectedSex == false,
                     onClick = { onSexFilterChange(false) },
-                    label = { Text(stringResource(R.string.macho)) }
+                    label = { Text(stringResource(R.string.male)) }
                 )
                 FilterChip(
                     selected = selectedSex == true,
                     onClick = { onSexFilterChange(true) },
-                    label = { Text(stringResource(R.string.hembra)) }
+                    label = { Text(stringResource(R.string.female)) }
                 )
             }
 
-            FilterSection(title = stringResource(R.string.caracteristicas)) {
+            FilterSection(title = stringResource(R.string.characteristics)) {
                 Characteristic.entries.forEach { characteristic ->
                     FilterChip(
                         selected = characteristic in selectedCharacteristics,
                         onClick = { onCharacteristicToggle(characteristic) },
-                        label = { Text(enumLabel(characteristic.name)) }
+                        label = { Text(characteristicLabel(characteristic)) }
                     )
                 }
             }
@@ -402,10 +485,10 @@ private fun AnimalFiltersBottomSheet(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 TextButton(onClick = onClearFilters) {
-                    Text(stringResource(R.string.limpiar_filtros))
+                    Text(stringResource(R.string.clear_filters))
                 }
                 TextButton(onClick = onDismiss) {
-                    Text(stringResource(R.string.aplicar_filtros))
+                    Text(stringResource(R.string.apply_filters))
                 }
             }
         }
@@ -435,9 +518,6 @@ private fun FilterSection(
         }
     }
 }
-
-private fun enumLabel(name: String): String =
-    name.replace("_", " ").lowercase().replaceFirstChar { it.uppercase() }
 
 @Preview(showBackground = true)
 @Composable

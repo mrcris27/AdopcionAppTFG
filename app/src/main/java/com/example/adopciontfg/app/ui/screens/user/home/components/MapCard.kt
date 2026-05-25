@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.LocationOn
@@ -15,13 +14,15 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.adopciontfg.R
+import com.example.adopciontfg.app.ui.screens.components.UriThumbnail
 import com.example.adopciontfg.data.local.entity.ShelterEntity
 import com.example.adopciontfg.ui.theme.Dimens
 import com.example.adopciontfg.ui.theme.elevatedSurface
@@ -48,18 +49,13 @@ fun MapCard(
                 .padding(Dimens.cardPadding),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Surface(
-                modifier = Modifier.size(44.dp),
+            UriThumbnail(
+                photoUri = shelter.profilePicture,
+                placeholderIcon = Icons.Default.LocationOn,
+                size = 44.dp,
+                iconSize = 24.dp,
                 shape = MaterialTheme.shapes.medium,
-                color = MaterialTheme.colorScheme.primaryContainer
-            ) {
-                Icon(
-                    imageVector = Icons.Default.LocationOn,
-                    contentDescription = null,
-                    modifier = Modifier.padding(10.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            }
+            )
 
             Column(
                 modifier = Modifier
@@ -72,7 +68,7 @@ fun MapCard(
                     fontWeight = FontWeight.SemiBold
                 )
                 Text(
-                    text = "Ver más información",
+                    text = stringResource(R.string.view_more_information),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.primary
                 )

@@ -17,6 +17,9 @@ public interface UserDao {
     @Query("SELECT * FROM users WHERE id = :userId")
     LiveData<UserEntity> getUserById(String userId);
 
+    @Query("SELECT * FROM users WHERE id = :userId LIMIT 1")
+    UserEntity getUserByIdSync(String userId);
+
     // Insertar/actualizar usuario (si ya existe lo reemplaza)
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void saveUser(UserEntity user);

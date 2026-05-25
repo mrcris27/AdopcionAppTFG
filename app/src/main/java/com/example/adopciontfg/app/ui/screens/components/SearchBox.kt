@@ -14,7 +14,7 @@ import com.example.adopciontfg.ui.theme.Dimens
 fun SearchSection(
     query: String,
     onQueryChange: (String) -> Unit,
-    placeholder: String = stringResource(R.string.buscar_animales),
+    placeholder: String = stringResource(R.string.search_animals),
 ) {
     SearchBar(
         query = query,
@@ -22,6 +22,6 @@ fun SearchSection(
         placeholder = placeholder,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = Dimens.spacingLg, vertical = Dimens.spacingSm)
+            .padding(horizontal = Dimens.spacingSm, vertical = Dimens.spacingSm)
     )
 }

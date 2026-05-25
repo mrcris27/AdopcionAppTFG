@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -55,6 +56,11 @@ fun AnimatedSplashScreen(
         ),
         label = "logo-pulse",
     )
+    val splashBackground = if (MaterialTheme.colorScheme.background.luminance() < 0.5f) {
+        MaterialTheme.colorScheme.background
+    } else {
+        SplashBackgroundLight
+    }
 
     LaunchedEffect(Unit) {
         launch {
@@ -85,7 +91,7 @@ fun AnimatedSplashScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(SplashBackground),
+            .background(splashBackground),
         contentAlignment = Alignment.Center,
     ) {
         Column(
@@ -121,7 +127,7 @@ fun AnimatedSplashScreen(
     }
 }
 
-private val SplashBackground = Color(0xFFEAFBF6)
+private val SplashBackgroundLight = Color(0xFFEAFBF6)
 
 @Preview(showBackground = true)
 @Composable

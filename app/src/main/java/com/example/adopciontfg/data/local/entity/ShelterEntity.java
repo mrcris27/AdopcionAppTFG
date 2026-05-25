@@ -14,7 +14,7 @@ public class ShelterEntity {
 
     private String name;
     private String cif;
-    private String profilePicture; // URL de Firebase Storage
+    private String profilePicture; // URI local de la foto de perfil
     private String email;
     private String address;
     private String phone;
@@ -24,6 +24,12 @@ public class ShelterEntity {
     @Ignore
     public ShelterEntity() {
         this.id = "";
+        this.name = "";
+        this.cif = "";
+        this.profilePicture = "";
+        this.email = "";
+        this.address = "";
+        this.phone = "";
         this.adoptionFormUrl = "";
     }
 

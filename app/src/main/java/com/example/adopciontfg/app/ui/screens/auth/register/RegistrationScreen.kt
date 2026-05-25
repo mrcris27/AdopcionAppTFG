@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -20,6 +22,7 @@ import com.example.adopciontfg.app.ui.screens.components.AppSecondaryButton
 import com.example.adopciontfg.app.ui.screens.components.AppTopAppBar
 import com.example.adopciontfg.ui.theme.AdoptionTheme
 import com.example.adopciontfg.ui.theme.Dimens
+import com.example.adopciontfg.ui.theme.elevatedSurface
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,7 +35,7 @@ fun RegistrationScreen(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             AppTopAppBar(
-                title = stringResource(R.string.registro),
+                title = stringResource(R.string.registration),
                 onBackClick = onBackClick
             )
         }
@@ -45,27 +48,34 @@ fun RegistrationScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = stringResource(R.string.registro_subtitle),
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = Dimens.spacingXl)
-            )
-
-            Column(
+            ElevatedCard(
                 modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(Dimens.spacingLg)
+                shape = MaterialTheme.shapes.large,
+                colors = CardDefaults.elevatedCardColors(
+                    containerColor = MaterialTheme.colorScheme.elevatedSurface()
+                ),
+                elevation = CardDefaults.elevatedCardElevation(defaultElevation = Dimens.spacingXs)
             ) {
-                AppPrimaryButton(
-                    text = stringResource(R.string.soy_usuario),
-                    onClick = onRegisterUserClick
-                )
-                AppSecondaryButton(
-                    text = stringResource(R.string.soy_protectora),
-                    onClick = onRegisterShelterClick
-                )
+                Column(
+                    modifier = Modifier.padding(Dimens.cardPadding),
+                    verticalArrangement = Arrangement.spacedBy(Dimens.spacingLg)
+                ) {
+                    Text(
+                        text = stringResource(R.string.registration_subtitle),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    AppPrimaryButton(
+                        text = stringResource(R.string.i_am_user),
+                        onClick = onRegisterUserClick
+                    )
+                    AppSecondaryButton(
+                        text = stringResource(R.string.i_am_shelter),
+                        onClick = onRegisterShelterClick
+                    )
+                }
             }
         }
     }

@@ -81,9 +81,6 @@ fun MainNavHost(
 
 
         userSettingsScreen(
-
-            onBackClick = { navController.popBackStack() },
-
             onLogout = onLogout,
 
         )

@@ -61,6 +61,10 @@ private fun ShelterProfileRouteContent(
             onCharacteristicToggle = viewModel::onCharacteristicToggle,
             onClearFilters = viewModel::clearFilters,
             isPetsLoading = uiState.isPetsLoading,
+            isRefreshing = uiState.isRefreshing,
+            refreshError = uiState.refreshError,
+            onRefresh = viewModel::refreshShelterProfile,
+            onRefreshErrorDismiss = viewModel::dismissRefreshError,
         )
     }
 }

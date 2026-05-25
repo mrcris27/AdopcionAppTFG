@@ -28,6 +28,8 @@ private fun PetListRouteContent(
     PetListScreen(
         uiState = uiState,
         onQueryChange = viewModel::onQueryChange,
+        onRefresh = viewModel::refreshAnimals,
+        onRefreshErrorDismiss = viewModel::dismissRefreshError,
         onDetailClick = onDetailClick,
     )
 }

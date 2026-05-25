@@ -3,9 +3,11 @@ package com.example.adopciontfg.app.ui.screens.user.shelter_profile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
+import com.example.adopciontfg.app.ui.state.DataRefreshError
+import com.example.adopciontfg.app.ui.state.awaitDataRefresh
+import com.example.adopciontfg.app.ui.state.toDataRefreshError
 import com.example.adopciontfg.data.local.entity.AnimalEntity
 import com.example.adopciontfg.data.local.entity.ShelterEntity
-import com.example.adopciontfg.data.local.entity.isPubliclyVisible
 import com.example.adopciontfg.data.repository.AnimalRepository
 import com.example.adopciontfg.data.repository.ShelterRepository
 import com.example.adopciontfg.model.Characteristic
@@ -28,6 +30,8 @@ data class ShelterProfileUiState(
     val selectedCharacteristics: Set<Characteristic> = emptySet(),
     val isLoading: Boolean = true,
     val isPetsLoading: Boolean = true,
+    val isRefreshing: Boolean = false,
+    val refreshError: DataRefreshError? = null,
 ) {
     val hasActiveFilters: Boolean
         get() = selectedSpecies != null || selectedSex != null || selectedCharacteristics.isNotEmpty()
@@ -43,8 +47,10 @@ class ShelterProfileViewModel @Inject constructor(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ShelterProfileUiState())
     val uiState: StateFlow<ShelterProfileUiState> = _uiState.asStateFlow()
+    private var currentShelterId: String? = null
 
     fun loadShelter(shelterId: String) {
+        currentShelterId = shelterId
         viewModelScope.launch {
             shelterRepository.getShelterById(shelterId).asFlow().collect { shelter ->
                 _uiState.update {
@@ -58,7 +64,7 @@ class ShelterProfileViewModel @Inject constructor(
         viewModelScope.launch {
             animalRepository.getAnimalsByShelter(shelterId).asFlow().collect { animals ->
                 _uiState.update { state ->
-                    val loadedAnimals = animals.orEmpty().filter { it.isPubliclyVisible() }
+                    val loadedAnimals = animals.orEmpty()
                     state.copy(
                         animals = loadedAnimals,
                         filteredAnimals = filterAnimals(
@@ -73,6 +79,7 @@ class ShelterProfileViewModel @Inject constructor(
                 }
             }
         }
+        refreshShelterProfile(showRefreshIndicator = false)
     }
 
     fun onQueryChange(query: String) {
@@ -129,6 +136,45 @@ class ShelterProfileViewModel @Inject constructor(
                 ),
             )
         }
+    }
+
+    fun refreshShelterProfile() {
+        refreshShelterProfile(showRefreshIndicator = true)
+    }
+
+    private fun refreshShelterProfile(showRefreshIndicator: Boolean) {
+        val shelterId = currentShelterId ?: return
+        if (_uiState.value.isRefreshing) return
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isRefreshing = showRefreshIndicator, refreshError = null) }
+            try {
+                awaitDataRefresh { onSuccess, onFailure ->
+                    shelterRepository.refreshShelterById(
+                        shelterId,
+                        { onSuccess() },
+                        { exception -> onFailure(exception) },
+                    )
+                }
+                awaitDataRefresh { onSuccess, onFailure ->
+                    animalRepository.refreshAnimalsByShelter(
+                        shelterId,
+                        { onSuccess() },
+                        { exception -> onFailure(exception) },
+                    )
+                }
+            } catch (exception: Exception) {
+                _uiState.update { it.copy(refreshError = exception.toDataRefreshError()) }
+            } finally {
+                if (showRefreshIndicator) {
+                    _uiState.update { it.copy(isRefreshing = false) }
+                }
+            }
+        }
+    }
+
+    fun dismissRefreshError() {
+        _uiState.update { it.copy(refreshError = null) }
     }
 
     private fun ShelterProfileUiState.filteredWith(

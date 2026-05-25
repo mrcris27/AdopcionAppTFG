@@ -40,6 +40,7 @@ fun ShelterMainNavHost(
                         launchSingleTop = true
                     }
                 },
+                onDeleted = { navController.popBackStack() },
             )
         }
         composable<ShelterEditPetRoute> { backStackEntry ->
@@ -48,6 +49,7 @@ fun ShelterMainNavHost(
                 animalId = route.animalId,
                 onBackClick = { navController.popBackStack() },
                 onSaved = { navController.popBackStack() },
+                onDeleted = { navController.popBackStack() },
             )
         }
         composable<ShelterSettingsTabRoute> {
