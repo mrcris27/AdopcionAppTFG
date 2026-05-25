@@ -10,6 +10,9 @@
     <string name="all">All</string>
     <string name="clear_filters">Clear filters</string>
     <string name="apply_filters">Apply filters</string>
+    <string name="adoption_status">Adoption status</string>
+    <string name="available_for_adoption">Available</string>
+    <string name="not_available_for_adoption">Not available</string>
     <string name="no_animal_results">No animals match your search.</string>
 
     <string name="i_am_user">I am a user</string>
@@ -51,6 +54,7 @@
     <string name="registration_invalid_phone_error">Enter a valid 9-digit phone number, with optional +34 prefix.</string>
     <string name="registration_password_min_length_error">The password must be at least 6 characters long.</string>
     <string name="registration_passwords_do_not_match_error">The passwords do not match.</string>
+    <string name="registration_invalid_google_forms_url_error">Enter a valid Google Forms link.</string>
 
     <string name="animal_registration">Register animal</string>
     <string name="basic_details">Basic details</string>
@@ -194,6 +198,7 @@
     <string name="tax_id_format">CIF: %1$s</string>
     <string name="no_phone_app_available">No phone app is available.</string>
     <string name="no_email_app_available">No email app is available.</string>
+    <string name="no_browser_app_available">No browser app is available.</string>
     <string name="available_animals">Available animals</string>
     <string name="no_available_animals">There are no animals available.</string>
     <string name="shelter_no_available_animals">There are no available animals in this shelter.</string>

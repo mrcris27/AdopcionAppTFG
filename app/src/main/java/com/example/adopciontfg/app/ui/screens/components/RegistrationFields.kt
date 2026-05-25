@@ -61,6 +61,7 @@ fun RegistrationTextField(
     keyboardType: KeyboardType = KeyboardType.Text,
     capitalization: KeyboardCapitalization = KeyboardCapitalization.None,
     errorMessage: String? = null,
+    placeholder: String? = null,
 ) {
     AppFilledTextField(
         value = value,
@@ -73,6 +74,7 @@ fun RegistrationTextField(
             keyboardType = keyboardType,
             capitalization = capitalization,
         ),
+        placeholder = placeholder?.let { { Text(it) } },
         supportingText = errorMessage?.let {
             {
                 Text(

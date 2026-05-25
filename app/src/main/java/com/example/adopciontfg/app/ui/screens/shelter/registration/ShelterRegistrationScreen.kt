@@ -56,6 +56,7 @@ fun ShelterRegistration(
         address: String,
         profilePhotoUri: String,
         email: String,
+        adoptionFormUrl: String,
         password: String
     ) -> Unit,
     onBackClick: () -> Unit,
@@ -150,6 +151,34 @@ fun ShelterRegistration(
                     )
                 }
 
+                AppFormSection(title = stringResource(R.string.adoptions)) {
+                    Text(
+                        text = stringResource(R.string.adoption_form_description),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    RegistrationTextField(
+                        value = uiState.value.adoptionFormUrl,
+                        onValueChange = viewModel::onAdoptionFormUrlChange,
+                        label = stringResource(R.string.google_forms_link),
+                        keyboardType = KeyboardType.Uri,
+                        errorMessage = if (uiState.value.isAdoptionFormUrlInvalid) {
+                            stringResource(R.string.registration_invalid_google_forms_url_error)
+                        } else {
+                            null
+                        },
+                        placeholder = stringResource(R.string.google_forms_placeholder)
+                    )
+                }
+
+                AppFormSection(title = stringResource(R.string.public_image)) {
+                    ProfilePhotoPicker(
+                        photoUri = uiState.value.profilePhotoUri,
+                        onPhotoChange = viewModel::onProfilePhotoChange,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
                 AppFormSection(title = stringResource(R.string.access)) {
                     RegistrationPasswordField(
                         value = uiState.value.password,
@@ -177,14 +206,6 @@ fun ShelterRegistration(
                     )
                 }
 
-                AppFormSection(title = stringResource(R.string.public_image)) {
-                    ProfilePhotoPicker(
-                        photoUri = uiState.value.profilePhotoUri,
-                        onPhotoChange = viewModel::onProfilePhotoChange,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-
                 AppSecondaryButton(
                     text = stringResource(R.string.register),
                     onClick = {
@@ -196,6 +217,7 @@ fun ShelterRegistration(
                                 address.trim(),
                                 profilePhotoUri,
                                 email.trim(),
+                                adoptionFormUrl.trim(),
                                 password
                             )
                         }
@@ -268,7 +290,7 @@ private fun ShelterProvinceDropdown(
 fun ShelterRegistrationPreview() {
     AdoptionTheme {
         ShelterRegistration(
-            onRegisterClick = { _, _, _, _, _, _, _ -> },
+            onRegisterClick = { _, _, _, _, _, _, _, _ -> },
             onBackClick = {},
             viewModel = ShelterRegistrationViewModel()
         )

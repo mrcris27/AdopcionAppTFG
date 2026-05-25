@@ -5,6 +5,7 @@ import com.example.adopciontfg.data.util.ShelterAddressParts
 import com.example.adopciontfg.data.util.buildShelterAddress
 import com.example.adopciontfg.app.ui.validation.doPasswordsMatch
 import com.example.adopciontfg.app.ui.validation.isValidEmail
+import com.example.adopciontfg.app.ui.validation.isValidGoogleFormsUrl
 import com.example.adopciontfg.app.ui.validation.isValidRegistrationPassword
 import com.example.adopciontfg.app.ui.validation.isValidSpanishPhone
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,6 +27,7 @@ data class ShelterRegistrationUiState(
     val province: String = "",
     val email: String = "",
     val profilePhotoUri: String = "",
+    val adoptionFormUrl: String = "",
     val password: String = "",
     val confirmPassword: String = "",
     val passwordHidden: Boolean = true,
@@ -40,6 +42,9 @@ data class ShelterRegistrationUiState(
 
     val isPasswordInvalid: Boolean
         get() = password.isNotBlank() && !isValidRegistrationPassword(password)
+
+    val isAdoptionFormUrlInvalid: Boolean
+        get() = adoptionFormUrl.isNotBlank() && !isValidGoogleFormsUrl(adoptionFormUrl)
 
     val doPasswordsNotMatch: Boolean
         get() = confirmPassword.isNotBlank() && !doPasswordsMatch(password, confirmPassword)
@@ -61,6 +66,7 @@ class ShelterRegistrationViewModel @Inject constructor() : ViewModel() {
     fun onProvinceChange(province: String) = updateAddress { it.copy(province = province) }
     fun onEmailChange(email: String) = updateForm { it.copy(email = email) }
     fun onProfilePhotoChange(value: String) = _uiState.update { it.copy(profilePhotoUri = value) }
+    fun onAdoptionFormUrlChange(value: String) = updateForm { it.copy(adoptionFormUrl = value) }
     fun onPasswordChange(password: String) = updateForm { it.copy(password = password) }
     fun onConfirmPasswordChange(confirmPassword: String) =
         updateForm { it.copy(confirmPassword = confirmPassword) }
@@ -110,6 +116,7 @@ class ShelterRegistrationViewModel @Inject constructor() : ViewModel() {
             state.city.isNotBlank() &&
             state.province.isNotBlank() &&
             isValidEmail(state.email) &&
+            isValidGoogleFormsUrl(state.adoptionFormUrl) &&
             isValidRegistrationPassword(state.password) &&
             doPasswordsMatch(state.password, state.confirmPassword)
     }

@@ -14,6 +14,7 @@ fun NavGraphBuilder.shelterRegistrationScreen(
         address: String,
         profilePhotoUri: String,
         email: String,
+        adoptionFormUrl: String,
         password: String
     ) -> Unit,
     onBackClick: () -> Unit,

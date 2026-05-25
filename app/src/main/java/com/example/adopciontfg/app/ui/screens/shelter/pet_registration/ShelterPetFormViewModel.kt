@@ -4,11 +4,9 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
-import com.example.adopciontfg.BuildConfig
 import com.example.adopciontfg.R
 import com.example.adopciontfg.data.local.entity.AnimalEntity
 import com.example.adopciontfg.data.repository.AnimalRepository
-import com.example.adopciontfg.data.sampleAnimals
 import com.example.adopciontfg.model.Characteristic
 import com.example.adopciontfg.model.Species
 import com.google.firebase.auth.FirebaseAuth
@@ -104,7 +102,7 @@ class ShelterPetFormViewModel @Inject constructor(
     private fun loadAnimalFromRepo(id: String) {
         viewModelScope.launch {
             animalRepository.getAnimalById(id).asFlow().collect { entity ->
-                val animal = entity ?: debugSampleAnimal(id) ?: return@collect
+                val animal = entity ?: return@collect
                 loadAnimalIntoState(animal)
             }
         }
@@ -127,11 +125,6 @@ class ShelterPetFormViewModel @Inject constructor(
                 selectedCharacteristics = entity.characteristics.orEmpty().toSet(),
             ).markCurrentDataSaved()
         }
-    }
-
-    private fun debugSampleAnimal(id: String): AnimalEntity? {
-        if (!BuildConfig.DEBUG) return null
-        return sampleAnimals.firstOrNull { it.id == id }
     }
 
     fun onNameChange(value: String) = _uiState.update { it.copy(name = value) }

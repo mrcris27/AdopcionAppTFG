@@ -39,18 +39,25 @@ private fun PetDetailRouteContent(
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val formMissingMessage = stringResource(R.string.adoption_form_not_configured)
+    val noBrowserMessage = stringResource(R.string.no_browser_app_available)
 
     LaunchedEffect(petId) {
         viewModel.loadAnimal(petId)
     }
 
-    val onAdoptClick = {
+    val onAdoptClick: () -> Unit = {
         val url = uiState.adoptionFormUrl.trim()
         if (url.isBlank()) {
             Toast.makeText(context, formMissingMessage, Toast.LENGTH_LONG).show()
         } else {
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-            context.startActivity(intent)
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+                addCategory(Intent.CATEGORY_BROWSABLE)
+            }
+            runCatching {
+                context.startActivity(intent)
+            }.onFailure {
+                Toast.makeText(context, noBrowserMessage, Toast.LENGTH_LONG).show()
+            }
         }
     }
 
@@ -70,6 +77,7 @@ private fun PetDetailRouteContent(
             animal = animal,
             onBackClick = onBackClick,
             onAdoptClick = onAdoptClick,
+            isAdoptActionEnabled = !uiState.isAdoptionFormLoading,
             isRefreshing = uiState.isRefreshing,
             refreshError = uiState.refreshError,
             onRefresh = viewModel::refreshAnimal,

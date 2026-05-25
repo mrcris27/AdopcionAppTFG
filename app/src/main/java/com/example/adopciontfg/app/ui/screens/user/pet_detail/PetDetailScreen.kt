@@ -85,6 +85,7 @@ fun PetDetailScreen(
     animal: AnimalEntity?,
     onBackClick: () -> Unit,
     onAdoptClick: () -> Unit,
+    isAdoptActionEnabled: Boolean = true,
     isLoading: Boolean = false,
     isRefreshing: Boolean = false,
     refreshError: DataRefreshError? = null,
@@ -160,13 +161,15 @@ fun PetDetailScreen(
                                 AppSecondaryButton(
                                     text = stringResource(R.string.adopt_now),
                                     onClick = onAdoptClick,
+                                    enabled = isAdoptActionEnabled,
                                     modifier = Modifier.weight(1f)
                                 )
                             }
                             AppOutlinedButton(
                                 text = stringResource(R.string.donate),
                                 onClick = { showDonationDialog = true },
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(1f),
+                                contentColor = MaterialTheme.colorScheme.secondary,
                             )
                         }
                     }

@@ -1,5 +1,6 @@
 package com.example.adopciontfg.app.ui.screens.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,6 +31,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -166,6 +168,8 @@ fun AppOutlinedButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    contentColor: Color = MaterialTheme.colorScheme.primary,
+    borderColor: Color = contentColor,
 ) {
     OutlinedButton(
         onClick = onClick,
@@ -173,6 +177,10 @@ fun AppOutlinedButton(
             .fillMaxWidth()
             .height(Dimens.buttonHeight),
         shape = MaterialTheme.shapes.large,
+        colors = ButtonDefaults.outlinedButtonColors(
+            contentColor = contentColor,
+        ),
+        border = BorderStroke(1.dp, borderColor),
     ) {
         Text(text = text, style = MaterialTheme.typography.labelLarge)
     }

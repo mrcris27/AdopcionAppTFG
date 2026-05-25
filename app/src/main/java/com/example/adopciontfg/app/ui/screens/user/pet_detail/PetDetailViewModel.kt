@@ -11,15 +11,18 @@ import com.example.adopciontfg.data.repository.AnimalRepository
 import com.example.adopciontfg.data.repository.ShelterRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 data class PetDetailUiState(
     val animal: AnimalEntity? = null,
     val adoptionFormUrl: String = "",
+    val isAdoptionFormLoading: Boolean = false,
     val isLoading: Boolean = true,
     val isRefreshing: Boolean = false,
     val refreshError: DataRefreshError? = null,
@@ -33,26 +36,43 @@ class PetDetailViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(PetDetailUiState())
     val uiState: StateFlow<PetDetailUiState> = _uiState.asStateFlow()
     private var currentAnimalId: String? = null
+    private var shelterObservationJob: Job? = null
 
     fun loadAnimal(animalId: String) {
         currentAnimalId = animalId
         viewModelScope.launch {
-            animalRepository.getAnimalById(animalId).asFlow().collect { animal ->
+            animalRepository.getAnimalById(animalId).asFlow().collectLatest { animal ->
                 _uiState.update {
                     it.copy(
                         animal = animal,
                         isLoading = false,
+                        adoptionFormUrl = "",
                     )
                 }
-                val shelterId = animal?.shelterId ?: return@collect
-                shelterRepository.getShelterById(shelterId).asFlow().collect { shelter ->
-                    _uiState.update { state ->
-                        state.copy(adoptionFormUrl = shelter?.adoptionFormUrl.orEmpty())
-                    }
-                }
+                observeShelterAdoptionForm(animal?.shelterId)
             }
         }
         refreshAnimal(showRefreshIndicator = false)
+    }
+
+    private fun observeShelterAdoptionForm(shelterId: String?) {
+        shelterObservationJob?.cancel()
+        if (shelterId.isNullOrBlank()) {
+            _uiState.update { it.copy(isAdoptionFormLoading = false) }
+            return
+        }
+
+        shelterObservationJob = viewModelScope.launch {
+            _uiState.update { it.copy(isAdoptionFormLoading = true) }
+            shelterRepository.getShelterById(shelterId).asFlow().collectLatest { shelter ->
+                _uiState.update { state ->
+                    state.copy(
+                        adoptionFormUrl = shelter?.adoptionFormUrl.orEmpty(),
+                        isAdoptionFormLoading = false,
+                    )
+                }
+            }
+        }
     }
 
     fun refreshAnimal() {

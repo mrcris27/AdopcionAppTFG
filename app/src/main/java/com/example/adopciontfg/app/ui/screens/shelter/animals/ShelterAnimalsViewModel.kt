@@ -3,14 +3,14 @@ package com.example.adopciontfg.app.ui.screens.shelter.animals
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
-import com.example.adopciontfg.BuildConfig
 import com.example.adopciontfg.app.ui.state.DataRefreshError
 import com.example.adopciontfg.app.ui.state.awaitDataRefresh
 import com.example.adopciontfg.app.ui.state.toDataRefreshError
 import com.example.adopciontfg.data.local.entity.AnimalEntity
 import com.example.adopciontfg.data.repository.AnimalRepository
-import com.example.adopciontfg.data.sampleAnimals
 import com.example.adopciontfg.domain.settings.SettingsRepository
+import com.example.adopciontfg.model.Characteristic
+import com.example.adopciontfg.model.Species
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -29,9 +29,27 @@ data class ShelterAnimalsUiState(
     val isRefreshing: Boolean = false,
     val refreshError: DataRefreshError? = null,
     val query: String = "",
+    val selectedSpecies: Species? = null,
+    val selectedSex: Boolean? = null,
+    val selectedAdoptionStatus: ShelterAnimalAdoptionStatus? = null,
+    val selectedCharacteristics: Set<Characteristic> = emptySet(),
     val animals: List<AnimalEntity> = emptyList(),
     val filteredAnimals: List<AnimalEntity> = emptyList(),
-)
+) {
+    val hasActiveFilters: Boolean
+        get() = selectedSpecies != null ||
+            selectedSex != null ||
+            selectedAdoptionStatus != null ||
+            selectedCharacteristics.isNotEmpty()
+
+    val isFiltering: Boolean
+        get() = query.isNotBlank() || hasActiveFilters
+}
+
+enum class ShelterAnimalAdoptionStatus {
+    AVAILABLE,
+    NOT_AVAILABLE,
+}
 
 @HiltViewModel
 class ShelterAnimalsViewModel @Inject constructor(
@@ -43,10 +61,8 @@ class ShelterAnimalsViewModel @Inject constructor(
     val uiState: StateFlow<ShelterAnimalsUiState> = _uiState.asStateFlow()
 
     init {
-        val shelterId = auth.currentUser?.uid ?: DEBUG_SAMPLE_SHELTER_ID.takeIf { BuildConfig.DEBUG }
-        val shelterName = auth.currentUser?.displayName.orEmpty().ifBlank {
-            if (BuildConfig.DEBUG) DEBUG_SAMPLE_SHELTER_NAME else ""
-        }
+        val shelterId = auth.currentUser?.uid
+        val shelterName = auth.currentUser?.displayName.orEmpty()
         _uiState.update { it.copy(shelterId = shelterId, shelterName = shelterName) }
 
         viewModelScope.launch {
@@ -58,11 +74,9 @@ class ShelterAnimalsViewModel @Inject constructor(
         if (shelterId != null) {
             viewModelScope.launch {
                 animalRepository.getAnimalsByShelter(shelterId).asFlow().collect { loaded ->
-                    val animals = loaded.orEmpty().ifEmpty {
-                        debugSampleAnimalsFor(shelterId)
-                    }
+                    val animals = loaded.orEmpty()
                     _uiState.update { state ->
-                        val filtered = applyFilters(animals, state.query)
+                        val filtered = state.filteredWith(animals = animals)
                         state.copy(
                             isLoading = false,
                             animals = animals,
@@ -81,20 +95,68 @@ class ShelterAnimalsViewModel @Inject constructor(
         _uiState.update { state ->
             state.copy(
                 query = query,
-                filteredAnimals = applyFilters(state.animals, query),
+                filteredAnimals = state.filteredWith(query = query),
             )
         }
     }
 
-    private fun applyFilters(
-        animals: List<AnimalEntity>,
-        query: String,
-    ): List<AnimalEntity> {
-        return animals
-            .filter { animal ->
-                query.isBlank() || animal.name.orEmpty().contains(query, ignoreCase = true)
+    fun onSpeciesFilterChange(species: Species?) {
+        _uiState.update { state ->
+            state.copy(
+                selectedSpecies = species,
+                filteredAnimals = state.filteredWith(selectedSpecies = species),
+            )
+        }
+    }
+
+    fun onSexFilterChange(sex: Boolean?) {
+        _uiState.update { state ->
+            state.copy(
+                selectedSex = sex,
+                filteredAnimals = state.filteredWith(selectedSex = sex),
+            )
+        }
+    }
+
+    fun onAdoptionStatusFilterChange(status: ShelterAnimalAdoptionStatus?) {
+        _uiState.update { state ->
+            state.copy(
+                selectedAdoptionStatus = status,
+                filteredAnimals = state.filteredWith(selectedAdoptionStatus = status),
+            )
+        }
+    }
+
+    fun onCharacteristicToggle(characteristic: Characteristic) {
+        _uiState.update { state ->
+            val selectedCharacteristics = if (characteristic in state.selectedCharacteristics) {
+                state.selectedCharacteristics - characteristic
+            } else {
+                state.selectedCharacteristics + characteristic
             }
-            .sortedBy { it.name.orEmpty() }
+
+            state.copy(
+                selectedCharacteristics = selectedCharacteristics,
+                filteredAnimals = state.filteredWith(selectedCharacteristics = selectedCharacteristics),
+            )
+        }
+    }
+
+    fun clearFilters() {
+        _uiState.update { state ->
+            state.copy(
+                selectedSpecies = null,
+                selectedSex = null,
+                selectedAdoptionStatus = null,
+                selectedCharacteristics = emptySet(),
+                filteredAnimals = state.filteredWith(
+                    selectedSpecies = null,
+                    selectedSex = null,
+                    selectedAdoptionStatus = null,
+                    selectedCharacteristics = emptySet(),
+                ),
+            )
+        }
     }
 
     fun refreshAnimals() {
@@ -129,31 +191,34 @@ class ShelterAnimalsViewModel @Inject constructor(
         _uiState.update { it.copy(refreshError = null) }
     }
 
-    private fun debugSampleAnimalsFor(shelterId: String): List<AnimalEntity> {
-        if (!BuildConfig.DEBUG) return emptyList()
+    private fun ShelterAnimalsUiState.filteredWith(
+        animals: List<AnimalEntity> = this.animals,
+        query: String = this.query,
+        selectedSpecies: Species? = this.selectedSpecies,
+        selectedSex: Boolean? = this.selectedSex,
+        selectedAdoptionStatus: ShelterAnimalAdoptionStatus? = this.selectedAdoptionStatus,
+        selectedCharacteristics: Set<Characteristic> = this.selectedCharacteristics,
+    ): List<AnimalEntity> {
+        return animals
+            .filter { animal ->
+                val matchesQuery = query.isBlank() ||
+                    animal.name.orEmpty().contains(query, ignoreCase = true)
+                val matchesSpecies = selectedSpecies == null || animal.species == selectedSpecies
+                val matchesSex = selectedSex == null || animal.isSex == selectedSex
+                val matchesAdoptionStatus = when (selectedAdoptionStatus) {
+                    ShelterAnimalAdoptionStatus.AVAILABLE -> animal.isForAdoption
+                    ShelterAnimalAdoptionStatus.NOT_AVAILABLE -> !animal.isForAdoption
+                    null -> true
+                }
+                val matchesCharacteristics = selectedCharacteristics.isEmpty() ||
+                    animal.characteristics.orEmpty().containsAll(selectedCharacteristics)
 
-        return sampleAnimals
-            .filter { it.shelterId == DEBUG_SAMPLE_SHELTER_ID }
-            .map { animal -> animal.withShelterId(shelterId) }
-    }
-
-    private fun AnimalEntity.withShelterId(shelterId: String): AnimalEntity {
-        return AnimalEntity(
-            id,
-            name,
-            isSex,
-            mainPhoto,
-            photos,
-            birthDate,
-            description,
-            species,
-            characteristics,
-            shelterId,
-        )
-    }
-
-    private companion object {
-        const val DEBUG_SAMPLE_SHELTER_ID = "1"
-        const val DEBUG_SAMPLE_SHELTER_NAME = "Protectora de prueba"
+                matchesQuery &&
+                    matchesSpecies &&
+                    matchesSex &&
+                    matchesAdoptionStatus &&
+                    matchesCharacteristics
+            }
+            .sortedBy { it.name.orEmpty() }
     }
 }

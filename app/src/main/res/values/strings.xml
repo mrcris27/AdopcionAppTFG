@@ -9,6 +9,9 @@
     <string name="all">Todos</string>
     <string name="clear_filters">Limpiar filtros</string>
     <string name="apply_filters">Aplicar filtros</string>
+    <string name="adoption_status">Estado de adopción</string>
+    <string name="available_for_adoption">Disponibles</string>
+    <string name="not_available_for_adoption">No disponibles</string>
     <string name="no_animal_results">No hay animales que coincidan con tu búsqueda.</string>
 
     <!--  Botones   -->
@@ -51,6 +54,7 @@
     <string name="registration_invalid_phone_error">Introduce un teléfono válido de 9 cifras, con prefijo +34 opcional.</string>
     <string name="registration_password_min_length_error">La contraseña debe tener al menos 6 caracteres.</string>
     <string name="registration_passwords_do_not_match_error">Las contraseñas no coinciden.</string>
+    <string name="registration_invalid_google_forms_url_error">Introduce un enlace válido de Google Forms.</string>
 
     <string name="animal_registration">Registrar animal</string>
     <string name="basic_details">Datos básicos</string>
@@ -194,6 +198,7 @@
     <string name="tax_id_format">CIF: %1$s</string>
     <string name="no_phone_app_available">No hay ninguna app de teléfono disponible.</string>
     <string name="no_email_app_available">No hay ninguna app de correo disponible.</string>
+    <string name="no_browser_app_available">No hay ningún navegador disponible.</string>
     <string name="available_animals">Animales disponibles</string>
     <string name="no_available_animals">No hay animales disponibles.</string>
     <string name="shelter_no_available_animals">No hay animales disponibles en esta protectora.</string>

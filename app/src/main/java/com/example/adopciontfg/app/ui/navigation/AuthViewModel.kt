@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.adopciontfg.R
 import com.example.adopciontfg.data.local.entity.ShelterEntity
 import com.example.adopciontfg.data.local.entity.UserEntity
@@ -11,10 +12,14 @@ import com.example.adopciontfg.data.remote.FirebaseService
 import com.example.adopciontfg.data.remote.RoleCallback
 import com.example.adopciontfg.data.repository.ShelterRepository
 import com.example.adopciontfg.data.repository.UserRepository
+import com.example.adopciontfg.data.settings.SettingsRepositoryImpl
+import com.example.adopciontfg.data.settings.settingsDataStore
+import com.example.adopciontfg.domain.settings.ShelterSettingsData
 import com.google.firebase.auth.FirebaseAuthException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 // los dos puntos significan que hereda de una clase
 class AuthViewModel (application: Application) : AndroidViewModel(application) {
@@ -22,6 +27,7 @@ class AuthViewModel (application: Application) : AndroidViewModel(application) {
     private val firebase = FirebaseService.getInstance()
     private val userRepos = UserRepository(application)
     private val shelterRepos = ShelterRepository(application)
+    private val settingsRepository = SettingsRepositoryImpl(application.settingsDataStore, application)
 
     // instancia de la sealed class AuthState
     private val _authState = MutableStateFlow<AuthState>(AuthState.Idle)
@@ -108,7 +114,16 @@ class AuthViewModel (application: Application) : AndroidViewModel(application) {
     }
 
 
-    fun registerShelter(name: String, cif : String, phoneName : String, address: String ,profilePic:String, email: String, password: String){
+    fun registerShelter(
+        name: String,
+        cif: String,
+        phoneName: String,
+        address: String,
+        profilePic: String,
+        email: String,
+        adoptionFormUrl: String,
+        password: String
+    ) {
         _authState.value = AuthState.Loading
 
         //Se registra el usuario en Firebase Auth
@@ -121,13 +136,62 @@ class AuthViewModel (application: Application) : AndroidViewModel(application) {
                     return@register
                 }
                 // La foto se copia al almacenamiento interno desde el repositorio.
-                shelterRepos.saveShelter(ShelterEntity(uid, name, cif, profilePic, email,address, phoneName ))
-                _authState.value = AuthState.Success("shelter")
+                shelterRepos.saveShelter(
+                    ShelterEntity(
+                        uid,
+                        name,
+                        cif,
+                        profilePic,
+                        email,
+                        address,
+                        phoneName,
+                        adoptionFormUrl
+                    )
+                )
+                saveRegisteredShelterSettings(
+                    name = name,
+                    cif = cif,
+                    phone = phoneName,
+                    address = address,
+                    profilePic = profilePic,
+                    email = email,
+                    adoptionFormUrl = adoptionFormUrl
+                )
             },
             { exception ->
                 _authState.value = AuthState.Error(getRegisterErrorMessage(exception))
             }
         )
+    }
+
+    private fun saveRegisteredShelterSettings(
+        name: String,
+        cif: String,
+        phone: String,
+        address: String,
+        profilePic: String,
+        email: String,
+        adoptionFormUrl: String
+    ) {
+        viewModelScope.launch {
+            try {
+                settingsRepository.saveShelterSettings(
+                    ShelterSettingsData(
+                        shelterName = name,
+                        email = email,
+                        phone = phone,
+                        address = address,
+                        cif = cif,
+                        profilePhotoUri = profilePic,
+                        adoptionFormUrl = adoptionFormUrl,
+                    )
+                )
+            } catch (_: Exception) {
+                // El registro ya está creado en Firebase; un fallo local no debe bloquear el acceso.
+            } finally {
+                _authState.value = AuthState.Success("shelter")
+            }
+        }
     }
 
 

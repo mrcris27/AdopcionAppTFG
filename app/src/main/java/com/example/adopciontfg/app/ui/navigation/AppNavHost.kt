@@ -152,7 +152,7 @@ fun AppNavHost(navController: NavHostController) {
             )
 
             shelterRegistrationScreen(
-                onRegisterClick = { name, cif, phone, address, profilePhotoUri, email, password ->
+                onRegisterClick = { name, cif, phone, address, profilePhotoUri, email, adoptionFormUrl, password ->
                     authViewModel.registerShelter(
                         name = name,
                         cif = cif,
@@ -160,6 +160,7 @@ fun AppNavHost(navController: NavHostController) {
                         address = address,
                         profilePic = profilePhotoUri,
                         email = email,
+                        adoptionFormUrl = adoptionFormUrl,
                         password = password
                     )
                 },
