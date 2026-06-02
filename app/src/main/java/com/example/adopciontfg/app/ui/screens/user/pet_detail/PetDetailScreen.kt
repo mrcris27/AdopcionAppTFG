@@ -4,9 +4,11 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,6 +22,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Photo
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
@@ -47,6 +50,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
@@ -55,6 +59,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.example.adopciontfg.R
 import com.example.adopciontfg.app.ui.components.skeleton.PetDetailBottomBarSkeleton
 import com.example.adopciontfg.app.ui.components.skeleton.PetDetailContentSkeleton
@@ -240,9 +246,9 @@ fun PetDetailScreen(
                                     for (characteristic in animal.characteristics) {
                                         characteristicLabels += characteristicLabel(characteristic)
                                     }
-                                    InfoRow(
-                                        stringResource(R.string.characteristics),
-                                        characteristicLabels.joinToString(", ")
+                                    CharacteristicsInfo(
+                                        label = stringResource(R.string.characteristics),
+                                        characteristics = characteristicLabels,
                                     )
                                 }
                                 Spacer(modifier = Modifier.height(Dimens.spacingXs))
@@ -347,6 +353,15 @@ private fun DonationDialog(
 
 @Composable
 private fun PetPhotosCarousel(photos: List<String>) {
+    var selectedPhotoUri by remember { mutableStateOf<String?>(null) }
+
+    selectedPhotoUri?.let { photoUri ->
+        PetPhotoDialog(
+            photoUri = photoUri,
+            onDismiss = { selectedPhotoUri = null }
+        )
+    }
+
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(Dimens.spacingSm)
@@ -376,7 +391,10 @@ private fun PetPhotosCarousel(photos: List<String>) {
                 contentPadding = PaddingValues(vertical = Dimens.spacingXs)
             ) {
                 itemsIndexed(photos, key = { index, _ -> index }) { _, photo ->
-                    PetPhotoItem(photoUri = photo)
+                    PetPhotoItem(
+                        photoUri = photo,
+                        onClick = { selectedPhotoUri = photo }
+                    )
                 }
             }
         }
@@ -384,7 +402,10 @@ private fun PetPhotosCarousel(photos: List<String>) {
 }
 
 @Composable
-private fun PetPhotoItem(photoUri: String) {
+private fun PetPhotoItem(
+    photoUri: String,
+    onClick: () -> Unit,
+) {
     val imageBitmap by rememberPetPhotoBitmap(photoUri)
 
     Box(
@@ -392,6 +413,7 @@ private fun PetPhotoItem(photoUri: String) {
             .width(280.dp)
             .height(200.dp)
             .clip(MaterialTheme.shapes.large)
+            .clickable(onClick = onClick)
             .background(MaterialTheme.colorScheme.surfaceVariant),
         contentAlignment = Alignment.Center
     ) {
@@ -408,6 +430,58 @@ private fun PetPhotoItem(photoUri: String) {
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
+        }
+    }
+}
+
+@Composable
+private fun PetPhotoDialog(
+    photoUri: String,
+    onDismiss: () -> Unit,
+) {
+    val imageBitmap by rememberPetPhotoBitmap(photoUri)
+
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.92f))
+                .padding(Dimens.spacingMd),
+            contentAlignment = Alignment.Center
+        ) {
+            if (imageBitmap != null) {
+                Image(
+                    bitmap = imageBitmap!!,
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Fit
+                )
+            } else {
+                Icon(
+                    imageVector = Icons.Default.Photo,
+                    contentDescription = null,
+                    tint = Color.White
+                )
+            }
+
+            IconButton(
+                onClick = onDismiss,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .background(
+                        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f),
+                        shape = MaterialTheme.shapes.large
+                    )
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = stringResource(R.string.close),
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
+            }
         }
     }
 }
@@ -447,6 +521,46 @@ private fun InfoRow(label: String, value: String) {
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface
         )
+    }
+}
+
+@Composable
+private fun CharacteristicsInfo(
+    label: String,
+    characteristics: List<String>,
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(Dimens.spacingSm)
+    ) {
+        Text(
+            text = label,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = MaterialTheme.typography.bodyMedium
+        )
+        FlowRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(Dimens.spacingSm),
+            verticalArrangement = Arrangement.spacedBy(Dimens.spacingSm),
+        ) {
+            characteristics.forEach { characteristic ->
+                Surface(
+                    color = MaterialTheme.colorScheme.surfaceVariant,
+                    shape = MaterialTheme.shapes.medium
+                ) {
+                    Text(
+                        text = characteristic,
+                        modifier = Modifier.padding(
+                            horizontal = Dimens.spacingSm,
+                            vertical = Dimens.spacingXs
+                        ),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+            }
+        }
     }
 }
 

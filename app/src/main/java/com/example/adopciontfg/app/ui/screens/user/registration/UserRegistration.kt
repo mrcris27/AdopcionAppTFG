@@ -71,18 +71,21 @@ fun UserRegistration(
                     RegistrationTextField(
                         value = uiState.value.name,
                         onValueChange = viewModel::onNameChange,
-                        label = stringResource(R.string.name)
+                        label = stringResource(R.string.name),
+                        required = true
                     )
                     RegistrationTextField(
                         value = uiState.value.surname,
                         onValueChange = viewModel::onSurnameChange,
-                        label = stringResource(R.string.surnames)
+                        label = stringResource(R.string.surnames),
+                        required = true
                     )
                     RegistrationTextField(
                         value = uiState.value.email,
                         onValueChange = viewModel::onEmailChange,
                         label = stringResource(R.string.email),
                         keyboardType = KeyboardType.Email,
+                        required = true,
                         errorMessage = if (uiState.value.isEmailInvalid) {
                             stringResource(R.string.login_invalid_email_error)
                         } else {
@@ -94,7 +97,8 @@ fun UserRegistration(
                         onValueChange = viewModel::onBiographyChange,
                         label = stringResource(R.string.biography),
                         singleLine = false,
-                        minLines = 3
+                        minLines = 3,
+                        required = true
                     )
                 }
 
@@ -113,6 +117,7 @@ fun UserRegistration(
                         label = stringResource(R.string.password),
                         hidden = uiState.value.passwordHidden,
                         onToggleVisibility = viewModel::togglePasswordVisibility,
+                        required = true,
                         errorMessage = if (uiState.value.isPasswordInvalid) {
                             stringResource(R.string.registration_password_min_length_error)
                         } else {
@@ -125,6 +130,7 @@ fun UserRegistration(
                         label = stringResource(R.string.repeat_password),
                         hidden = uiState.value.confirmPasswordHidden,
                         onToggleVisibility = viewModel::toggleConfirmPasswordVisibility,
+                        required = true,
                         errorMessage = if (uiState.value.doPasswordsNotMatch) {
                             stringResource(R.string.registration_passwords_do_not_match_error)
                         } else {

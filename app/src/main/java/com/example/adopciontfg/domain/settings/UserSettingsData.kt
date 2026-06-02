@@ -6,6 +6,5 @@ data class UserSettingsData(
     val email: String = "",
     val biography: String = "",
     val profilePhotoUri: String = "",
-    val notificationsEnabled: Boolean = true,
     val darkModeEnabled: Boolean = false
 )

@@ -12,7 +12,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material.icons.outlined.Campaign
 import androidx.compose.material.icons.outlined.Palette
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenuItem
@@ -41,6 +40,7 @@ import com.example.adopciontfg.app.ui.screens.components.AppOutlinedButton
 import com.example.adopciontfg.app.ui.screens.components.AppPrimaryButton
 import com.example.adopciontfg.app.ui.screens.components.AppTopAppBar
 import com.example.adopciontfg.app.ui.screens.components.ProfilePhotoPicker
+import com.example.adopciontfg.app.ui.screens.components.RequiredFieldLabel
 import com.example.adopciontfg.app.ui.screens.components.SavingOverlay
 import com.example.adopciontfg.ui.theme.Dimens
 import androidx.compose.runtime.Composable
@@ -96,7 +96,6 @@ fun ShelterSettingsScreen(
         onProvinceChange = viewModel::onProvinceChange,
         onCifChange = viewModel::onCifChange,
         onAdoptionFormUrlChange = viewModel::onAdoptionFormUrlChange,
-        onAdoptionAlertsChange = viewModel::onAdoptionAlertsChange,
         onDarkModeChange = viewModel::onDarkModeChange,
         onCurrentPasswordChange = viewModel::onCurrentPasswordChange,
         onNewPasswordChange = viewModel::onNewPasswordChange,
@@ -129,7 +128,6 @@ private fun ShelterSettingsContent(
     onProvinceChange: (String) -> Unit,
     onCifChange: (String) -> Unit,
     onAdoptionFormUrlChange: (String) -> Unit,
-    onAdoptionAlertsChange: (Boolean) -> Unit,
     onDarkModeChange: (Boolean) -> Unit,
     onCurrentPasswordChange: (String) -> Unit,
     onNewPasswordChange: (String) -> Unit,
@@ -185,18 +183,29 @@ private fun ShelterSettingsContent(
                     AppFilledTextField(
                         value = uiState.shelterName,
                         onValueChange = onShelterNameChange,
-                        label = { Text(stringResource(R.string.shelter_name)) }
+                        label = { RequiredFieldLabel(stringResource(R.string.shelter_name)) }
                     )
                     AppFilledTextField(
                         value = uiState.email,
                         onValueChange = onEmailChange,
-                        label = { Text(stringResource(R.string.email)) },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+                        label = { RequiredFieldLabel(stringResource(R.string.email)) },
+                        isError = uiState.isEmailInvalid,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                        supportingText = if (uiState.isEmailInvalid) {
+                            {
+                                Text(
+                                    text = stringResource(R.string.login_invalid_email_error),
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            }
+                        } else {
+                            null
+                        }
                     )
                     AppFilledTextField(
                         value = uiState.phone,
                         onValueChange = onPhoneChange,
-                        label = { Text(stringResource(R.string.phone)) },
+                        label = { RequiredFieldLabel(stringResource(R.string.phone)) },
                         isError = uiState.isPhoneInvalid,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                         supportingText = if (uiState.isPhoneInvalid) {
@@ -213,7 +222,7 @@ private fun ShelterSettingsContent(
                     AppFilledTextField(
                         value = uiState.cif,
                         onValueChange = onCifChange,
-                        label = { Text(stringResource(R.string.tax_id)) }
+                        label = { RequiredFieldLabel(stringResource(R.string.tax_id)) }
                     )
                 }
 
@@ -221,25 +230,36 @@ private fun ShelterSettingsContent(
                     AppFilledTextField(
                         value = uiState.street,
                         onValueChange = onStreetChange,
-                        label = { Text(stringResource(R.string.street)) },
+                        label = { RequiredFieldLabel(stringResource(R.string.street)) },
                         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words)
                     )
                     AppFilledTextField(
                         value = uiState.streetNumber,
                         onValueChange = onStreetNumberChange,
-                        label = { Text(stringResource(R.string.street_number)) },
+                        label = { RequiredFieldLabel(stringResource(R.string.street_number)) },
                         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Characters)
                     )
                     AppFilledTextField(
                         value = uiState.postalCode,
                         onValueChange = onPostalCodeChange,
-                        label = { Text(stringResource(R.string.postal_code)) },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                        label = { RequiredFieldLabel(stringResource(R.string.postal_code)) },
+                        isError = uiState.isPostalCodeInvalid,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        supportingText = if (uiState.isPostalCodeInvalid) {
+                            {
+                                Text(
+                                    text = stringResource(R.string.registration_invalid_postal_code_error),
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            }
+                        } else {
+                            null
+                        }
                     )
                     AppFilledTextField(
                         value = uiState.city,
                         onValueChange = onCityChange,
-                        label = { Text(stringResource(R.string.town_city)) },
+                        label = { RequiredFieldLabel(stringResource(R.string.town_city)) },
                         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words)
                     )
                     ShelterSettingsProvinceDropdown(
@@ -258,18 +278,24 @@ private fun ShelterSettingsContent(
                     AppFilledTextField(
                         value = uiState.adoptionFormUrl,
                         onValueChange = onAdoptionFormUrlChange,
-                        label = { Text(stringResource(R.string.google_forms_link)) },
-                        placeholder = { Text(stringResource(R.string.google_forms_placeholder)) }
+                        label = { RequiredFieldLabel(stringResource(R.string.google_forms_link)) },
+                        isError = uiState.isAdoptionFormUrlInvalid,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
+                        placeholder = { Text(stringResource(R.string.google_forms_placeholder)) },
+                        supportingText = if (uiState.isAdoptionFormUrlInvalid) {
+                            {
+                                Text(
+                                    text = stringResource(R.string.registration_invalid_google_forms_url_error),
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            }
+                        } else {
+                            null
+                        }
                     )
                 }
 
                 AppFormSection(title = stringResource(R.string.preferences)) {
-                    SwitchRow(
-                        text = stringResource(R.string.adoption_alerts),
-                        icon = { Icon(Icons.Outlined.Campaign, contentDescription = null) },
-                        checked = uiState.adoptionAlertsEnabled,
-                        onCheckedChange = onAdoptionAlertsChange
-                    )
                     SwitchRow(
                         text = stringResource(R.string.dark_mode),
                         icon = { Icon(Icons.Outlined.Palette, contentDescription = null) },
@@ -328,7 +354,7 @@ private fun ShelterSettingsProvinceDropdown(
             value = selectedProvince,
             onValueChange = {},
             readOnly = true,
-            label = { Text(stringResource(R.string.province)) },
+            label = { RequiredFieldLabel(stringResource(R.string.province)) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier
                 .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true)
@@ -378,7 +404,6 @@ private fun ShelterSettingsScreenPreview() {
             onProvinceChange = {},
             onCifChange = {},
             onAdoptionFormUrlChange = {},
-            onAdoptionAlertsChange = {},
             onDarkModeChange = {},
             onCurrentPasswordChange = {},
             onNewPasswordChange = {},
@@ -494,7 +519,7 @@ private fun PasswordField(
     AppFilledTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(label) },
+        label = { RequiredFieldLabel(label) },
         singleLine = true,
         visualTransformation = if (hidden) {
             PasswordVisualTransformation()

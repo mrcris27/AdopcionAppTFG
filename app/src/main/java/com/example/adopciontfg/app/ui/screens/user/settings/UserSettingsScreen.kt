@@ -12,7 +12,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Palette
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -34,6 +33,7 @@ import com.example.adopciontfg.app.ui.screens.components.AppOutlinedButton
 import com.example.adopciontfg.app.ui.screens.components.AppPrimaryButton
 import com.example.adopciontfg.app.ui.screens.components.AppTopAppBar
 import com.example.adopciontfg.app.ui.screens.components.ProfilePhotoPicker
+import com.example.adopciontfg.app.ui.screens.components.RequiredFieldLabel
 import com.example.adopciontfg.app.ui.screens.components.SavingOverlay
 import com.example.adopciontfg.ui.theme.Dimens
 import androidx.compose.runtime.Composable
@@ -76,7 +76,6 @@ fun UserSettingsScreen(
         onSurnameChange = viewModel::onSurnameChange,
         onEmailChange = viewModel::onEmailChange,
         onBiographyChange = viewModel::onBiographyChange,
-        onNotificationsChange = viewModel::onNotificationsChange,
         onDarkModeChange = viewModel::onDarkModeChange,
         onCurrentPasswordChange = viewModel::onCurrentPasswordChange,
         onNewPasswordChange = viewModel::onNewPasswordChange,
@@ -102,7 +101,6 @@ private fun UserSettingsContent(
     onSurnameChange: (String) -> Unit,
     onEmailChange: (String) -> Unit,
     onBiographyChange: (String) -> Unit,
-    onNotificationsChange: (Boolean) -> Unit,
     onDarkModeChange: (Boolean) -> Unit,
     onCurrentPasswordChange: (String) -> Unit,
     onNewPasswordChange: (String) -> Unit,
@@ -157,35 +155,40 @@ private fun UserSettingsContent(
                     AppFilledTextField(
                         value = uiState.name,
                         onValueChange = onNameChange,
-                        label = { Text(stringResource(R.string.name)) }
+                        label = { RequiredFieldLabel(stringResource(R.string.name)) }
                     )
                     AppFilledTextField(
                         value = uiState.surname,
                         onValueChange = onSurnameChange,
-                        label = { Text(stringResource(R.string.surnames)) }
+                        label = { RequiredFieldLabel(stringResource(R.string.surnames)) }
                     )
                     AppFilledTextField(
                         value = uiState.email,
                         onValueChange = onEmailChange,
-                        label = { Text(stringResource(R.string.email)) },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+                        label = { RequiredFieldLabel(stringResource(R.string.email)) },
+                        isError = uiState.isEmailInvalid,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                        supportingText = if (uiState.isEmailInvalid) {
+                            {
+                                Text(
+                                    text = stringResource(R.string.login_invalid_email_error),
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            }
+                        } else {
+                            null
+                        }
                     )
                     AppFilledTextField(
                         value = uiState.biography,
                         onValueChange = onBiographyChange,
-                        label = { Text(stringResource(R.string.biography)) },
+                        label = { RequiredFieldLabel(stringResource(R.string.biography)) },
                         singleLine = false,
                         minLines = 3
                     )
                 }
 
                 AppFormSection(title = stringResource(R.string.preferences)) {
-                    SettingsSwitchRow(
-                        text = stringResource(R.string.notifications),
-                        icon = { Icon(Icons.Outlined.Notifications, contentDescription = null) },
-                        checked = uiState.notificationsEnabled,
-                        onCheckedChange = onNotificationsChange
-                    )
                     SettingsSwitchRow(
                         text = stringResource(R.string.dark_mode),
                         icon = { Icon(Icons.Outlined.Palette, contentDescription = null) },
@@ -239,7 +242,6 @@ private fun UserSettingsScreenPreview() {
             onSurnameChange = {},
             onEmailChange = {},
             onBiographyChange = {},
-            onNotificationsChange = {},
             onDarkModeChange = {},
             onCurrentPasswordChange = {},
             onNewPasswordChange = {},
@@ -358,7 +360,7 @@ private fun PasswordField(
     AppFilledTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(label) },
+        label = { RequiredFieldLabel(label) },
         singleLine = true,
         visualTransformation = if (hidden) {
             PasswordVisualTransformation()

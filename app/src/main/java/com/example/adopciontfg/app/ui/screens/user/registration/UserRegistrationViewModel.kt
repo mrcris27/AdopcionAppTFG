@@ -64,6 +64,7 @@ class UserRegistrationViewModel @Inject constructor() : ViewModel() {
     private fun validate(state: UserRegistrationUiState): Boolean {
         return state.name.isNotBlank() &&
             state.surname.isNotBlank() &&
+            state.biography.isNotBlank() &&
             isValidEmail(state.email) &&
             isValidRegistrationPassword(state.password) &&
             doPasswordsMatch(state.password, state.confirmPassword)

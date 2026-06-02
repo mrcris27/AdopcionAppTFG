@@ -17,10 +17,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.example.adopciontfg.ui.theme.Dimens
 import com.example.adopciontfg.ui.theme.elevatedSurface
@@ -62,11 +65,12 @@ fun RegistrationTextField(
     capitalization: KeyboardCapitalization = KeyboardCapitalization.None,
     errorMessage: String? = null,
     placeholder: String? = null,
+    required: Boolean = false,
 ) {
     AppFilledTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(label) },
+        label = { FieldLabel(text = label, required = required) },
         isError = errorMessage != null,
         singleLine = singleLine,
         minLines = minLines,
@@ -94,11 +98,12 @@ fun RegistrationPasswordField(
     hidden: Boolean,
     onToggleVisibility: () -> Unit,
     errorMessage: String? = null,
+    required: Boolean = false,
 ) {
     AppFilledTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(label) },
+        label = { FieldLabel(text = label, required = required) },
         isError = errorMessage != null,
         visualTransformation = if (hidden) {
             PasswordVisualTransformation()
@@ -123,5 +128,31 @@ fun RegistrationPasswordField(
                 )
             }
         },
+    )
+}
+
+@Composable
+fun RequiredFieldLabel(text: String) {
+    FieldLabel(text = text, required = true)
+}
+
+@Composable
+private fun FieldLabel(
+    text: String,
+    required: Boolean,
+) {
+    if (!required) {
+        Text(text)
+        return
+    }
+
+    Text(
+        buildAnnotatedString {
+            append(text)
+            append(" ")
+            withStyle(SpanStyle(color = MaterialTheme.colorScheme.error)) {
+                append("*")
+            }
+        }
     )
 }

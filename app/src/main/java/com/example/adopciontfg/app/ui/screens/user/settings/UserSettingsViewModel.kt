@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import com.example.adopciontfg.R
+import com.example.adopciontfg.app.ui.validation.isValidEmail
 import com.example.adopciontfg.data.local.entity.UserEntity
 import com.example.adopciontfg.data.repository.UserRepository
 import com.example.adopciontfg.domain.settings.SettingsRepository
@@ -29,7 +30,6 @@ data class UserSettingsUiState(
     val email: String = "",
     val biography: String = "",
     val profilePhotoUri: String = "",
-    val notificationsEnabled: Boolean = true,
     val darkModeEnabled: Boolean = false,
     val currentPassword: String = "",
     val newPassword: String = "",
@@ -48,8 +48,20 @@ data class UserSettingsUiState(
     val hasUnsavedChanges: Boolean
         get() = savedSettings?.let { toSettingsData() != it } ?: false
 
+    val hasRequiredProfileFields: Boolean
+        get() = name.isNotBlank() &&
+            surname.isNotBlank() &&
+            email.isNotBlank() &&
+            biography.isNotBlank()
+
+    val isEmailInvalid: Boolean
+        get() = email.isNotBlank() && !isValidEmail(email)
+
     val canSaveSettings: Boolean
-        get() = hasUnsavedChanges && !isSavingSettings
+        get() = hasUnsavedChanges &&
+            !isSavingSettings &&
+            hasRequiredProfileFields &&
+            !isEmailInvalid
 
     fun toSettingsData(): UserSettingsData {
         return UserSettingsData(
@@ -58,7 +70,6 @@ data class UserSettingsUiState(
             email = email,
             biography = biography,
             profilePhotoUri = profilePhotoUri,
-            notificationsEnabled = notificationsEnabled,
             darkModeEnabled = darkModeEnabled
         )
     }
@@ -87,7 +98,6 @@ class UserSettingsViewModel @Inject constructor(
                     email = data.email.ifBlank { firebaseUser?.email.orEmpty() },
                     biography = data.biography,
                     profilePhotoUri = data.profilePhotoUri,
-                    notificationsEnabled = data.notificationsEnabled,
                     darkModeEnabled = data.darkModeEnabled
                 )
                 _uiState.update { current ->
@@ -97,7 +107,6 @@ class UserSettingsViewModel @Inject constructor(
                         email = loadedSettings.email,
                         biography = loadedSettings.biography,
                         profilePhotoUri = loadedSettings.profilePhotoUri,
-                        notificationsEnabled = loadedSettings.notificationsEnabled,
                         darkModeEnabled = loadedSettings.darkModeEnabled,
                         savedSettings = loadedSettings
                     )
@@ -133,8 +142,6 @@ class UserSettingsViewModel @Inject constructor(
     fun onCurrentPasswordChange(value: String) = _uiState.update { it.copy(currentPassword = value) }
     fun onNewPasswordChange(value: String) = _uiState.update { it.copy(newPassword = value) }
     fun onConfirmNewPasswordChange(value: String) = _uiState.update { it.copy(confirmNewPassword = value) }
-    
-    fun onNotificationsChange(enabled: Boolean) = _uiState.update { it.copy(notificationsEnabled = enabled) }
 
     fun toggleCurrentPasswordVisibility() {
         _uiState.update { it.copy(currentPasswordHidden = !it.currentPasswordHidden) }

@@ -41,6 +41,7 @@ import com.example.adopciontfg.app.ui.screens.components.AppTopAppBar
 import com.example.adopciontfg.app.ui.screens.components.ProfilePhotoPicker
 import com.example.adopciontfg.app.ui.screens.components.RegistrationPasswordField
 import com.example.adopciontfg.app.ui.screens.components.RegistrationTextField
+import com.example.adopciontfg.app.ui.screens.components.RequiredFieldLabel
 import com.example.adopciontfg.app.ui.screens.components.SavingOverlay
 import com.example.adopciontfg.ui.theme.AdoptionTheme
 import com.example.adopciontfg.ui.theme.Dimens
@@ -88,18 +89,21 @@ fun ShelterRegistration(
                     RegistrationTextField(
                         value = uiState.value.name,
                         onValueChange = viewModel::onNameChange,
-                        label = stringResource(R.string.name)
+                        label = stringResource(R.string.name),
+                        required = true
                     )
                     RegistrationTextField(
                         value = uiState.value.cif,
                         onValueChange = viewModel::onCifChange,
-                        label = stringResource(R.string.tax_id)
+                        label = stringResource(R.string.tax_id),
+                        required = true
                     )
                     RegistrationTextField(
                         value = uiState.value.phone,
                         onValueChange = viewModel::onPhoneChange,
                         label = stringResource(R.string.phone),
                         keyboardType = KeyboardType.Phone,
+                        required = true,
                         errorMessage = if (uiState.value.isPhoneInvalid) {
                             stringResource(R.string.registration_invalid_phone_error)
                         } else {
@@ -111,6 +115,7 @@ fun ShelterRegistration(
                         onValueChange = viewModel::onEmailChange,
                         label = stringResource(R.string.email),
                         keyboardType = KeyboardType.Email,
+                        required = true,
                         errorMessage = if (uiState.value.isEmailInvalid) {
                             stringResource(R.string.login_invalid_email_error)
                         } else {
@@ -124,25 +129,34 @@ fun ShelterRegistration(
                         value = uiState.value.street,
                         onValueChange = viewModel::onStreetChange,
                         label = stringResource(R.string.street),
-                        capitalization = KeyboardCapitalization.Words
+                        capitalization = KeyboardCapitalization.Words,
+                        required = true
                     )
                     RegistrationTextField(
                         value = uiState.value.streetNumber,
                         onValueChange = viewModel::onStreetNumberChange,
                         label = stringResource(R.string.street_number),
-                        capitalization = KeyboardCapitalization.Characters
+                        capitalization = KeyboardCapitalization.Characters,
+                        required = true
                     )
                     RegistrationTextField(
                         value = uiState.value.postalCode,
                         onValueChange = viewModel::onPostalCodeChange,
                         label = stringResource(R.string.postal_code),
-                        keyboardType = KeyboardType.Number
+                        keyboardType = KeyboardType.Number,
+                        required = true,
+                        errorMessage = if (uiState.value.isPostalCodeInvalid) {
+                            stringResource(R.string.registration_invalid_postal_code_error)
+                        } else {
+                            null
+                        }
                     )
                     RegistrationTextField(
                         value = uiState.value.city,
                         onValueChange = viewModel::onCityChange,
                         label = stringResource(R.string.town_city),
-                        capitalization = KeyboardCapitalization.Words
+                        capitalization = KeyboardCapitalization.Words,
+                        required = true
                     )
                     ShelterProvinceDropdown(
                         selectedProvince = uiState.value.province,
@@ -162,6 +176,7 @@ fun ShelterRegistration(
                         onValueChange = viewModel::onAdoptionFormUrlChange,
                         label = stringResource(R.string.google_forms_link),
                         keyboardType = KeyboardType.Uri,
+                        required = true,
                         errorMessage = if (uiState.value.isAdoptionFormUrlInvalid) {
                             stringResource(R.string.registration_invalid_google_forms_url_error)
                         } else {
@@ -186,6 +201,7 @@ fun ShelterRegistration(
                         label = stringResource(R.string.password),
                         hidden = uiState.value.passwordHidden,
                         onToggleVisibility = viewModel::togglePasswordVisibility,
+                        required = true,
                         errorMessage = if (uiState.value.isPasswordInvalid) {
                             stringResource(R.string.registration_password_min_length_error)
                         } else {
@@ -198,6 +214,7 @@ fun ShelterRegistration(
                         label = stringResource(R.string.repeat_password),
                         hidden = uiState.value.confirmPasswordHidden,
                         onToggleVisibility = viewModel::toggleConfirmPasswordVisibility,
+                        required = true,
                         errorMessage = if (uiState.value.doPasswordsNotMatch) {
                             stringResource(R.string.registration_passwords_do_not_match_error)
                         } else {
@@ -252,7 +269,7 @@ private fun ShelterProvinceDropdown(
             value = selectedProvince,
             onValueChange = {},
             readOnly = true,
-            label = { Text(stringResource(R.string.province)) },
+            label = { RequiredFieldLabel(stringResource(R.string.province)) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier
                 .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true)

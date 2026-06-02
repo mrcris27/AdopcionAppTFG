@@ -40,6 +40,9 @@ data class ShelterRegistrationUiState(
     val isPhoneInvalid: Boolean
         get() = phone.isNotBlank() && !isValidSpanishPhone(phone)
 
+    val isPostalCodeInvalid: Boolean
+        get() = postalCode.isNotBlank() && (postalCode.length != 5 || postalCode.any { !it.isDigit() })
+
     val isPasswordInvalid: Boolean
         get() = password.isNotBlank() && !isValidRegistrationPassword(password)
 

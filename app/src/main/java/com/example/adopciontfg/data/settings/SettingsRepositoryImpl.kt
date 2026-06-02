@@ -34,7 +34,6 @@ class SettingsRepositoryImpl @Inject constructor(
                     email = prefs[USER_EMAIL] ?: "",
                     biography = prefs[USER_BIOGRAPHY] ?: "",
                     profilePhotoUri = prefs[USER_PROFILE_PHOTO_URI] ?: "",
-                    notificationsEnabled = prefs[USER_NOTIFICATIONS] ?: true,
                     darkModeEnabled = prefs[USER_DARK_MODE] ?: false
                 )
             }
@@ -47,7 +46,6 @@ class SettingsRepositoryImpl @Inject constructor(
             prefs[USER_EMAIL] = data.email
             prefs[USER_BIOGRAPHY] = data.biography
             prefs[USER_PROFILE_PHOTO_URI] = data.profilePhotoUri
-            prefs[USER_NOTIFICATIONS] = data.notificationsEnabled
             prefs[USER_DARK_MODE] = data.darkModeEnabled
         }
         LaunchThemeController.applyApplicationNightMode(context, data.darkModeEnabled)
@@ -67,7 +65,6 @@ class SettingsRepositoryImpl @Inject constructor(
                     cif = prefs[SHELTER_CIF] ?: "",
                     profilePhotoUri = prefs[SHELTER_PROFILE_PHOTO_URI] ?: "",
                     adoptionFormUrl = prefs[SHELTER_ADOPTION_FORM_URL] ?: "",
-                    adoptionAlertsEnabled = prefs[SHELTER_ADOPTION_ALERTS] ?: true,
                     darkModeEnabled = prefs[SHELTER_DARK_MODE] ?: false
                 )
             }
@@ -82,7 +79,6 @@ class SettingsRepositoryImpl @Inject constructor(
             prefs[SHELTER_CIF] = data.cif
             prefs[SHELTER_PROFILE_PHOTO_URI] = data.profilePhotoUri
             prefs[SHELTER_ADOPTION_FORM_URL] = data.adoptionFormUrl
-            prefs[SHELTER_ADOPTION_ALERTS] = data.adoptionAlertsEnabled
             prefs[SHELTER_DARK_MODE] = data.darkModeEnabled
         }
         LaunchThemeController.applyApplicationNightMode(context, data.darkModeEnabled)
@@ -94,7 +90,6 @@ class SettingsRepositoryImpl @Inject constructor(
         val USER_EMAIL = stringPreferencesKey("user_email")
         val USER_BIOGRAPHY = stringPreferencesKey("user_biography")
         val USER_PROFILE_PHOTO_URI = stringPreferencesKey("user_profile_photo_uri")
-        val USER_NOTIFICATIONS = booleanPreferencesKey("user_notifications")
         val USER_DARK_MODE = booleanPreferencesKey("user_dark_mode")
 
         val SHELTER_NAME = stringPreferencesKey("shelter_name")
@@ -104,7 +99,6 @@ class SettingsRepositoryImpl @Inject constructor(
         val SHELTER_CIF = stringPreferencesKey("shelter_cif")
         val SHELTER_PROFILE_PHOTO_URI = stringPreferencesKey("shelter_profile_photo_uri")
         val SHELTER_ADOPTION_FORM_URL = stringPreferencesKey("shelter_adoption_form_url")
-        val SHELTER_ADOPTION_ALERTS = booleanPreferencesKey("shelter_adoption_alerts")
         val SHELTER_DARK_MODE = booleanPreferencesKey("shelter_dark_mode")
     }
 }

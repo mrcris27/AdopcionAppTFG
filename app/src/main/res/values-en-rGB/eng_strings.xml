@@ -55,6 +55,7 @@
     <string name="registration_password_min_length_error">The password must be at least 6 characters long.</string>
     <string name="registration_passwords_do_not_match_error">The passwords do not match.</string>
     <string name="registration_invalid_google_forms_url_error">Enter a valid Google Forms link.</string>
+    <string name="registration_invalid_postal_code_error">Enter a valid 5-digit postal code.</string>
 
     <string name="animal_registration">Register animal</string>
     <string name="basic_details">Basic details</string>
@@ -112,7 +113,6 @@
     <string name="preferences">Preferences</string>
     <string name="security">Security</string>
     <string name="city">City</string>
-    <string name="notifications">Notifications</string>
     <string name="dark_mode">Dark mode</string>
     <string name="update_password_from_form">Update your password from a private form.</string>
     <string name="change_password">Change password</string>
@@ -131,10 +131,9 @@
     <string name="adoption_form_description">Users will fill out this form when they request to adopt an animal.</string>
     <string name="google_forms_link">Google Forms link</string>
     <string name="google_forms_placeholder">https://forms.gle/…</string>
-    <string name="adoption_alerts">Adoption alerts</string>
     <string name="settings_hub_desc">Select the profile type to edit its preferences.</string>
     <string name="settings_user_subtitle">Profile, contact, and app preferences</string>
-    <string name="settings_shelter_subtitle">Organization details and adoption alerts</string>
+    <string name="settings_shelter_subtitle">Organization details and adoption form</string>
     <string name="shelters">Shelters</string>
     <string name="list">List</string>
     <string name="map">Map</string>

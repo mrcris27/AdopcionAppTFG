@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import com.example.adopciontfg.R
+import com.example.adopciontfg.app.ui.validation.isValidEmail
+import com.example.adopciontfg.app.ui.validation.isValidGoogleFormsUrl
 import com.example.adopciontfg.app.ui.validation.isValidSpanishPhone
 import com.example.adopciontfg.data.local.entity.ShelterEntity
 import com.example.adopciontfg.data.repository.ShelterRepository
@@ -38,7 +40,6 @@ data class ShelterSettingsUiState(
     val cif: String = "",
     val profilePhotoUri: String = "",
     val adoptionFormUrl: String = "",
-    val adoptionAlertsEnabled: Boolean = true,
     val darkModeEnabled: Boolean = false,
     val currentPassword: String = "",
     val newPassword: String = "",
@@ -57,10 +58,37 @@ data class ShelterSettingsUiState(
         get() = savedSettings?.let { toSettingsData() != it } ?: false
 
     val canSaveSettings: Boolean
-        get() = hasUnsavedChanges && !isSavingSettings && !isPhoneInvalid
+        get() = hasUnsavedChanges &&
+            !isSavingSettings &&
+            hasRequiredFields &&
+            !isEmailInvalid &&
+            !isPhoneInvalid &&
+            !isPostalCodeInvalid &&
+            !isAdoptionFormUrlInvalid
 
     val isPhoneInvalid: Boolean
         get() = phone.isNotBlank() && !isValidSpanishPhone(phone)
+
+    val isEmailInvalid: Boolean
+        get() = email.isNotBlank() && !isValidEmail(email)
+
+    val isPostalCodeInvalid: Boolean
+        get() = postalCode.isNotBlank() && (postalCode.length != 5 || postalCode.any { !it.isDigit() })
+
+    val isAdoptionFormUrlInvalid: Boolean
+        get() = adoptionFormUrl.isNotBlank() && !isValidGoogleFormsUrl(adoptionFormUrl)
+
+    private val hasRequiredFields: Boolean
+        get() = shelterName.isNotBlank() &&
+            email.isNotBlank() &&
+            phone.isNotBlank() &&
+            street.isNotBlank() &&
+            streetNumber.isNotBlank() &&
+            postalCode.isNotBlank() &&
+            city.isNotBlank() &&
+            province.isNotBlank() &&
+            cif.isNotBlank() &&
+            adoptionFormUrl.isNotBlank()
 
     fun toSettingsData(): ShelterSettingsData {
         return ShelterSettingsData(
@@ -71,7 +99,6 @@ data class ShelterSettingsUiState(
             cif = cif,
             profilePhotoUri = profilePhotoUri,
             adoptionFormUrl = adoptionFormUrl,
-            adoptionAlertsEnabled = adoptionAlertsEnabled,
             darkModeEnabled = darkModeEnabled
         )
     }
@@ -99,7 +126,6 @@ class ShelterSettingsViewModel @Inject constructor(
                     cif = data.cif,
                     profilePhotoUri = data.profilePhotoUri,
                     adoptionFormUrl = data.adoptionFormUrl,
-                    adoptionAlertsEnabled = data.adoptionAlertsEnabled,
                     darkModeEnabled = data.darkModeEnabled
                 )
                 _uiState.update { current ->
@@ -116,7 +142,6 @@ class ShelterSettingsViewModel @Inject constructor(
                         cif = loadedSettings.cif,
                         profilePhotoUri = loadedSettings.profilePhotoUri,
                         adoptionFormUrl = loadedSettings.adoptionFormUrl,
-                        adoptionAlertsEnabled = loadedSettings.adoptionAlertsEnabled,
                         darkModeEnabled = loadedSettings.darkModeEnabled,
                         savedSettings = loadedSettings
                     )
@@ -129,11 +154,17 @@ class ShelterSettingsViewModel @Inject constructor(
                 shelterRepository.getShelterById(shelterId).asFlow().collectLatest { shelter ->
                     if (shelter != null) {
                         _uiState.update { current ->
+                            val addressParts = parseShelterAddress(shelter.address.orEmpty())
                             val updated = current.copy(
                                 shelterName = shelter.name.orEmpty(),
                                 email = shelter.email.orEmpty(),
                                 phone = shelter.phone.orEmpty(),
                                 address = shelter.address.orEmpty(),
+                                street = addressParts.street,
+                                streetNumber = addressParts.streetNumber,
+                                postalCode = addressParts.postalCode,
+                                city = addressParts.city,
+                                province = addressParts.province,
                                 cif = shelter.cif.orEmpty(),
                                 profilePhotoUri = shelter.profilePicture.orEmpty(),
                                 adoptionFormUrl = shelter.adoptionFormUrl.orEmpty(),
@@ -161,8 +192,6 @@ class ShelterSettingsViewModel @Inject constructor(
     fun onCurrentPasswordChange(value: String) = _uiState.update { it.copy(currentPassword = value) }
     fun onNewPasswordChange(value: String) = _uiState.update { it.copy(newPassword = value) }
     fun onConfirmNewPasswordChange(value: String) = _uiState.update { it.copy(confirmNewPassword = value) }
-    
-    fun onAdoptionAlertsChange(enabled: Boolean) = _uiState.update { it.copy(adoptionAlertsEnabled = enabled) }
 
     fun toggleCurrentPasswordVisibility() {
         _uiState.update { it.copy(currentPasswordHidden = !it.currentPasswordHidden) }
